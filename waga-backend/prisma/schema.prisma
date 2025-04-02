@@ -1,0 +1,419 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int                @id @default(autoincrement())
+  email                String             @unique
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  firstName            String?
+  isActive             Boolean            @default(true)
+  isEmailVerified      Boolean            @default(false)
+  lastLoginAt          DateTime?
+  lastName             String?
+  passwordHash         String?
+  resetPasswordExpires DateTime?
+  resetPasswordToken   String?
+  verificationToken    String?
+  walletAddress        String?
+  role                 UserRole           @default(STUDENT)
+  auditLogs            AuditLog[]
+  campRegistrations    CampRegistration[]
+  courses              Course[]           @relation("InstructorCourses")
+  enrollments          Enrollment[]
+  organizedEvents      Event[]
+  posts                ForumPost[]
+  authoredTopics       ForumTopic[]       @relation("AuthorRelation")
+  lastPostTopics       ForumTopic[]       @relation("LastPostUserRelation")
+  notifications        Notification[]
+  profile              Profile?
+  resources            Resource[]
+  sessions             Session[]
+  settings             Settings?
+  waitlists            Waitlist[]
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  token        String   @unique
+  expiresAt    DateTime
+  ipAddress    String
+  userAgent    String
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime
+  isRevoked    Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Profile {
+  id          Int               @id @default(autoincrement())
+  userId      Int               @unique
+  bio         String?
+  avatarUrl   String?
+  jobTitle    String?
+  company     String?
+  location    String?
+  website     String?
+  socialLinks Json
+  skills      String[]
+  interests   String[]
+  education   Json
+  experience  Json
+  visibility  ProfileVisibility @default(PUBLIC)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User              @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id                     Int          @id @default(autoincrement())
+  title                  String
+  description            String
+  instructorId           Int
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  autoEnrollFromWaitlist Boolean      @default(false)
+  averageRating          Float        @default(0)
+  category               String?
+  duration               Int?
+  enrollmentCount        Int          @default(0)
+  featured               Boolean      @default(false)
+  hasWaitlist            Boolean      @default(false)
+  level                  CourseLevel?
+  maxEnrollments         Int?
+  maxWaitlistSize        Int?
+  modules                Json?
+  objectives             String[]
+  prerequisites          String[]
+  price                  Float?
+  publishedAt            DateTime?
+  shortDescription       String?
+  slug                   String?
+  status                 CourseStatus @default(DRAFT)
+  tags                   String[]
+  thumbnailUrl           String?
+  waitlistCount          Int          @default(0)
+  waitlistEnabled        Boolean      @default(false)
+  instructor             User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  enrollments            Enrollment[]
+  waitlists              Waitlist[]
+}
+
+model Enrollment {
+  id             Int              @id @default(autoincrement())
+  userId         Int
+  courseId       Int
+  enrolledAt     DateTime         @default(now())
+  certificateId  String?
+  completedAt    DateTime?
+  lastAccessedAt DateTime?
+  moduleProgress Json?
+  progress       Float            @default(0)
+  status         EnrollmentStatus @default(ACTIVE)
+  course         Course           @relation(fields: [courseId], references: [id])
+  user           User             @relation(fields: [userId], references: [id])
+}
+
+model Waitlist {
+  id                    Int            @id @default(autoincrement())
+  courseId              Int
+  userId                Int?
+  email                 String?
+  walletAddress         String?
+  position              Int
+  joinedAt              DateTime       @default(now())
+  status                WaitlistStatus @default(ACTIVE)
+  notificationSent      Boolean        @default(false)
+  notificationSentAt    DateTime?
+  convertedToEnrollment Boolean        @default(false)
+  convertedAt           DateTime?
+  notes                 String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  course                Course         @relation(fields: [courseId], references: [id])
+  user                  User?          @relation(fields: [userId], references: [id])
+}
+
+model Resource {
+  id            Int                @id @default(autoincrement())
+  title         String
+  description   String
+  type          ResourceType
+  category      String
+  tags          String[]
+  url           String
+  thumbnailUrl  String?
+  fileSize      Int?
+  fileType      String?
+  authorId      Int
+  visibility    ResourceVisibility @default(PUBLIC)
+  downloadCount Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  author        User               @relation(fields: [authorId], references: [id])
+}
+
+model Event {
+  id                   Int         @id @default(autoincrement())
+  title                String
+  description          String
+  startDate            DateTime
+  endDate              DateTime
+  location             Json
+  type                 EventType
+  category             String
+  tags                 String[]
+  imageUrl             String?
+  organizerId          Int
+  capacity             Int?
+  registrationDeadline DateTime?
+  registrationCount    Int         @default(0)
+  status               EventStatus @default(UPCOMING)
+  isPublic             Boolean     @default(true)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  organizer            User        @relation(fields: [organizerId], references: [id])
+}
+
+model ForumCategory {
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String
+  slug           String       @unique
+  order          Int
+  topicCount     Int          @default(0)
+  lastActivityAt DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  topics         ForumTopic[]
+}
+
+model ForumTopic {
+  id             Int           @id @default(autoincrement())
+  categoryId     Int
+  title          String
+  slug           String        @unique
+  authorId       Int
+  content        String
+  isPinned       Boolean       @default(false)
+  isLocked       Boolean       @default(false)
+  viewCount      Int           @default(0)
+  postCount      Int           @default(0)
+  lastPostAt     DateTime?
+  lastPostUserId Int?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  posts          ForumPost[]
+  author         User          @relation("AuthorRelation", fields: [authorId], references: [id])
+  category       ForumCategory @relation(fields: [categoryId], references: [id])
+  lastPostUser   User?         @relation("LastPostUserRelation", fields: [lastPostUserId], references: [id])
+}
+
+model ForumPost {
+  id        Int         @id @default(autoincrement())
+  topicId   Int
+  authorId  Int
+  content   String
+  parentId  Int?
+  isEdited  Boolean     @default(false)
+  editedAt  DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  author    User        @relation(fields: [authorId], references: [id])
+  parent    ForumPost?  @relation("ParentPost", fields: [parentId], references: [id])
+  replies   ForumPost[] @relation("ParentPost")
+  topic     ForumTopic  @relation(fields: [topicId], references: [id])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json?
+  link      String?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+}
+
+model Settings {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  notifications Json
+  privacy       Json
+  theme         String
+  language      String
+  timezone      String
+  updatedAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  action     String
+  entityType String
+  entityId   String?
+  ipAddress  String
+  userAgent  String
+  oldValues  Json?
+  newValues  Json?
+  metadata   Json?
+  timestamp  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model SummerCamp {
+  id                   Int                @id @default(autoincrement())
+  name                 String
+  description          String
+  startDate            DateTime
+  endDate              DateTime
+  location             String
+  capacity             Int
+  ageRange             Json
+  price                Float
+  earlyBirdPrice       Float?
+  earlyBirdDeadline    DateTime?
+  registrationDeadline DateTime
+  status               CampStatus         @default(UPCOMING)
+  activities           String[]
+  staff                Json
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  registrations        CampRegistration[] @relation("CampToRegistrations") // Add relation name
+}
+
+model CampRegistration {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  campId       Int
+  firstName    String
+  lastName     String
+  email        String
+  phone        String
+  role         String
+  expertise    String
+  availability String
+  motivation   String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         User       @relation(fields: [userId], references: [id])
+  camp         SummerCamp @relation("CampToRegistrations", fields: [campId], references: [id]) // Add opposite relation
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  COMMUNITY
+  PRIVATE
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+  EXPIRED
+}
+
+enum WaitlistStatus {
+  ACTIVE
+  INVITED
+  ENROLLED
+  EXPIRED
+  DECLINED
+}
+
+enum ResourceType {
+  PDF
+  VIDEO
+  LINK
+  IMAGE
+  AUDIO
+  DOCUMENT
+  OTHER
+}
+
+enum ResourceVisibility {
+  PUBLIC
+  REGISTERED
+  PREMIUM
+}
+
+enum EventType {
+  WEBINAR
+  WORKSHOP
+  CONFERENCE
+  MEETUP
+  COURSE
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum LocationType {
+  PHYSICAL
+  VIRTUAL
+  HYBRID
+}
+
+enum NotificationType {
+  COURSE
+  FORUM
+  EVENT
+  SYSTEM
+  ACHIEVEMENT
+  WAITLIST
+}
+
+enum CampStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+}

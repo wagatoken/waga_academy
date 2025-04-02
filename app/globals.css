@@ -1,0 +1,942 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark Mode - Darkened */
+    --background: 222 47% 15%; /* Darkened from 18% to 15% */
+    --foreground: 210 40% 98%;
+    --card: 222 47% 17%; /* Darkened from 20% to 17% */
+    --card-foreground: 210 40% 98%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 20%; /* Darkened from 24% to 20% */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 20%; /* Darkened from 24% to 20% */
+    --muted-foreground: 215 20.2% 75%; /* Keeping the same for readability */
+    --accent: 262.1 83.3% 57.8%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 20%; /* Darkened from 24% to 20% */
+    --input: 217.2 32.6% 20%; /* Darkened from 24% to 20% */
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.5rem;
+
+    /* Status Colors - Dark Mode - Adjusted for darker theme */
+    --status-created: 217 33% 18%; /* Darkened to match overall theme */
+    --status-verified: 217 91% 60%;
+    --status-minted: 142 71% 45%;
+    --status-in-transit: 48 96% 53%;
+    --status-delivered: 262 83% 58%;
+    --status-expired: 0 63% 31%;
+    --status-recalled: 24 95% 53%;
+  }
+
+  .light {
+    /* Light Mode - Balanced with Dark Mode changes */
+    --background: 0 0% 94%; /* Darkened from 96% to 94% */
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 94%; /* Darkened from 96% to 94% */
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 90%; /* Darkened from 93% to 90% */
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 90%; /* Darkened from 93% to 90% */
+    --muted-foreground: 215.4 16.3% 40%; /* Darkened from 42% to 40% */
+    --accent: 262.1 83.3% 57.8%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 84%; /* Darkened from 87% to 84% */
+    --input: 214.3 31.8% 84%; /* Darkened from 87% to 84% */
+    --ring: 262.1 83.3% 57.8%;
+
+    /* Status Colors - Light Mode - Adjusted for balance */
+    --status-created: 210 40% 92%; /* Darkened to match overall theme */
+    --status-verified: 217 91% 60%;
+    --status-minted: 142 71% 45%;
+    --status-in-transit: 48 96% 53%;
+    --status-delivered: 262 83% 58%;
+    --status-expired: 0 84% 60%;
+    --status-recalled: 24 95% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at 25px 25px, rgba(124, 58, 237, 0.12) 2px, transparent 0),
+      radial-gradient(circle at 75px 75px, rgba(124, 58, 237, 0.08) 2px, transparent 0);
+    background-size: 100px 100px;
+  }
+  h1 {
+    @apply text-2xl font-bold md:text-3xl lg:text-4xl;
+  }
+  h2 {
+    @apply text-xl font-bold md:text-2xl lg:text-3xl;
+  }
+  h3 {
+    @apply text-lg font-bold md:text-xl lg:text-2xl;
+  }
+}
+
+/* Animation Keyframes */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.35);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.35);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}
+
+@keyframes glowRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glowRotateSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Dynamic Animation Classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-on-hover:hover {
+  animation: pulse 1.5s ease-in-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0) 0%, rgba(124, 58, 237, 0.1) 50%, rgba(124, 58, 237, 0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.glass-card {
+  @apply bg-black/40 border-purple-500/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.3);
+  border-color: rgba(124, 58, 237, 0.3);
+  transform: translateY(-2px);
+}
+
+.primary-gradient {
+  @apply bg-gradient-to-r from-purple-600 to-indigo-600;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+  transition: all 0.3s ease;
+}
+
+.primary-gradient:hover {
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.7);
+}
+
+.secondary-gradient {
+  @apply bg-gradient-to-r from-amber-600 to-amber-700;
+  transition: all 0.3s ease;
+}
+
+.secondary-gradient:hover {
+  filter: brightness(1.1);
+}
+
+.container {
+  @apply w-full px-4 sm:px-6 md:px-8 lg:max-w-5xl lg:mx-auto;
+}
+
+.grid-cols-responsive {
+  @apply grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+}
+
+.web3-card {
+  @apply border border-purple-500/20 bg-card/80 backdrop-blur;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+  border-color: rgba(124, 58, 237, 0.4);
+  transform: translateY(-3px);
+}
+
+/* Add these new card style variations after the existing .web3-card styles */
+.web3-card-purple {
+  @apply border border-purple-500/30 bg-gradient-to-br from-purple-900/40 to-purple-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-purple:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  border-color: rgba(124, 58, 237, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-blue {
+  @apply border border-blue-500/30 bg-gradient-to-br from-blue-900/40 to-blue-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-blue:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-teal {
+  @apply border border-teal-500/30 bg-gradient-to-br from-teal-900/40 to-teal-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-teal:hover {
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+  border-color: rgba(20, 184, 166, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-pink {
+  @apply border border-pink-500/30 bg-gradient-to-br from-pink-900/40 to-pink-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-pink:hover {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  border-color: rgba(236, 72, 153, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-amber {
+  @apply border border-amber-500/30 bg-gradient-to-br from-amber-900/40 to-amber-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-amber:hover {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-emerald {
+  @apply border border-emerald-500/30 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 backdrop-blur;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+  transition: all 0.3s ease;
+}
+
+.web3-card-emerald:hover {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.5);
+  transform: translateY(-3px);
+}
+
+.web3-card-featured {
+  @apply border border-purple-500/30 bg-gradient-to-br from-purple-900/50 via-indigo-900/40 to-blue-900/30 backdrop-blur;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.web3-card-featured:hover {
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
+  border-color: rgba(124, 58, 237, 0.6);
+  transform: translateY(-3px);
+}
+
+/* Add these CSS rules after the existing .web3-card-* styles to ensure proper text contrast in light mode */
+.light .web3-card,
+.light .web3-card-purple,
+.light .web3-card-blue,
+.light .web3-card-teal,
+.light .web3-card-pink,
+.light .web3-card-amber,
+.light .web3-card-emerald,
+.light .web3-card-featured {
+  color: hsl(var(--foreground));
+}
+
+.light .web3-card .text-muted-foreground,
+.light .web3-card-purple .text-muted-foreground,
+.light .web3-card-blue .text-muted-foreground,
+.light .web3-card-teal .text-muted-foreground,
+.light .web3-card-pink .text-muted-foreground,
+.light .web3-card-amber .text-muted-foreground,
+.light .web3-card-emerald .text-muted-foreground,
+.light .web3-card-featured .text-muted-foreground {
+  color: hsl(215.4 16.3% 40%);
+}
+
+.light .web3-card .text-gray-400,
+.light .web3-card-purple .text-gray-400,
+.light .web3-card-blue .text-gray-400,
+.light .web3-card-teal .text-gray-400,
+.light .web3-card-pink .text-gray-400,
+.light .web3-card-amber .text-gray-400,
+.light .web3-card-emerald .text-gray-400,
+.light .web3-card-featured .text-gray-400 {
+  color: hsl(215.4 16.3% 40%);
+}
+
+/* Ensure card backgrounds have proper contrast in light mode */
+.light .web3-card-purple {
+  background: linear-gradient(to bottom right, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.05));
+}
+
+.light .web3-card-blue {
+  background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.05));
+}
+
+.light .web3-card-teal {
+  background: linear-gradient(to bottom right, rgba(20, 184, 166, 0.15), rgba(13, 148, 136, 0.05));
+}
+
+.light .web3-card-pink {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0.05));
+}
+
+.light .web3-card-amber {
+  background: linear-gradient(to bottom right, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.05));
+}
+
+.light .web3-card-emerald {
+  background: linear-gradient(to bottom right, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05));
+}
+
+.light .web3-card-featured {
+  background: linear-gradient(
+    to bottom right,
+    rgba(124, 58, 237, 0.15),
+    rgba(79, 70, 229, 0.1),
+    rgba(59, 130, 246, 0.05)
+  );
+}
+
+/* Add these styles to fix FAQ text visibility in light mode */
+.light .web3-card-purple .web3-gradient-text {
+  background-image: linear-gradient(
+    to right,
+    rgba(126, 34, 206, 1) /* purple-700 */,
+    rgba(79, 70, 229, 1) /* indigo-600 */,
+    rgba(37, 99, 235, 1) /* blue-600 */
+  );
+}
+
+.light .accordion-content {
+  color: hsl(var(--foreground));
+}
+
+/* Fix accordion trigger and content text in light mode */
+.light .accordion-trigger,
+.light [data-state="open"] .accordion-trigger,
+.light .accordion-content {
+  color: hsl(var(--foreground));
+}
+
+/* Ensure accordion items have proper background in light mode */
+.light .web3-card-purple[data-state="open"] {
+  background: linear-gradient(to bottom right, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.05));
+}
+
+.web3-card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.web3-card-glow::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(124, 58, 237, 0) 0%, rgba(124, 58, 237, 0.3) 50%, rgba(124, 58, 237, 0) 100%);
+  z-index: -1;
+  animation: glowRotateSlow 4s linear infinite;
+  border-radius: inherit;
+}
+
+.glow-effect {
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+  transition: all 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.7);
+}
+
+.web3-bg {
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+.web3-gradient-text {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(
+    to right,
+    rgba(168, 85, 247, 0.9) /* purple-400 */,
+    rgba(134, 239, 172, 0.85) /* green-300 with reduced opacity for subtlety */,
+    rgba(129, 140, 248, 0.9) /* indigo-400 */
+  );
+  background-size: 200% auto;
+  transition: all 0.5s ease;
+}
+
+.web3-gradient-text:hover {
+  background-position: right center;
+}
+
+.web3-gradient-text-vibrant {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(
+    to right,
+    rgba(192, 132, 252, 1) /* purple-300 at full opacity */,
+    rgba(74, 222, 128, 1) /* green-400 at full opacity - more vibrant than green-300 */,
+    rgba(129, 140, 248, 1) /* indigo-400 at full opacity */
+  );
+  background-size: 200% auto;
+  animation: gradientShift 5s ease infinite;
+}
+
+.web3-gradient-text-animated {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(
+    to right,
+    rgba(168, 85, 247, 1),
+    rgba(134, 239, 172, 1),
+    rgba(129, 140, 248, 1),
+    rgba(168, 85, 247, 1)
+  );
+  background-size: 300% auto;
+  animation: gradientShift 8s linear infinite;
+}
+
+.web3-border {
+  border: 1px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to right, rgba(124, 58, 237, 0.5), rgba(99, 102, 241, 0.5));
+  transition: all 0.3s ease;
+}
+
+.web3-border:hover {
+  border-image-source: linear-gradient(to right, rgba(124, 58, 237, 0.8), rgba(99, 102, 241, 0.8));
+}
+
+.web3-button {
+  @apply bg-gradient-to-r from-purple-600 to-indigo-600 text-white;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.35);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.web3-button:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.55);
+  transform: translateY(-1px);
+}
+
+.web3-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+}
+
+.web3-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.web3-button:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+.web3-input {
+  @apply bg-black/30 border-purple-500/30;
+  transition: all 0.3s ease;
+}
+
+.web3-input:focus {
+  @apply border-purple-500/70;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+  transform: translateY(-1px);
+}
+
+.web3-grid-bg {
+  background-size: 50px 50px;
+  background-image: linear-gradient(to right, rgba(124, 58, 237, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
+  position: relative;
+  overflow: hidden;
+}
+
+.web3-grid-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.web3-grid-bg:hover::after {
+  opacity: 1;
+}
+
+.web3-glow {
+  position: relative;
+}
+
+.web3-glow::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.web3-glow:hover::after {
+  opacity: 1;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+  transition: all 0.3s ease;
+}
+
+.shadow-glow:hover {
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.7);
+}
+
+/* Improved select component styling */
+.web3-select-content {
+  @apply bg-black/90 border-purple-500/30 backdrop-blur;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.web3-select-item {
+  @apply text-white hover:bg-purple-500/20 focus:bg-purple-500/30;
+  transition: all 0.2s ease;
+}
+
+.web3-select-trigger {
+  @apply bg-black/50 border-purple-500/30;
+  transition: all 0.3s ease;
+}
+
+.web3-select-trigger:focus {
+  @apply border-purple-500/70;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+}
+
+/* Add these styles to fix the header text in Why Volunteer cards */
+.light .web3-card-purple .card-title,
+.light .web3-card-blue .card-title,
+.light .web3-card-teal .card-title,
+.light .web3-card-pink .card-title,
+.light .web3-card-amber .card-title,
+.light .web3-card-emerald .card-title {
+  color: hsl(var(--foreground));
+}
+
+/* Fix for specific card titles in light mode */
+.light .web3-card-purple h3,
+.light .web3-card-blue h3,
+.light .web3-card-teal h3,
+.light .web3-card-pink h3,
+.light .web3-card-amber h3,
+.light .web3-card-emerald h3 {
+  color: hsl(var(--foreground));
+}
+
+/* Target all text in cards for light mode */
+.light
+  .web3-card-purple
+  *:not(.text-purple-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a),
+.light .web3-card-blue *:not(.text-blue-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a),
+.light .web3-card-teal *:not(.text-teal-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a),
+.light .web3-card-pink *:not(.text-pink-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a),
+.light .web3-card-amber *:not(.text-amber-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a),
+.light
+  .web3-card-emerald
+  *:not(.text-emerald-400):not(.text-muted-foreground):not(.web3-gradient-text):not(button):not(a) {
+  color: hsl(var(--foreground));
+}
+
+/* Enhance light mode text visibility in all cards */
+.light .web3-card p,
+.light .web3-card-purple p,
+.light .web3-card-blue p,
+.light .web3-card-teal p,
+.light .web3-card-pink p,
+.light .web3-card-amber p,
+.light .web3-card-emerald p,
+.light .web3-card-featured p,
+.light .web3-card div,
+.light .web3-card-purple div,
+.light .web3-card-blue div,
+.light .web3-card-teal div,
+.light .web3-card-pink div,
+.light .web3-card-amber div,
+.light .web3-card-emerald div,
+.light .web3-card-featured div,
+.light
+  .web3-card
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-purple
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-blue
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-teal
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-pink
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-amber
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-emerald
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ),
+.light
+  .web3-card-featured
+  span:not(.text-purple-300):not(.text-blue-300):not(.text-teal-300):not(.text-pink-300):not(.text-amber-300):not(
+    .text-emerald-300
+  ) {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure text-white is overridden in light mode */
+.light .web3-card .text-white,
+.light .web3-card-purple .text-white,
+.light .web3-card-blue .text-white,
+.light .web3-card-teal .text-white,
+.light .web3-card-pink .text-white,
+.light .web3-card-amber .text-white,
+.light .web3-card-emerald .text-white,
+.light .web3-card-featured .text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure all card descriptions are readable */
+.light .web3-card .card-description,
+.light .web3-card-purple .card-description,
+.light .web3-card-blue .card-description,
+.light .web3-card-teal .card-description,
+.light .web3-card-pink .card-description,
+.light .web3-card-amber .card-description,
+.light .web3-card-emerald .card-description,
+.light .web3-card-featured .card-description {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure all paragraphs in cards are readable */
+.light .web3-card p:not(.text-muted-foreground),
+.light .web3-card-purple p:not(.text-muted-foreground),
+.light .web3-card-blue p:not(.text-muted-foreground),
+.light .web3-card-teal p:not(.text-muted-foreground),
+.light .web3-card-pink p:not(.text-muted-foreground),
+.light .web3-card-amber p:not(.text-muted-foreground),
+.light .web3-card-emerald p:not(.text-muted-foreground),
+.light .web3-card-featured p:not(.text-muted-foreground) {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure all list items in cards are readable */
+.light .web3-card li:not(.text-muted-foreground),
+.light .web3-card-purple li:not(.text-muted-foreground),
+.light .web3-card-blue li:not(.text-muted-foreground),
+.light .web3-card-teal li:not(.text-muted-foreground),
+.light .web3-card-pink li:not(.text-muted-foreground),
+.light .web3-card-amber li:not(.text-muted-foreground),
+.light .web3-card-emerald li:not(.text-muted-foreground),
+.light .web3-card-featured li:not(.text-muted-foreground) {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Add these comprehensive fixes for text visibility in light mode */
+
+/* Force dark text on all card content in light mode */
+.light
+  .web3-card-purple
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-blue
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-teal
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-pink
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-amber
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-emerald
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card-featured
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400),
+.light
+  .web3-card
+  *:not(svg):not(button):not(.web3-gradient-text):not(.text-purple-400):not(.text-blue-400):not(.text-teal-400):not(
+    .text-pink-400
+  ):not(.text-amber-400):not(.text-emerald-400) {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Specifically target card titles and descriptions */
+.light .web3-card-purple h3,
+.light .web3-card-blue h3,
+.light .web3-card-teal h3,
+.light .web3-card-pink h3,
+.light .web3-card-amber h3,
+.light .web3-card-emerald h3,
+.light .web3-card-featured h3,
+.light .web3-card h3,
+.light .web3-card-purple .card-title,
+.light .web3-card-blue .card-title,
+.light .web3-card-teal .card-title,
+.light .web3-card-pink .card-title,
+.light .web3-card-amber .card-title,
+.light .web3-card-emerald .card-title,
+.light .web3-card-featured .card-title,
+.light .web3-card .card-title {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure paragraphs in cards are readable */
+.light .web3-card-purple p:not(.text-muted-foreground),
+.light .web3-card-blue p:not(.text-muted-foreground),
+.light .web3-card-teal p:not(.text-muted-foreground),
+.light .web3-card-pink p:not(.text-muted-foreground),
+.light .web3-card-amber p:not(.text-muted-foreground),
+.light .web3-card-emerald p:not(.text-muted-foreground),
+.light .web3-card-featured p:not(.text-muted-foreground),
+.light .web3-card p:not(.text-muted-foreground) {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure card descriptions are readable */
+.light .web3-card-purple .card-description,
+.light .web3-card-blue .card-description,
+.light .web3-card-teal .card-description,
+.light .web3-card-pink .card-description,
+.light .web3-card-amber .card-description,
+.light .web3-card-emerald .card-description,
+.light .web3-card-featured .card-description,
+.light .web3-card .card-description {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Override any text-white classes in light mode */
+.light .text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Make card backgrounds more opaque in light mode for better contrast */
+.light .web3-card-purple,
+.light .web3-card-blue,
+.light .web3-card-teal,
+.light .web3-card-pink,
+.light .web3-card-amber,
+.light .web3-card-emerald,
+.light .web3-card-featured,
+.light .web3-card {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Add light mode specific button styling */
+.light .web3-button {
+  background-image: linear-gradient(to right, rgba(168, 85, 247, 0.8), rgba(99, 102, 241, 0.8));
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.25);
+}
+
+.light .web3-button:hover {
+  background-image: linear-gradient(to right, rgba(168, 85, 247, 0.9), rgba(99, 102, 241, 0.9));
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.35);
+}
+
+.light .primary-gradient {
+  background-image: linear-gradient(to right, rgba(168, 85, 247, 0.8), rgba(99, 102, 241, 0.8));
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.25);
+}
+
+.light .primary-gradient:hover {
+  background-image: linear-gradient(to right, rgba(168, 85, 247, 0.9), rgba(99, 102, 241, 0.9));
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.35);
+}
+
