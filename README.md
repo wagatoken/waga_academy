@@ -168,4 +168,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Contact
 
-For questions or support, please contact the development team at [support@protocolacademy.com](mailto:support@protocolacademy.com).
+For questions or support, please contact the development team at [devs@wagatoken.io](mailto:devs@wagatoken.io).
