@@ -252,41 +252,51 @@ export default function SummerCampPage() {
               {[
                 {
                   id: 1,
-                  title: "Problem Discovery Phase",
+                  title: "Problem Discovery Phase – \"Observe & Understand\"",
                   gradient: "from-purple-500/80 via-purple-400/80 to-purple-300/80",
                   goal: "Introduce participants to the real-world context of Ethiopian coffee farming and supply chains.",
-                  details: [
+                  activities: [
                     "Field visits to farms, washing stations, cooperatives.",
                     "Interviews with farmers, youth, processors, and traders.",
                     "Workshops on supply chain structure, transparency gaps, and digital literacy.",
                   ],
-                  outcomes: "First-hand understanding of challenges in the coffee sector and problem framing based on community insights.",
+                  outcomes: [
+                    "First-hand understanding of challenges in the coffee sector.",
+                    "Problem framing based on lived experiences and community insights.",
+                  ],
                 },
                 {
                   id: 2,
-                  title: "Problem Analysis Phase",
+                  title: "Problem Analysis Phase – \"Break it Down\"",
                   gradient: "from-blue-500/80 via-blue-400/80 to-blue-300/80",
-                  goal: "Analyze challenges from a blockchain, DeFi, and digital infrastructure perspective.",
-                  details: [
+                  goal: "Analyze the discovered challenges using tools from blockchain, DeFi, traceability, and digital infrastructure.",
+                  activities: [
                     "Design thinking and systems-mapping sessions.",
                     "Introductions to Web3 concepts (wallets, smart contracts, DAOs, DeFi, etc.).",
                     "Case studies on existing blockchain impact projects.",
                     "Group work on mapping problems to potential tech-based or process solutions.",
                   ],
-                  outcomes: "Deeper understanding of root causes and potential leverage points, with problem statements ready for prototyping.",
+                  outcomes: [
+                    "Deeper understanding of root causes and potential leverage points.",
+                    "Team formation and problem statements ready for prototyping.",
+                  ],
                 },
                 {
                   id: 3,
-                  title: "Problem Improvement Phase",
+                  title: "Problem Improvement Phase – \"Design, Build & Showcase\"",
                   gradient: "from-teal-500/80 via-teal-400/80 to-teal-300/80",
                   goal: "Prototype and present tech-enabled or process-enhancing solutions.",
-                  details: [
+                  activities: [
                     "Hackathon-style solution development sprint.",
-                    "Mentorship from WAGA contributors, sponsors, and subject matter experts.",
+                    "Mentorship from WAGA contributors and global experts.",
                     "Prototyping of smart contracts, apps, training tools, or supply chain models.",
                     "Demo Day: Teams present to local stakeholders and international observers.",
                   ],
-                  outcomes: "Working MVPs, stronger capacity for digital entrepreneurship, and seeded relationships for future collaboration.",
+                  outcomes: [
+                    "Working MVPs, mock-ups, or policy proposals.",
+                    "Stronger capacity for digital entrepreneurship and innovation.",
+                    "Seeded relationships for post-camp collaboration.",
+                  ],
                 },
               ].map((phase) => {
                 const [isOpen, setIsOpen] = useState(false);
@@ -303,14 +313,18 @@ export default function SummerCampPage() {
                         <p>
                           <strong>Goal:</strong> {phase.goal}
                         </p>
+                        <h4 className="mt-4 font-bold">🛠️ Activities:</h4>
                         <ul className="list-disc list-inside space-y-2 text-sm">
-                          {phase.details.map((detail, index) => (
-                            <li key={index}>{detail}</li>
+                          {phase.activities.map((activity, index) => (
+                            <li key={index}>{activity}</li>
                           ))}
                         </ul>
-                        <p className="text-sm">
-                          <strong>Outcomes:</strong> {phase.outcomes}
-                        </p>
+                        <h4 className="mt-4 font-bold">📚 Outcomes:</h4>
+                        <ul className="list-disc list-inside space-y-2 text-sm">
+                          {phase.outcomes.map((outcome, index) => (
+                            <li key={index}>{outcome}</li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
