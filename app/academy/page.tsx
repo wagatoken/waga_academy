@@ -73,7 +73,9 @@ export default function AcademyPage() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">Our Vision</h2>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
+                Our Vision
+              </h2>
               <p className="text-muted-foreground">
                 The WAGA Academy is critical to the achievement of WAGA's objectives and is designed to provide
                 accessible and specialized training to youth and professionals aiming to work in the coffee industry.
@@ -122,7 +124,7 @@ export default function AcademyPage() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Global Value Chain Approach
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
@@ -333,7 +335,7 @@ export default function AcademyPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 General Skills Across the Coffee Value Chain
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
@@ -342,7 +344,7 @@ export default function AcademyPage() {
               </p>
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5 w-full pt-8">
-              <Card className="web3-card-purple">
+              <Card className="web3-card web3-card-purple">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <Laptop className="h-10 w-10 text-purple-400" />
@@ -355,7 +357,7 @@ export default function AcademyPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card className="web3-card-amber">
+              <Card className="web3-card web3-card-amber">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <Truck className="h-10 w-10 text-amber-400" />
@@ -368,7 +370,7 @@ export default function AcademyPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card className="web3-card-blue">
+              <Card className="web3-card web3-card-blue">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <Coins className="h-10 w-10 text-blue-400" />
@@ -381,7 +383,7 @@ export default function AcademyPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card className="web3-card-pink">
+              <Card className="web3-card web3-card-pink">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <LineChart className="h-10 w-10 text-pink-400" />
@@ -395,7 +397,7 @@ export default function AcademyPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card className="web3-card-teal">
+              <Card className="web3-card web3-card-teal">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <Leaf className="h-10 w-10 text-teal-400" />
@@ -418,7 +420,7 @@ export default function AcademyPage() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Training Delivery
               </h2>
               <p className="text-muted-foreground">
@@ -497,7 +499,7 @@ export default function AcademyPage() {
               />
             </div>
             <div className="space-y-4 order-1 lg:order-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Integration with WAGAToken
               </h2>
               <p className="text-muted-foreground">
@@ -553,7 +555,7 @@ export default function AcademyPage() {
               {/* Strategic coffee bean near the CTA */}
               <StrategicCoffeeBeans position="center-left" size={30} quantity={2} opacity={0.6} />
 
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Join the WAGA Academy Today
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">

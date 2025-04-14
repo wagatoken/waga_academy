@@ -128,7 +128,7 @@ export default function AboutPage() {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2">
                 <Target className="h-5 w-5 text-purple-400" />
-                <h2 className="text-2xl font-bold web3-gradient-text">Our Mission</h2>
+                <h2 className="text-2xl font-bold web3-dual-gradient-text-glow">Our Mission</h2>
               </div>
               <p className="text-muted-foreground">
                 To provide accessible and specialized training to youth and professionals in the coffee industry,
@@ -159,7 +159,7 @@ export default function AboutPage() {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2">
                 <Lightbulb className="h-5 w-5 text-blue-400" />
-                <h2 className="text-2xl font-bold web3-gradient-text">Our Vision</h2>
+                <h2 className="text-2xl font-bold web3-dual-gradient-text-glow">Our Vision</h2>
               </div>
               <p className="text-muted-foreground">
                 A world where coffee farmers are empowered through technology, where the coffee value chain is
@@ -196,7 +196,7 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Our Core Values
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
@@ -279,7 +279,7 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Meet Our Team
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
@@ -324,7 +324,9 @@ export default function AboutPage() {
       <section className="w-full py-12 md:py-24">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">Our Roadmap</h2>
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
+              Our Roadmap
+            </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
               Our strategic plan for building and growing WAGA Academy
             </p>
@@ -448,7 +450,9 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">Our Partners</h2>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
+                Our Partners
+              </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
                 Collaborating with organizations across sectors to create lasting impact
               </p>
@@ -496,7 +500,7 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Projected Impact
               </h2>
               <p className="text-muted-foreground">
@@ -596,7 +600,7 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-gradient-text">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow">
                 Join Our Mission
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
