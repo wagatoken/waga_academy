@@ -56,46 +56,66 @@ export default function SummerCampPage() {
       </section>
 
       {/* Key Info Section */}
-      <section className="w-full py-12 md:py-24">
-        <div className="container px-4 md:px-6">
+      <section className="w-full py-12 md:py-24 relative">
+        <div className="absolute inset-0 z-0 web3-grid-bg"></div>
+        <div className="container px-4 md:px-6 relative z-10">
           <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow text-center mb-8">
             Key Information
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Card className="web3-card-purple">
-              <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
-                <CalendarDays className="h-12 w-12 text-purple-400 mb-2" />
-                <h3 className="text-xl font-bold">July - September 2024</h3>
-                <p className="text-muted-foreground">Flexible 2-4 week volunteer program with multiple start dates</p>
-              </CardContent>
-            </Card>
-            <Card className="web3-card-blue">
-              <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
-                <MapPin className="h-12 w-12 text-blue-400 mb-2" />
-                <h3 className="text-xl font-bold">Ethiopia</h3>
-                <p className="text-muted-foreground">
-                  Experience the birthplace of coffee in its coffee-producing regions
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="web3-card-teal">
-              <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
-                <Users className="h-12 w-12 text-teal-400 mb-2" />
-                <h3 className="text-xl font-bold">200+ Farmers</h3>
-                <p className="text-muted-foreground">
-                  Train the next generation of coffee farmers in Web3 and digital skills
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="web3-card-pink">
-              <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
-                <Award className="h-12 w-12 text-pink-400 mb-2" />
-                <h3 className="text-xl font-bold">WAGA Certification</h3>
-                <p className="text-muted-foreground">
-                  Receive official recognition for your contribution to the program
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <CalendarDays className="h-12 w-12 text-purple-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">July - September 2024</h3>
+              <p className="text-muted-foreground text-center">
+                Flexible 2-4 week volunteer program with multiple start dates
+              </p>
+            </div>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <MapPin className="h-12 w-12 text-blue-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">Ethiopia</h3>
+              <p className="text-muted-foreground text-center">
+                Experience the birthplace of coffee in its coffee-producing regions
+              </p>
+            </div>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <Users className="h-12 w-12 text-teal-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">200+ Farmers</h3>
+              <p className="text-muted-foreground text-center">
+                Train the next generation of coffee farmers and "Coffeepreneurs" in Web3 and digital skills
+              </p>
+            </div>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <Award className="h-12 w-12 text-pink-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">WAGA Certification</h3>
+              <p className="text-muted-foreground text-center">
+                Receive official recognition for your contribution to the program
+              </p>
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <Lightbulb className="h-12 w-12 text-emerald-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">Innovative Learning</h3>
+              <p className="text-muted-foreground text-center">
+                Gain hands-on experience with blockchain, DeFi, and digital tools to solve real-world challenges.
+              </p>
+            </div>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <Coffee className="h-12 w-12 text-orange-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">Cultural Immersion</h3>
+              <p className="text-muted-foreground text-center">
+                Participate in Ethiopia's coffee culture, including traditional ceremonies and farm visits.
+              </p>
+            </div>
+            <div className="relative p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 web3-dual-gradient-text-glow">
+              <Globe className="h-12 w-12 text-indigo-400 mb-4 mx-auto" />
+              <h3 className="text-xl font-bold text-center">Global Impact</h3>
+              <p className="text-muted-foreground text-center">
+                Collaborate with international experts and local communities to create sustainable solutions.
+              </p>
+            </div>
           </div>
         </div>
       </section>

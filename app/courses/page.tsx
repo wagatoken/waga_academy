@@ -221,7 +221,9 @@ export default function CoursesPage({ searchParams }: { searchParams: { category
               Coming Soon
             </Badge>
           </div>
-          <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+          <CardTitle className="line-clamp-2 bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+            {course.title}
+          </CardTitle>
           <CardDescription className="text-sm">Duration: {course.duration}</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow">

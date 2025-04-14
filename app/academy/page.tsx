@@ -349,7 +349,9 @@ export default function AcademyPage() {
                   <div className="flex justify-center mb-4">
                     <Laptop className="h-10 w-10 text-purple-400" />
                   </div>
-                  <CardTitle>Web3 & IT Infrastructure</CardTitle>
+                  <CardTitle className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+                    Web3 & IT Infrastructure
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-400">
@@ -362,7 +364,9 @@ export default function AcademyPage() {
                   <div className="flex justify-center mb-4">
                     <Truck className="h-10 w-10 text-amber-400" />
                   </div>
-                  <CardTitle>Supply Chain Management</CardTitle>
+                  <CardTitle className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+                    Supply Chain Management
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-400">
@@ -375,7 +379,9 @@ export default function AcademyPage() {
                   <div className="flex justify-center mb-4">
                     <Coins className="h-10 w-10 text-blue-400" />
                   </div>
-                  <CardTitle>Finance & Accounting</CardTitle>
+                  <CardTitle className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+                    Finance & Accounting
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-400">
@@ -388,7 +394,9 @@ export default function AcademyPage() {
                   <div className="flex justify-center mb-4">
                     <LineChart className="h-10 w-10 text-pink-400" />
                   </div>
-                  <CardTitle>Marketing & Sales</CardTitle>
+                  <CardTitle className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+                    Marketing & Sales
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-400">
@@ -402,7 +410,9 @@ export default function AcademyPage() {
                   <div className="flex justify-center mb-4">
                     <Leaf className="h-10 w-10 text-teal-400" />
                   </div>
-                  <CardTitle>Sustainability & Ethics</CardTitle>
+                  <CardTitle className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-teal-400 bg-clip-text text-transparent">
+                    Sustainability & Ethics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-400">
