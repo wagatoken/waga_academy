@@ -89,38 +89,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser()
 
     // Set up auth state change listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
         setUser(session.user)
 
-        // Fetch the user's profile when auth state changes
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single()
-
-        if (profileError) {
-          console.error("Error fetching profile:", profileError)
-        } else {
-          setProfile(profileData)
-        }
-      } else {
+        // Call the profile fetch asynchronously
+        fetchProfile(session.user.id)
+    } else {
         setUser(null)
         setProfile(null)
-      }
-
-      // Refresh the page on auth state change to update server components
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-        router.refresh()
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
     }
+
+    // Refresh the page on auth state change to update server components
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        router.refresh()
+    }
+})
+
+  // Define the async function to fetch profile data
+  const fetchProfile = async (userId) => {
+      try {
+          const { data: profileData, error: profileError } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", userId)
+              .single()
+
+          if (profileError) {
+              console.error("Error fetching profile:", profileError)
+          } else {
+              setProfile(profileData)
+          }
+      } catch (error) {
+          console.error("Unexpected error fetching profile:", error)
+      }
+  }
+
+// Cleanup the subscription when no longer needed
+return () => {
+    data.subscription.unsubscribe()
+}
   }, [supabase, supabaseInitialized, router])
 
   const signUp = async (values: any) => {
