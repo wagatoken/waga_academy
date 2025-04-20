@@ -5,13 +5,6 @@ import { createServerClient as createSupabaseServerClient } from '@supabase/ssr'
 let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
 
 // Only used in production — assumed this file is only used in production environment
-const cookieSettings = {
-  name: 'sb-access-token',
-  path: '/',
-  sameSite: 'Lax',
-  secure: true,
-  domain: '.academy-waga.netlify.app', 
-}
 
 export const getSupabaseBrowserClient = () => {
   if (!supabaseClient) {
@@ -24,7 +17,13 @@ export const getSupabaseBrowserClient = () => {
     }
 
     supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
-      cookies: cookieSettings,
+      cookies: {
+        name: 'sb-access-token',
+        path: '/',
+        sameSite: 'Lax',
+        secure: true,
+        domain: '.academy-waga.netlify.app', 
+      },
     })
   }
 
