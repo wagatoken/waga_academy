@@ -56,7 +56,7 @@ export default function LoginPage() {
         title: "Welcome back!",
         description: "You've successfully logged into the WAGA Early Access Community.",
       })
-      router.push("/community/dashboard")
+      // router.push("/community/dashboard")
     } catch (error) {
       console.error("Login error:", error)
       toast({
