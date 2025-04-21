@@ -16,7 +16,6 @@ export const getSupabaseBrowserClient = () => {
       throw new Error("Supabase configuration is incomplete. Check your environment variables.")
     }
 
-    
   supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
   }
   return supabaseClient

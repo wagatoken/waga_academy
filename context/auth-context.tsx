@@ -99,12 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null)
         setProfile(null)
     }
-    if (event == "SIGNED_IN"){
-        console.log("Redirecting after sign in...")
-        router.replace("/community/dashboard")
-    }
     // Refresh the page on auth state change to update server components
-    if (event === "SIGNED_OUT") {
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
         router.refresh()
     }
 })
