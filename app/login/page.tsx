@@ -51,13 +51,14 @@ export default function LoginPage() {
         setIsLoading(false)
         return
       }
-
+     
       toast({
         title: "Welcome back!",
         description: "You've successfully logged into the WAGA Early Access Community.",
       })
-      router.replace("/community/dashboard")
-    } catch (error) {
+    } 
+    
+    catch (error) {
       console.error("Login error:", error)
       toast({
         title: "Login failed",
@@ -66,6 +67,10 @@ export default function LoginPage() {
       })
       setIsLoading(false)
     }
+    console.log("Before redirect");
+    router.refresh(); 
+    router.push("community/dashboard/");
+    console.log("After redirect");
   }
 
   return (
