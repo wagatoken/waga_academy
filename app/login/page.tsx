@@ -56,6 +56,9 @@ export default function LoginPage() {
         title: "Welcome back!",
         description: "You've successfully logged into the WAGA Early Access Community.",
       })
+
+      router.refresh(); 
+      router.push("community/dashboard/");
     } 
     
     catch (error) {
@@ -67,10 +70,7 @@ export default function LoginPage() {
       })
       setIsLoading(false)
     }
-    console.log("Before redirect");
-    router.refresh(); 
-    router.push("community/dashboard/");
-    console.log("After redirect");
+  
   }
 
   return (
