@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/components/ui/toast";
 import { Lock, Mail } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
 
@@ -53,8 +53,9 @@ export default function LoginPage() {
       }
      
       toast({
-        title: "Welcome back!",
+        title: "Welcome 👋",
         description: "You've successfully logged into the WAGA Early Access Community.",
+        variant: "default",
       })
 
       router.refresh(); 
