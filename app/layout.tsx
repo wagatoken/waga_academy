@@ -9,6 +9,7 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 import { WalletProvider } from "@/context/wallet-context"
 import { AuthProvider } from "@/context/auth-context"
 import { WalletConnectionModal } from "@/components/wallet-connection-modal"
+import { ToastProviderWithContext } from "@/components/ui/toast" // Import the ToastProvider
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -30,14 +31,16 @@ export default function RootLayout({
           <AuthProvider>
             <WalletProvider>
               <ScrollToTop>
-                <div className="relative min-h-screen bg-background font-sans antialiased">
-                  <div className="relative flex min-h-screen flex-col">
-                    <MainNav />
-                    <main className="flex-1">{children}</main>
-                    <Footer />
+                <ToastProviderWithContext> 
+                  <div className="relative min-h-screen bg-background font-sans antialiased">
+                    <div className="relative flex min-h-screen flex-col">
+                      <MainNav />
+                      <main className="flex-1">{children}</main>
+                      <Footer />
+                    </div>
                   </div>
-                </div>
-                <WalletConnectionModal />
+                  <WalletConnectionModal />
+                </ToastProviderWithContext>
               </ScrollToTop>
             </WalletProvider>
           </AuthProvider>
@@ -46,6 +49,5 @@ export default function RootLayout({
     </html>
   )
 }
-
 
 import './globals.css'
