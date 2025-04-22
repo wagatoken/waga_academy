@@ -204,14 +204,10 @@ return () => {
         email,
         password,
       })
-
-      if(data){
-          router.push("/community/dashboard") 
-      }
       if (error) {
         return { error: error.message }
       }
-
+    
       return { error: null }
     } catch (error: any) {
       console.error("Sign in error:", error)
