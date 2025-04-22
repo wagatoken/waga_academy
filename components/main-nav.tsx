@@ -2,16 +2,20 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ConnectWalletButton } from "@/components/connect-wallet-button"
-import { Menu, X, LogIn, UserPlus, ChevronDown } from "lucide-react"
+import { Menu, X, LogIn, UserPlus, ChevronDown, LogOut, User } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/context/auth-context"
+import { toast } from "@/components/ui/toast"
 
 export function MainNav() {
+  const { user, signOut } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const routes = [
@@ -52,14 +56,12 @@ export function MainNav() {
     },
   ]
 
-  // Check if user is on a community page
-  const isInCommunity = pathname.startsWith("/community")
   // Check if user is on login or register page
   const isAuthPage = pathname === "/login" || pathname === "/register"
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-emerald-500/20 bg-emerald-950/80 backdrop-blur supports-[backdrop-filter]:bg-emerald-950/60">
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 md:gap-6">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-purple-600 hover:to-indigo-500 transition-all duration-300">
@@ -92,7 +94,7 @@ export function MainNav() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          {!isInCommunity && !isAuthPage && (
+          {!user && !isAuthPage && (
             <div className="hidden md:flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -131,19 +133,56 @@ export function MainNav() {
             </div>
           )}
 
-          {isInCommunity && (
+          {user && !isAuthPage && (
             <div className="hidden md:block">
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/10 h-8 emerald-glow relative overflow-hidden group"
-              >
-                <Link href="/community/profile" scroll={true}>
-                  <span className="relative z-10">My Profile</span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                </Link>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/10 h-8 px-2 emerald-glow relative overflow-hidden group"
+                  >
+                    <span className="relative z-10">Account</span>
+                    <ChevronDown className="ml-1 h-3 w-3 relative z-10" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48 bg-emerald-950/95 backdrop-blur border-emerald-500/20 web3-card-emerald"
+                >
+                  <DropdownMenuItem asChild>
+                    <Link href="/community/profile" className="flex items-center cursor-pointer group">
+                      <User className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
+                      <span>My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      try {
+                        await signOut();
+                        router.push("/login");
+                        toast({
+                          title: "Logged Out 😔",
+                          description: "You have successfully logged out.",
+                          variant: "default",
+                        });
+                      } catch (error) {
+                        console.error("Error during sign out:", error);
+                        toast({
+                          title: "Logout Failed",
+                          description: "An error occurred while logging out. Please try again.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                    className="flex items-center cursor-pointer group"
+                  >
+                    <LogOut className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
 
@@ -186,17 +225,55 @@ export function MainNav() {
             ))}
 
             <div className="flex flex-col gap-2 pt-2">
-              {isInCommunity ? (
-                <Button
-                  variant="outline"
-                  asChild
-                  className="border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/10 emerald-glow relative overflow-hidden group"
-                >
-                  <Link href="/community/profile" scroll={true} onClick={() => setIsMenuOpen(false)}>
-                    <span className="relative z-10">My Profile</span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  </Link>
-                </Button>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/10 h-8 px-2 emerald-glow relative overflow-hidden group"
+                    >
+                      <span className="relative z-10">Account</span>
+                      <ChevronDown className="ml-1 h-3 w-3 relative z-10" />
+                      <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-48 bg-emerald-950/95 backdrop-blur border-emerald-500/20 web3-card-emerald"
+                  >
+                    <DropdownMenuItem asChild>
+                      <Link href="/community/profile" className="flex items-center cursor-pointer group">
+                        <User className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
+                        <span>My Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        try {
+                          await signOut();
+                          router.push("/login");
+                          toast({
+                            title: "Logged Out",
+                            description: "You have successfully logged out.",
+                            variant: "default",
+                          });
+                        } catch (error) {
+                          console.error("Error during sign out:", error);
+                          toast({
+                            title: "Logout Failed",
+                            description: "An error occurred while logging out. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="flex items-center cursor-pointer group"
+                    >
+                      <LogOut className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 !isAuthPage && (
                   <>
