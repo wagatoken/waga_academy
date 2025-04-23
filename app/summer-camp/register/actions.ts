@@ -39,14 +39,20 @@ const volunteerFormSchema = z.object({
 export type VolunteerFormValues = z.infer<typeof volunteerFormSchema>
 
 export async function submitCampRegistration(formData: VolunteerFormValues) {
+  console.log("submitCampRegistration called with formData:", formData) // Log input data
+
   try {
     // Validate the form data
+    console.log("Validating form data...")
     const validatedData = volunteerFormSchema.parse(formData)
+    console.log("Validated data:", validatedData)
 
     // Create a Supabase client
+    console.log("Creating Supabase client...")
     const supabase = createServerClient()
 
     // Insert the registration into the database
+    console.log("Inserting data into camp_registrations table...")
     const { data, error } = await supabase
       .from("camp_registrations")
       .insert({
@@ -63,17 +69,18 @@ export async function submitCampRegistration(formData: VolunteerFormValues) {
         status: "pending",
       })
       .select()
-      console.log("Hi")
-      console.log("Registration data:", data)
-      console.log("Registration error:", error)
+
+    console.log("Insert result - data:", data, "error:", error)
+
     if (error) {
-      console.error("Error submitting registration:", error)
+      console.error("Error inserting registration:", error)
       return {
         success: false,
         message: "Failed to submit your registration. Please try again.",
       }
     }
 
+    console.log("Registration submitted successfully!")
     return {
       success: true,
       message: "Your registration has been submitted successfully! We'll be in touch soon.",
@@ -81,7 +88,9 @@ export async function submitCampRegistration(formData: VolunteerFormValues) {
     }
   } catch (error) {
     console.error("Error in submitCampRegistration:", error)
+
     if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors)
       return {
         success: false,
         message: "Please check your form inputs and try again.",
