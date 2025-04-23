@@ -74,7 +74,7 @@ export default function VolunteerRegistrationPage() {
     setIsSubmitting(true)
     try {
       const result = await submitCampRegistration(values as VolunteerFormValues)
-
+      console.log(result)
       if (result.success) {
         toast({
           title: "Application Submitted!",
