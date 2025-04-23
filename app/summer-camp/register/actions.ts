@@ -63,7 +63,9 @@ export async function submitCampRegistration(formData: VolunteerFormValues) {
         status: "pending",
       })
       .select()
-
+      console.log("Hi")
+      console.log("Registration data:", data)
+      console.log("Registration error:", error)
     if (error) {
       console.error("Error submitting registration:", error)
       return {
