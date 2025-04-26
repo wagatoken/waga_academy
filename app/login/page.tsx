@@ -65,7 +65,7 @@ export default function LoginPage() {
     catch (error) {
       console.error("Login error:", error)
       toast({
-        title: "Login failed",
+        title: "Login failed ❌",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       })
