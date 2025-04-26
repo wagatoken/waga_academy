@@ -71,10 +71,13 @@ export default function ProfilePage() {
 
     try {
       const { error } = await updateProfile(formData)
+      XMLHttpRequest
       if (error) {
+        // TODO: Remove and replace with proper logging for production
+        console.error("Profile update error:", error)
         toast({
-          title: "Error updating profile",
-          description: error,
+          title: "Error updating profile ❌",
+           description: "An unexpected error occurred. Please try again later.",
           variant: "destructive",
         })
         return

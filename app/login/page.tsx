@@ -43,9 +43,11 @@ export default function LoginPage() {
       const { error } = await signIn(values.email, values.password)
 
       if (error) {
+          // TODO: Remove and replace with proper logging for production
+        console.error("Login error:", error)
         toast({
-          title: "Login failed",
-          description: error,
+          title: "Login failed ❌",
+          description: "An unexpected error occurred. Please try again later.",
           variant: "destructive",
         })
         setIsLoading(false)
