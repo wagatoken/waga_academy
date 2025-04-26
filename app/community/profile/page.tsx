@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,14 +17,26 @@ export default function ProfilePage() {
   const { user, profile, updateProfile, isLoading } = useAuth()
   const [isUpdating, setIsUpdating] = useState(false)
   const [formData, setFormData] = useState({
-    first_name: profile?.first_name || "",
-    last_name: profile?.last_name || "",
-    bio: profile?.bio || "",
-    website: profile?.website || "",
-    twitter: profile?.twitter || "",
-    github: profile?.github || "",
+    first_name: "",
+    last_name: "",
+    bio: "",
+    website:"",
+    twitter: "",
+    github: "",
   })
 
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        bio: profile.bio || "",
+        website: profile.website || "",
+        twitter: profile.twitter || "",
+        github: profile.github || "",
+      });
+    }
+  }, [profile]);
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -94,9 +106,10 @@ export default function ProfilePage() {
       nft: "NFTs & Digital Assets",
       web3: "Web3 Development",
       other: "Other",
+      coffee: "Coffee"
     }
 
-    return interestMap[interest] || interest
+    return interestMap[interest] || interest[0].toUpperCase() + interest.slice(1)
   }
 
   // Helper function to format background
@@ -111,7 +124,7 @@ export default function ProfilePage() {
       educator: "Educator - Teaching others",
     }
 
-    return backgroundMap[background] || background
+    return backgroundMap[background] || background[0].toUpperCase() + background.slice(1)
   }
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -273,38 +286,6 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Tell us about yourself"
                   />
-                </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleChange}
-                      placeholder="https://example.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter</Label>
-                    <Input
-                      id="twitter"
-                      name="twitter"
-                      value={formData.twitter}
-                      onChange={handleChange}
-                      placeholder="username"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="github">GitHub</Label>
-                    <Input
-                      id="github"
-                      name="github"
-                      value={formData.github}
-                      onChange={handleChange}
-                      placeholder="username"
-                    />
-                  </div>
                 </div>
               </CardContent>
               <CardFooter>
