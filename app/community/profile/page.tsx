@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { toast } from "@/hooks/use-toast"
-import { Loader2 } from "lucide-react"
+import { toast } from "@/components/ui/toast"
+import { Loader2, User, Globe, Twitter, Github, Award, BookOpen } from "lucide-react"
 
 export default function ProfilePage() {
   const { user, profile, updateProfile, isLoading } = useAuth()
@@ -20,10 +20,11 @@ export default function ProfilePage() {
     first_name: "",
     last_name: "",
     bio: "",
-    website:"",
+    website: "",
     twitter: "",
     github: "",
   })
+  const [activeTab, setActiveTab] = useState("profile") // State to track the active tab
 
   useEffect(() => {
     if (profile) {
@@ -34,9 +35,10 @@ export default function ProfilePage() {
         website: profile.website || "",
         twitter: profile.twitter || "",
         github: profile.github || "",
-      });
+      })
     }
-  }, [profile]);
+  }, [profile])
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -69,7 +71,6 @@ export default function ProfilePage() {
 
     try {
       const { error } = await updateProfile(formData)
-
       if (error) {
         toast({
           title: "Error updating profile",
@@ -78,15 +79,16 @@ export default function ProfilePage() {
         })
         return
       }
-
       toast({
-        title: "Profile updated",
+        title: "Profile updated 🎉",
         description: "Your profile has been updated successfully.",
+        variant: "default",
       })
+      setActiveTab("profile") // Switch back to the "Profile" tab
     } catch (error) {
       console.error("Profile update error:", error)
       toast({
-        title: "Error updating profile",
+        title: "Error updating profile ❌",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       })
@@ -106,7 +108,7 @@ export default function ProfilePage() {
       nft: "NFTs & Digital Assets",
       web3: "Web3 Development",
       other: "Other",
-      coffee: "Coffee"
+      coffee: "Coffee",
     }
 
     return interestMap[interest] || interest[0].toUpperCase() + interest.slice(1)
@@ -133,7 +135,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto mt-10 max-w-4xl p-4">
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="account">Account Settings</TabsTrigger>
@@ -149,7 +151,7 @@ export default function ProfilePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="space-y-1 text-center sm:text-left">
-                  <CardTitle className="text-2xl">
+                  <CardTitle className="text-2xl flex items-center gap-2">
                     {profile.first_name} {profile.last_name}
                   </CardTitle>
                   <CardDescription>{user.email}</CardDescription>
@@ -169,18 +171,27 @@ export default function ProfilePage() {
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <h3 className="font-medium">Primary Interest</h3>
+                  <h3 className="font-medium flex items-center gap-2">
+                    <Award className="h-5 w-5 text-primary" />
+                    Primary Interest
+                  </h3>
                   <p className="text-muted-foreground">{formatInterest(profile.interest)}</p>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-medium">Background</h3>
+                  <h3 className="font-medium flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    Background
+                  </h3>
                   <p className="text-muted-foreground">{formatBackground(profile.background)}</p>
                 </div>
               </div>
 
               {profile.bio && (
                 <div className="space-y-2">
-                  <h3 className="font-medium">Bio</h3>
+                  <h3 className="font-medium flex items-center gap-2">
+                    <User className="h-5 w-5 text-primary" />
+                    Bio
+                  </h3>
                   <p className="text-muted-foreground">{profile.bio}</p>
                 </div>
               )}
@@ -188,7 +199,10 @@ export default function ProfilePage() {
               <div className="grid gap-4 md:grid-cols-3">
                 {profile.website && (
                   <div className="space-y-2">
-                    <h3 className="font-medium">Website</h3>
+                    <h3 className="font-medium flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-primary" />
+                      Website
+                    </h3>
                     <a
                       href={profile.website}
                       target="_blank"
@@ -201,7 +215,10 @@ export default function ProfilePage() {
                 )}
                 {profile.twitter && (
                   <div className="space-y-2">
-                    <h3 className="font-medium">Twitter</h3>
+                    <h3 className="font-medium flex items-center gap-2">
+                      <Twitter className="h-5 w-5 text-primary" />
+                      Twitter
+                    </h3>
                     <a
                       href={`https://twitter.com/${profile.twitter}`}
                       target="_blank"
@@ -214,7 +231,10 @@ export default function ProfilePage() {
                 )}
                 {profile.github && (
                   <div className="space-y-2">
-                    <h3 className="font-medium">GitHub</h3>
+                    <h3 className="font-medium flex items-center gap-2">
+                      <Github className="h-5 w-5 text-primary" />
+                      GitHub
+                    </h3>
                     <a
                       href={`https://github.com/${profile.github}`}
                       target="_blank"
@@ -286,6 +306,38 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Tell us about yourself"
                   />
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      name="website"
+                      value={formData.website}
+                      onChange={handleChange}
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter">Twitter</Label>
+                    <Input
+                      id="twitter"
+                      name="twitter"
+                      value={formData.twitter}
+                      onChange={handleChange}
+                      placeholder="username"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="github">GitHub</Label>
+                    <Input
+                      id="github"
+                      name="github"
+                      value={formData.github}
+                      onChange={handleChange}
+                      placeholder="username"
+                    />
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
