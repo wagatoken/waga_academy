@@ -12,6 +12,8 @@ import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/ser
 
 export default async function CommunityForumsPage() {
    const { data: categories, error: categoriesError } = await getForumCategories();
+   console.log("Categories:", categories)
+   console.log("Categories Error:", categoriesError)
   const { data: recentTopics, error: topicsError } = await getRecentTopics();
   const {data: popularTopics, error: popularTopicsError} = await getPopularTopics()
 
@@ -56,7 +58,7 @@ export default async function CommunityForumsPage() {
 
           <TabsContent value="categories" className="mt-6">
             <div className="space-y-4">
-              {(categories || []).map((category, index) => {
+              {(categories || []).map((category) => {
                 // Assign different card styles based on category
                 let cardClass = "web3-card"
                 if (category.slug === "web3-blockchain") cardClass = "web3-card-purple"
