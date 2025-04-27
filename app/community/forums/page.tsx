@@ -6,101 +6,73 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MessageSquare, Plus, Search } from "lucide-react"
+import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
 
-// Sample forum categories
-const categories = [
-  {
-    id: "general",
-    name: "General Discussion",
-    description: "General discussions about WAGA Academy and the community",
-    topics: 24,
-    posts: 142,
-  },
-  {
-    id: "web3",
-    name: "Web3 & Blockchain",
-    description: "Discussions about blockchain technology, DeFi, and tokenization",
-    topics: 18,
-    posts: 97,
-  },
-  {
-    id: "coffee",
-    name: "Coffee Industry",
-    description: "Discussions about coffee farming, processing, and the global coffee market",
-    topics: 15,
-    posts: 83,
-  },
-  {
-    id: "education",
-    name: "Education & Training",
-    description: "Discussions about learning resources, courses, and educational approaches",
-    topics: 12,
-    posts: 64,
-  },
-  {
-    id: "summer-camp",
-    name: "Summer Camp",
-    description: "Discussions about the WAGA Summer Camp program and experiences",
-    topics: 8,
-    posts: 42,
-  },
-]
 
 // Sample forum topics
-const recentTopics = [
-  {
-    id: 1,
-    title: "How can blockchain improve coffee farmer incomes?",
-    category: "web3",
-    author: "CoffeeChain",
-    avatar: "CC",
-    replies: 24,
-    views: 156,
-    lastActive: "2 hours ago",
-  },
-  {
-    id: 2,
-    title: "Summer Camp 2024: What to expect?",
-    category: "summer-camp",
-    author: "EthioExplorer",
-    avatar: "EE",
-    replies: 18,
-    views: 132,
-    lastActive: "5 hours ago",
-  },
-  {
-    id: 3,
-    title: "DeFi lending models for smallholder farmers",
-    category: "web3",
-    author: "CryptoFarmer",
-    avatar: "CF",
-    replies: 32,
-    views: 215,
-    lastActive: "1 day ago",
-  },
-  {
-    id: 4,
-    title: "Introducing myself: Coffee roaster from Colombia",
-    category: "general",
-    author: "BeanMaster",
-    avatar: "BM",
-    replies: 15,
-    views: 98,
-    lastActive: "2 days ago",
-  },
-  {
-    id: 5,
-    title: "Best resources for learning about coffee processing?",
-    category: "education",
-    author: "NewFarmer",
-    avatar: "NF",
-    replies: 21,
-    views: 143,
-    lastActive: "3 days ago",
-  },
-]
+// const recentTopics = [
+//   {
+//     id: 1,
+//     title: "How can blockchain improve coffee farmer incomes?",
+//     category: "web3",
+//     author: "CoffeeChain",
+//     avatar: "CC",
+//     replies: 24,
+//     views: 156,
+//     lastActive: "2 hours ago",
+//   },
+//   {
+//     id: 2,
+//     title: "Summer Camp 2024: What to expect?",
+//     category: "summer-camp",
+//     author: "EthioExplorer",
+//     avatar: "EE",
+//     replies: 18,
+//     views: 132,
+//     lastActive: "5 hours ago",
+//   },
+//   {
+//     id: 3,
+//     title: "DeFi lending models for smallholder farmers",
+//     category: "web3",
+//     author: "CryptoFarmer",
+//     avatar: "CF",
+//     replies: 32,
+//     views: 215,
+//     lastActive: "1 day ago",
+//   },
+//   {
+//     id: 4,
+//     title: "Introducing myself: Coffee roaster from Colombia",
+//     category: "general",
+//     author: "BeanMaster",
+//     avatar: "BM",
+//     replies: 15,
+//     views: 98,
+//     lastActive: "2 days ago",
+//   },
+//   {
+//     id: 5,
+//     title: "Best resources for learning about coffee processing?",
+//     category: "education",
+//     author: "NewFarmer",
+//     avatar: "NF",
+//     replies: 21,
+//     views: 143,
+//     lastActive: "3 days ago",
+//   },
+// ]
 
-export default function CommunityForumsPage() {
+export default async function CommunityForumsPage() {
+   const { data: categories, error: categoriesError } = await getForumCategories();
+  const { data: recentTopics, error: topicsError } = await getRecentTopics();
+  const {data: popularTopics, error: popularTopicsError} = await getPopularTopics()
+
+
+  if (categoriesError || topicsError || popularTopicsError) {
+    console.error("Error fetching data:", categoriesError || topicsError || popularTopicsError);
+    return <div>Error loading forum data. Please try again later.</div>;
+  }
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -137,13 +109,13 @@ export default function CommunityForumsPage() {
 
           <TabsContent value="categories" className="mt-6">
             <div className="space-y-4">
-              {categories.map((category, index) => {
+              {(categories || []).map((category, index) => {
                 // Assign different card styles based on category
                 let cardClass = "web3-card"
-                if (category.id === "web3") cardClass = "web3-card-purple"
-                else if (category.id === "coffee") cardClass = "web3-card-blue"
-                else if (category.id === "education") cardClass = "web3-card-teal"
-                else if (category.id === "summer-camp") cardClass = "web3-card-pink"
+                if (category.slug === "web3-blockchain") cardClass = "web3-card-purple"
+                else if (category.slug === "coffee-industry") cardClass = "web3-card-blue"
+                else if (category.slug === "education-training") cardClass = "web3-card-teal"
+                else if (category.slug === "summer-camp") cardClass = "web3-card-pink"
                 else cardClass = "web3-card-amber"
 
                 return (
@@ -162,10 +134,10 @@ export default function CommunityForumsPage() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <MessageSquare className="h-4 w-4" />
-                            <span>{category.topics} topics</span>
+                            <span>{category.topics_count} topics</span>
                           </div>
                           <div>
-                            <span>{category.posts} posts</span>
+                            <span>{category.posts_count} posts</span>
                           </div>
                         </div>
                       </div>
@@ -178,22 +150,22 @@ export default function CommunityForumsPage() {
 
           <TabsContent value="recent" className="mt-6">
             <div className="space-y-4">
-              {recentTopics.map((topic) => {
+              {(recentTopics || []).map((topic) => {
                 // Assign different card styles based on category
                 let cardClass = "web3-card"
-                if (topic.category === "web3") cardClass = "web3-card-purple"
-                else if (topic.category === "coffee") cardClass = "web3-card-blue"
-                else if (topic.category === "education") cardClass = "web3-card-teal"
-                else if (topic.category === "summer-camp") cardClass = "web3-card-pink"
+                if (topic.category.slug === "web3-blockchain") cardClass = "web3-card-purple"
+                else if (topic.category.slug === "coffee-industry") cardClass = "web3-card-blue"
+                else if (topic.category.slug === "education-training") cardClass = "web3-card-teal"
+                else if (topic.category.slug === "summer-camp") cardClass = "web3-card-pink"
                 else cardClass = "web3-card-amber"
 
                 return (
-                  <Card key={topic.id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
+                  <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-4">
                           <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                            <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author} />
+                            <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name} />
                             <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
                           </Avatar>
                           <div>
@@ -208,11 +180,11 @@ export default function CommunityForumsPage() {
                                 variant="outline"
                                 className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
                               >
-                                {categories.find((c) => c.id === topic.category)?.name}
+                                {topic.category.name}
                               </Badge>
-                              <span className="text-xs text-muted-foreground">By {topic.author}</span>
+                              <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
                               <span className="text-xs text-muted-foreground">•</span>
-                              <span className="text-xs text-muted-foreground">Last active {topic.lastActive}</span>
+                              <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
                             </div>
                           </div>
                         </div>
@@ -221,9 +193,9 @@ export default function CommunityForumsPage() {
                             variant="secondary"
                             className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
                           >
-                            {topic.replies} replies
+                            {topic.replies_count} replies
                           </Badge>
-                          <span className="text-xs text-muted-foreground">{topic.views} views</span>
+                          <span className="text-xs text-muted-foreground">{topic.views_count} views</span>
                         </div>
                       </div>
                     </CardContent>
@@ -235,24 +207,25 @@ export default function CommunityForumsPage() {
 
           <TabsContent value="popular" className="mt-6">
             <div className="space-y-4">
-              {recentTopics
+              {(popularTopics || [])
                 .sort((a, b) => b.views - a.views)
                 .map((topic) => {
                   // Assign different card styles based on category
                   let cardClass = "web3-card"
-                  if (topic.category === "web3") cardClass = "web3-card-purple"
-                  else if (topic.category === "coffee") cardClass = "web3-card-blue"
-                  else if (topic.category === "education") cardClass = "web3-card-teal"
-                  else if (topic.category === "summer-camp") cardClass = "web3-card-pink"
+                  if (topic.category.slug === "web3-blockchain") cardClass = "web3-card-purple"
+                  else if (topic.category.slug === "coffee-industry") cardClass = "web3-card-blue"
+                  else if (topic.category.slug === "education-training") cardClass = "web3-card-teal"
+                  else if (topic.category.slug === "summer-camp") cardClass = "web3-card-pink"
                   else cardClass = "web3-card-amber"
 
                   return (
-                    <Card key={topic.id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
+                    <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="flex items-start gap-4">
+                            
                             <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                              <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author} />
+                              <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.firstname} />
                               <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
                             </Avatar>
                             <div>
@@ -267,11 +240,11 @@ export default function CommunityForumsPage() {
                                   variant="outline"
                                   className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
                                 >
-                                  {categories.find((c) => c.id === topic.category)?.name}
+                                  {topic.category.name}
                                 </Badge>
-                                <span className="text-xs text-muted-foreground">By {topic.author}</span>
+                                <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
                                 <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">Last active {topic.lastActive}</span>
+                                <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
                               </div>
                             </div>
                           </div>
@@ -280,9 +253,9 @@ export default function CommunityForumsPage() {
                               variant="secondary"
                               className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
                             >
-                              {topic.replies} replies
+                              {topic.replies_count} replies
                             </Badge>
-                            <span className="text-xs text-muted-foreground">{topic.views} views</span>
+                            <span className="text-xs text-muted-foreground">{topic.views_count} views</span>
                           </div>
                         </div>
                       </CardContent>
