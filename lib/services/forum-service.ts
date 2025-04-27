@@ -20,7 +20,7 @@ export async function getForumCategories(): Promise<ForumResult<any[]>> {
     const { data, error } = await supabase
       .from("forum_categories")
       .select("*")
-      .order("order_index", { ascending: true })
+      .order("created_at", { ascending: true })
 
     if (error) {
       return { data: null, error: { message: error.message } }
@@ -36,6 +36,55 @@ export async function getForumCategories(): Promise<ForumResult<any[]>> {
   }
 }
 
+// Get recent topics
+export async function getRecentTopics(): Promise<ForumResult<any[]>> {
+  const supabase = createServerClient()
+
+  try {
+    const { data, error } = await supabase
+      .from("forum_topics_view")
+      .select("*")
+      .order("last_active", { ascending: false })
+      .limit(5)
+
+    if (error) {
+      return { data: null, error: { message: error.message } }
+    }
+
+    return { data, error: null }
+  } catch (error) {
+    console.error("Error fetching recent topics:", error)
+    return {
+      data: null,
+      error: { message: "An unexpected error occurred while fetching recent topics." },
+    }
+  }
+}
+
+// Get popular topics
+export async function getPopularTopics(): Promise<ForumResult<any[]>> {
+  const supabase = createServerClient()
+
+  try {
+    const { data, error } = await supabase
+      .from("forum_topics_view")
+      .select("*")
+      .order("replies_count", { ascending: false })
+      .limit(5)
+
+    if (error) {
+      return { data: null, error: { message: error.message } }
+    }
+
+    return { data, error: null }
+  } catch (error) {
+    console.error("Error fetching popular topics:", error)
+    return {
+      data: null,
+      error: { message: "An unexpected error occurred while fetching popular topics." },
+    }
+  }
+}
 // Get topics for a category
 export async function getTopicsByCategory(categoryId: string): Promise<ForumResult<any[]>> {
   const supabase = createServerClient()
@@ -80,7 +129,7 @@ export async function getTopicWithReplies(topicId: string): Promise<ForumResult<
       .select(`
         *,
         user:profiles(id, first_name, last_name, avatar_url),
-        category:forum_categories(id, name, slug)
+        category:forum_categories(id, name, style_class)
       `)
       .eq("id", topicId)
       .single()
