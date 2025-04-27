@@ -20,7 +20,7 @@ export async function getForumCategories(): Promise<ForumResult<any[]>> {
     const { data, error } = await supabase
       .from("forum_categories")
       .select("*")
-      .order("created_at", { ascending: true })
+      .order("order_index", { ascending: true })
 
     if (error) {
       return { data: null, error: { message: error.message } }
