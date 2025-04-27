@@ -105,7 +105,8 @@ The application uses a .env.local file to manage sensitive credentials and confi
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/protocol-academy.git
+   git clone https://github.com/wagatoken/waga_academy.git
+   
    cd protocol-academy
    ```
 
