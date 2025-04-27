@@ -9,59 +9,6 @@ import { MessageSquare, Plus, Search } from "lucide-react"
 import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
 
 
-// Sample forum topics
-// const recentTopics = [
-//   {
-//     id: 1,
-//     title: "How can blockchain improve coffee farmer incomes?",
-//     category: "web3",
-//     author: "CoffeeChain",
-//     avatar: "CC",
-//     replies: 24,
-//     views: 156,
-//     lastActive: "2 hours ago",
-//   },
-//   {
-//     id: 2,
-//     title: "Summer Camp 2024: What to expect?",
-//     category: "summer-camp",
-//     author: "EthioExplorer",
-//     avatar: "EE",
-//     replies: 18,
-//     views: 132,
-//     lastActive: "5 hours ago",
-//   },
-//   {
-//     id: 3,
-//     title: "DeFi lending models for smallholder farmers",
-//     category: "web3",
-//     author: "CryptoFarmer",
-//     avatar: "CF",
-//     replies: 32,
-//     views: 215,
-//     lastActive: "1 day ago",
-//   },
-//   {
-//     id: 4,
-//     title: "Introducing myself: Coffee roaster from Colombia",
-//     category: "general",
-//     author: "BeanMaster",
-//     avatar: "BM",
-//     replies: 15,
-//     views: 98,
-//     lastActive: "2 days ago",
-//   },
-//   {
-//     id: 5,
-//     title: "Best resources for learning about coffee processing?",
-//     category: "education",
-//     author: "NewFarmer",
-//     avatar: "NF",
-//     replies: 21,
-//     views: 143,
-//     lastActive: "3 days ago",
-//   },
-// ]
 
 export default async function CommunityForumsPage() {
    const { data: categories, error: categoriesError } = await getForumCategories();
