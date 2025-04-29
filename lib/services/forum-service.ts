@@ -1,6 +1,7 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
+
 import { revalidatePath } from "next/cache"
 
 export type ForumError = {
@@ -14,7 +15,7 @@ export type ForumResult<T> = {
 
 // Get all forum categories
 export async function getForumCategories(): Promise<ForumResult<any[]>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   try {
     const { data, error } = await supabase
@@ -38,13 +39,12 @@ export async function getForumCategories(): Promise<ForumResult<any[]>> {
 
 // Get recent topics
 export async function getRecentTopics(): Promise<ForumResult<any[]>> {
-  const supabase = createServerClient()
-
+  const supabase = await createServerClientInstance()
   try {
     const { data, error } = await supabase
       .from("forum_topics_view")
       .select("*")
-      .order("last_active", { ascending: false })
+      .order("last_active", { ascending: true })
       .limit(5)
 
     if (error) {
@@ -63,7 +63,7 @@ export async function getRecentTopics(): Promise<ForumResult<any[]>> {
 
 // Get popular topics
 export async function getPopularTopics(): Promise<ForumResult<any[]>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   try {
     const { data, error } = await supabase
@@ -87,7 +87,7 @@ export async function getPopularTopics(): Promise<ForumResult<any[]>> {
 }
 // Get topics for a category
 export async function getTopicsByCategory(categoryId: string): Promise<ForumResult<any[]>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   try {
     const { data, error } = await supabase
@@ -117,7 +117,7 @@ export async function getTopicsByCategory(categoryId: string): Promise<ForumResu
 
 // Get a topic with its replies
 export async function getTopicWithReplies(topicId: string): Promise<ForumResult<any>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   try {
     // Increment view count
@@ -170,48 +170,67 @@ export async function getTopicWithReplies(topicId: string): Promise<ForumResult<
 
 // Create a new topic
 export async function createTopic(topicData: any): Promise<ForumResult<any>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance();
 
   try {
-    // Get the current user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    // Get the current session
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-    if (!user) {
-      return { data: null, error: { message: "Not authenticated" } }
+    if (sessionError) {
+      console.error("Error fetching session:", sessionError);
+      return { data: null, error: { message: "Failed to retrieve session." } };
     }
+
+    if (!sessionData?.session) {
+      console.log("No active session found.");
+      return { data: null, error: { message: "Not authenticated" } };
+    }
+
+    const userId = sessionData.session.user.id;
 
     // Create the topic
-    const { data, error } = await supabase
+    const { data: topic, error: topicError } = await supabase
       .from("forum_topics")
       .insert({
-        ...topicData,
-        user_id: user.id,
+        title: topicData.title,
+        content: topicData.content,
+        profile_id: userId, // Use the authenticated user's ID
+        category_id: topicData.category,
       })
       .select()
-      .single()
+      .single();
 
-    if (error) {
-      return { data: null, error: { message: error.message } }
+    if (topicError) {
+      console.error("Error inserting topic:", topicError);
+      return { data: null, error: { message: topicError.message || "Failed to create the topic." } };
     }
 
-    revalidatePath("/community/forums")
-    revalidatePath(`/community/forums/topics/${data.id}`)
+    // Increment the topic count for the category
+    const { error: categoryError } = await supabase
+      .rpc('increment', { row_id: topicData.category })
 
-    return { data, error: null }
+
+    if (categoryError) {
+      console.error("Error updating topic count for category:", categoryError);
+      return { data: null, error: { message: categoryError.message || "Failed to update topic count." } };
+    }
+
+    // Revalidate the forums page
+    revalidatePath("/community/dashboard");
+
+    return { data: topic, error: null };
   } catch (error) {
-    console.error("Error creating topic:", error)
+    console.error("Unexpected error creating topic:", error);
     return {
       data: null,
       error: { message: "An unexpected error occurred while creating the topic." },
-    }
+    };
   }
 }
 
 // Create a reply to a topic
 export async function createReply(replyData: any): Promise<ForumResult<any>> {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   try {
     // Get the current user
@@ -237,7 +256,7 @@ export async function createReply(replyData: any): Promise<ForumResult<any>> {
       return { data: null, error: { message: error.message } }
     }
 
-    revalidatePath(`/community/forums/topics/${replyData.topic_id}`)
+    // revalidatePath(`/community/forums/topics/${replyData.topic_id}`)
 
     return { data, error: null }
   } catch (error) {
