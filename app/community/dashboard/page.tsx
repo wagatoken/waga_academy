@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, MessageSquare, Users, Coffee, Globe } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 
 // Fetch resources from the database
 async function getResources() {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("resources")
@@ -35,7 +35,7 @@ async function getResources() {
 
 // Fetch upcoming events
 async function getUpcomingEvents() {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("events")
@@ -62,7 +62,7 @@ async function getUpcomingEvents() {
 
 // Fetch discussion topics
 async function getDiscussionTopics() {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_topics")
@@ -85,7 +85,7 @@ async function getDiscussionTopics() {
 
 // Get community member count
 async function getCommunityMemberCount() {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { count, error } = await supabase.from("profiles").select("*", { count: "exact", head: true })
 
