@@ -1,38 +1,58 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft } from "lucide-react";
+import { toast } from "@/components/ui/toast";
+import { createTopic, getForumCategories } from "@/lib/services/forum-service";
 
 export default function NewTopicPage() {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     content: "",
-  })
+  });
+  const [categories, setCategories] = useState([]);
+  const [categoriesError, setCategoriesError] = useState(null);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await getForumCategories();
+        if (error) {
+          setCategoriesError(error.message);
+          return;
+        }
+        setCategories(data || []);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setCategoriesError("Failed to fetch categories.");
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleCategoryChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, category: value }))
-  }
+    setFormData((prev) => ({ ...prev, category: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     // Basic validation
     if (!formData.title.trim() || !formData.category || !formData.content.trim()) {
@@ -40,22 +60,47 @@ export default function NewTopicPage() {
         title: "Error",
         description: "Please fill in all fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      // Call the createTopic function
+      const { data, error } = await createTopic({
+        title: formData.title,
+        category: formData.category, 
+        content: formData.content,
+      });
+
+      if (error) {
+        console.error("Error creating topic:", error);
+        toast({
+          title: "Error ❌",
+          description: "Failed to create the topic. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        title: "Topic created",
+        title: "Topic created 🎉",
         description: "Your topic has been posted successfully",
-      })
-      router.push("/community/forums")
-    }, 1000)
-  }
+      });
+
+      router.push("/community/forums");
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error ❌",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container py-12">
@@ -98,11 +143,17 @@ export default function NewTopicPage() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">General Discussion</SelectItem>
-                    <SelectItem value="web3">Web3 & Blockchain</SelectItem>
-                    <SelectItem value="coffee">Coffee Industry</SelectItem>
-                    <SelectItem value="education">Education & Training</SelectItem>
-                    <SelectItem value="summer-camp">Summer Camp</SelectItem>
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="x" disabled>
+                        "No categories available"
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -137,5 +188,5 @@ export default function NewTopicPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
