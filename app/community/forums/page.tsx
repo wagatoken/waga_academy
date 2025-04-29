@@ -7,20 +7,22 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MessageSquare, Plus, Search } from "lucide-react"
 import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
-
+import { toast } from "@/components/ui/toast"
 
 
 export default async function CommunityForumsPage() {
    const { data: categories, error: categoriesError } = await getForumCategories();
-   console.log("Categories:", categories)
-   console.log("Categories Error:", categoriesError)
   const { data: recentTopics, error: topicsError } = await getRecentTopics();
   const {data: popularTopics, error: popularTopicsError} = await getPopularTopics()
 
 
   if (categoriesError || topicsError || popularTopicsError) {
-    console.error("Error fetching data:", categoriesError || topicsError || popularTopicsError);
-    return <div>Error loading forum data. Please try again later.</div>;
+    console.error("Error fetching data:", categoriesError || topicsError || popularTopicsError);  
+    toast({
+        title: "Error loading forum data ❌",
+        description: "Error loading forum data. Please try again later.",
+        variant: "destructive",
+  })
   }
   return (
     <div className="container py-12">
