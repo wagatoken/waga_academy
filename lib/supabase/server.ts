@@ -1,32 +1,25 @@
-import { createClient } from "@supabase/supabase-js"
-import { cookies } from "next/headers"
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-export const createServerClient = () => {
-  const cookieStore = cookies()
+export const createServerClientInstance = async () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value
-      },
-      set(name: string, value: string, options: any) {
-        try {
-          cookieStore.set({ name, value, ...options })
-        } catch (error) {
-          // This can happen when attempting to set cookies in middleware
-          // We can safely ignore this error
-        }
-      },
-      remove(name: string, options: any) {
-        try {
-          cookieStore.set({ name, value: "", ...options })
-        } catch (error) {
-          // This can happen when attempting to delete cookies in middleware
-          // We can safely ignore this error
-        }
-      },
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase environment variables are not set.");
+  }
+
+  // Await cookies() to retrieve all cookies
+  const cookieStore = await cookies();
+
+  const cookieMethods = {
+    getAll: async () => cookieStore.getAll(), // Retrieve all cookies asynchronously
+    setAll: async (newCookies: { name: string; value: string }[]) => {
+      for (const { name, value } of newCookies) {
+        await cookieStore.set(name, value); // Set cookies asynchronously
+      }
     },
-  })
+  };
 
-  return supabase
-}
+  return createServerClient(supabaseUrl, supabaseKey, { cookies: cookieMethods });
+};
