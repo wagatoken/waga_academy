@@ -1,11 +1,11 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 // Get all forum categories
 export async function getForumCategories() {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_categories")
@@ -25,7 +25,7 @@ export async function getForumCategories() {
 
 // Get topics for a category
 export async function getForumTopics(categoryId: string) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_topics")
@@ -49,7 +49,7 @@ export async function getForumTopics(categoryId: string) {
 
 // Get a single topic with replies
 export async function getForumTopic(topicId: string) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_topics")
@@ -81,7 +81,7 @@ export async function getForumTopic(topicId: string) {
 
 // Create a new topic
 export async function createForumTopic(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -123,7 +123,7 @@ export async function createForumTopic(formData: FormData) {
 
 // Create a reply to a topic
 export async function createForumReply(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -163,7 +163,7 @@ export async function createForumReply(formData: FormData) {
 
 // Admin: Create a new category
 export async function createForumCategory(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -227,7 +227,7 @@ export async function createForumCategory(formData: FormData) {
 
 // Admin: Pin/unpin a topic
 export async function togglePinTopic(topicId: string, isPinned: boolean) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -267,7 +267,7 @@ export async function togglePinTopic(topicId: string, isPinned: boolean) {
 
 // Admin: Lock/unlock a topic
 export async function toggleLockTopic(topicId: string, isLocked: boolean) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {

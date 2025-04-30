@@ -84,28 +84,41 @@ async function getDiscussionTopics() {
 }
 
 // Get community member count
-async function getCommunityMemberCount() {
-  const supabase = await createServerClientInstance()
+// async function getCommunityMemberCount() {
+//   const supabase = await createServerClientInstance()
 
-  const { count, error } = await supabase.from("profiles").select("*", { count: "exact", head: true })
+//   const { count, error } = await supabase.from("profiles").select("*", { count: "exact", head: true })
 
+//   if (error) {
+//     console.error("Error fetching member count:", error)
+//     return 0
+//   }
+
+//   return count || 0
+// }
+
+async function getStats(){
+   const supabase = await createServerClientInstance()
+  const { data, error } = await supabase.from("community_stats").select("*").single();
   if (error) {
-    console.error("Error fetching member count:", error)
+    console.error("Error fetching stats")
     return 0
   }
 
-  return count || 0
+  return data
+  
 }
-
 export default async function CommunityDashboard() {
   // Fetch data
-  const [resources, upcomingEvents, discussionTopics, memberCount] = await Promise.all([
+  const [resources, upcomingEvents, discussionTopics, stats] = await Promise.all([
     getResources(),
     getUpcomingEvents(),
     getDiscussionTopics(),
-    getCommunityMemberCount(),
+    getStats(),
   ])
 
+  const { member_count=0, upcoming_event_count=0, discussion_count=0 } = stats || {};
+  
   // Fallback data if no resources are found
   const resourcesData =
     resources.length > 0
@@ -188,9 +201,9 @@ export default async function CommunityDashboard() {
               <Users className="h-4 w-4 text-purple-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{memberCount || 1}</div>
+              <div className="text-2xl font-bold">{member_count || 1}</div>
               <p className="text-xs text-muted-foreground">
-                {memberCount > 1 ? "Active members and growing!" : "You're the first one here!"}
+                {member_count > 1 ? "Active members and growing!" : "You're the first one here!"}
               </p>
             </CardContent>
           </Card>
@@ -200,8 +213,10 @@ export default async function CommunityDashboard() {
               <Calendar className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{eventsData.length}</div>
-              <p className="text-xs text-muted-foreground">Coming soon</p>
+                <div className="text-2xl font-bold">{upcoming_event_count}</div>
+               <p className="text-xs text-muted-foreground">
+                {upcoming_event_count > 0 ? "Exciting events ahead!" : "No events yet. Stay tuned!"}
+                </p>
             </CardContent>
           </Card>
           <Card className="web3-card-teal">
@@ -210,8 +225,10 @@ export default async function CommunityDashboard() {
               <MessageSquare className="h-4 w-4 text-teal-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{topicsData.length}</div>
-              <p className="text-xs text-muted-foreground">Start the conversation</p>
+              <div className="text-2xl font-bold">{discussion_count}</div>
+               <p className="text-xs text-muted-foreground">
+                  {discussion_count > 0 ? "Discussion happening now!!" : "Start a new discussion!"}
+              </p>
             </CardContent>
           </Card>
         </div>

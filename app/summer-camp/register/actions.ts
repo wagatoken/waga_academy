@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { z } from "zod"
 
 // Define the schema for validation
@@ -44,7 +44,7 @@ export async function submitCampRegistration(formData: VolunteerFormValues) {
     const validatedData = volunteerFormSchema.parse(formData)
 
     // Create a Supabase client
-    const supabase = createServerClient()
+    const supabase = createServerClientInstance()
 
     // Insert the registration into the database
     const { data, error } = await supabase

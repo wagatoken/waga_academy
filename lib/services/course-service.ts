@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export type CourseError = {
@@ -14,7 +14,7 @@ export type CourseResult<T> = {
 
 // Get all published courses
 export async function getPublishedCourses(): Promise<CourseResult<any[]>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     const { data, error } = await supabase
@@ -39,7 +39,7 @@ export async function getPublishedCourses(): Promise<CourseResult<any[]>> {
 
 // Get a course by slug
 export async function getCourseBySlug(slug: string): Promise<CourseResult<any>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     const { data, error } = await supabase
@@ -71,7 +71,7 @@ export async function getCourseBySlug(slug: string): Promise<CourseResult<any>> 
 
 // Create a new course (admin only)
 export async function createCourse(courseData: any): Promise<CourseResult<any>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     // Get the current user
@@ -123,7 +123,7 @@ export async function createCourse(courseData: any): Promise<CourseResult<any>> 
 
 // Update a course (admin only)
 export async function updateCourse(courseId: string, courseData: any): Promise<CourseResult<any>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     // Get the current user
@@ -170,7 +170,7 @@ export async function updateCourse(courseId: string, courseData: any): Promise<C
 
 // Enroll a user in a course
 export async function enrollInCourse(courseId: string): Promise<CourseResult<any>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     // Get the current user
@@ -226,7 +226,7 @@ export async function enrollInCourse(courseId: string): Promise<CourseResult<any
 
 // Get user's enrolled courses
 export async function getUserEnrolledCourses(): Promise<CourseResult<any[]>> {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   try {
     // Get the current user

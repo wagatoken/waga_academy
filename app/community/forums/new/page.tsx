@@ -89,7 +89,7 @@ export default function NewTopicPage() {
         description: "Your topic has been posted successfully",
       });
 
-      router.push("/community/forums");
+      router.push("/community/dashboard");
     } catch (error) {
       console.error("Unexpected error:", error);
       toast({

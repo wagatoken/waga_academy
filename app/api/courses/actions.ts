@@ -1,11 +1,11 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 // Admin: Create a new course
 export async function createCourse(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -64,7 +64,7 @@ export async function createCourse(formData: FormData) {
 
 // Admin: Update a course
 export async function updateCourse(courseId: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -119,7 +119,7 @@ export async function updateCourse(courseId: string, formData: FormData) {
 
 // Admin: Delete a course
 export async function deleteCourse(courseId: string) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -154,7 +154,7 @@ export async function deleteCourse(courseId: string) {
 
 // Admin: Add a module to a course
 export async function addModuleToCourse(courseId: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -212,7 +212,7 @@ export async function addModuleToCourse(courseId: string, formData: FormData) {
 
 // Admin: Add a lesson to a module
 export async function addLessonToModule(moduleId: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -284,7 +284,7 @@ export async function addLessonToModule(moduleId: string, formData: FormData) {
 
 // Student: Enroll in a course
 export async function enrollInCourse(courseId: string) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -333,7 +333,7 @@ export async function enrollInCourse(courseId: string) {
 
 // Student: Update course progress
 export async function updateCourseProgress(enrollmentId: string, progress: number) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
@@ -366,7 +366,7 @@ export async function updateCourseProgress(enrollmentId: string, progress: numbe
 
 // Get all courses (public)
 export async function getAllCourses() {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   const { data, error } = await supabase
     .from("courses")
@@ -388,7 +388,7 @@ export async function getAllCourses() {
 
 // Get course by slug (public)
 export async function getCourseBySlug(slug: string) {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   const { data, error } = await supabase
     .from("courses")
@@ -413,7 +413,7 @@ export async function getCourseBySlug(slug: string) {
 
 // Admin: Get all courses (including unpublished)
 export async function getAdminCourses() {
-  const supabase = createServerClient()
+  const supabase = createServerClientInstance()
 
   // Get the current user
   const {
