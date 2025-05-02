@@ -244,7 +244,7 @@ export default async function CommunityDashboard() {
                       variant="outline"
                       className="border-purple-600/30 hover:border-purple-600/60"
                       >
-                      <Link href={`/community/events/${event.id}`}>
+                      <Link href={`/community/events/${event.slug}`}>
                         {new Date(event.date_time) > new Date() ? "Register Now" : "Stay Tuned"}
                       </Link>
                       </Button>
