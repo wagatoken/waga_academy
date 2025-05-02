@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, MessageSquare, Users, Coffee, Globe } from "lucide-react"
 import { createServerClientInstance } from "@/lib/supabase/server"
+import { getUpcomingEvents, MinimalEvent } from "@/lib/services/event-service"
 
 // Fetch resources from the database
 async function getResources() {
@@ -32,34 +33,6 @@ async function getResources() {
 
   return data || []
 }
-
-// Fetch upcoming events
-async function getUpcomingEvents() {
-  const supabase = await createServerClientInstance()
-
-  const { data, error } = await supabase
-    .from("events")
-    .select(`
-      id,
-      title,
-      description,
-      start_date,
-      end_date,
-      location,
-      is_virtual
-    `)
-    .gte("start_date", new Date().toISOString())
-    .order("start_date", { ascending: true })
-    .limit(2)
-
-  if (error) {
-    console.error("Error fetching events:", error)
-    return []
-  }
-
-  return data || []
-}
-
 // Fetch discussion topics
 async function getDiscussionTopics() {
   const supabase = await createServerClientInstance()
@@ -110,13 +83,13 @@ async function getStats(){
 }
 export default async function CommunityDashboard() {
   // Fetch data
-  const [resources, upcomingEvents, discussionTopics, stats] = await Promise.all([
+  const [resources, discussionTopics, stats] = await Promise.all([
     getResources(),
-    getUpcomingEvents(),
     getDiscussionTopics(),
     getStats(),
   ])
 
+  const {data: upcomingEvents} = await getUpcomingEvents();
   const { member_count=0, upcoming_event_count=0, discussion_count=0 } = stats || {};
   
   // Fallback data if no resources are found
@@ -139,27 +112,7 @@ export default async function CommunityDashboard() {
         ]
 
   // Fallback data if no events are found
-  const eventsData =
-    upcomingEvents.length > 0
-      ? upcomingEvents
-      : [
-          {
-            id: 1,
-            title: "Welcome to WAGA Academy",
-            type: "Webinar",
-            start_date: "Coming Soon",
-            time: "To be announced",
-            speakers: ["WAGA Team"],
-          },
-          {
-            id: 2,
-            title: "Introduction to Blockchain for Coffee",
-            type: "Live Session",
-            start_date: "Coming Soon",
-            time: "To be announced",
-            speakers: ["WAGA Team"],
-          },
-        ]
+
 
   // Fallback data if no discussion topics are found
   const topicsData =
@@ -241,68 +194,71 @@ export default async function CommunityDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {eventsData.map((event, index) => {
+                {upcomingEvents.length > 0 ? (
+                  upcomingEvents.map((event: MinimalEvent, index: number) => {
                   // Assign different background colors based on event type
                   let bgClass = "bg-purple-500/10"
-                  if (event.type === "Live Session" || event.is_virtual === false) bgClass = "bg-blue-500/10"
-                  if (event.type === "Workshop") bgClass = "bg-teal-500/10"
+                  if (event.is_virtual === false) bgClass = "bg-blue-500/10"
 
                   // Format date and time
                   let dateDisplay = "Coming Soon"
                   let timeDisplay = "To be announced"
 
-                  if (event.start_date && typeof event.start_date !== "string") {
-                    const date = new Date(event.start_date)
+                  if (event.date_time) {
+                    const date = new Date(event.date_time)
                     dateDisplay = date.toLocaleDateString("en-US", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                     })
                     timeDisplay = date.toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
                     })
                   }
 
                   return (
                     <div key={event.id} className="flex flex-col sm:flex-row gap-4 pb-4 border-b border-purple-500/20">
-                      <div className="sm:w-1/4">
-                        <div className={`${bgClass} p-4 rounded-md text-center`}>
-                          <p className="text-sm font-medium">{dateDisplay}</p>
-                          <p className="text-xs text-muted-foreground">{timeDisplay}</p>
-                        </div>
-                      </div>
-                      <div className="sm:w-3/4 space-y-2">
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-medium">{event.title}</h3>
-                          <Badge variant="outline" className={`${bgClass} border-purple-500/30 text-purple-300`}>
-                            {event.is_virtual !== undefined
-                              ? event.is_virtual
-                                ? "Virtual"
-                                : "In Person"
-                              : event.type || "Event"}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {event.description
-                            ? event.description.substring(0, 100) + "..."
-                            : "Join us for this exciting event!"}
-                        </p>
-                        <Button
-                          asChild
-                          size="sm"
-                          variant="outline"
-                          className="border-purple-600/30 hover:border-purple-600/60"
-                        >
-                          <Link href={`/community/events/${event.id}`}>
-                            {new Date(event.start_date) > new Date() ? "Register Now" : "Stay Tuned"}
-                          </Link>
-                        </Button>
+                    <div className="sm:w-1/4">
+                      <div className={`${bgClass} p-4 rounded-md text-center`}>
+                      <p className="text-sm font-medium">{dateDisplay}</p>
+                      <p className="text-xs text-muted-foreground">{timeDisplay}</p>
                       </div>
                     </div>
+                    <div className="sm:w-3/4 space-y-2">
+                      <div className="flex justify-between items-start">
+                      <h3 className="font-medium">{event.title}</h3>
+                      <Badge variant="outline" className={`${bgClass} border-purple-500/30 text-purple-300`}>
+                        {event.is_virtual ? "Virtual" : "In Person"}
+                      </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                      {event.description
+                        ? event.description.substring(0, 100) + "..."
+                        : "Join us for this exciting event!"}
+                      </p>
+                      <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="border-purple-600/30 hover:border-purple-600/60"
+                      >
+                      <Link href={`/community/events/${event.id}`}>
+                        {new Date(event.date_time) > new Date() ? "Register Now" : "Stay Tuned"}
+                      </Link>
+                      </Button>
+                    </div>
+                    </div>
                   )
-                })}
+                  })
+                ) : (
+                  <div className="text-center text-sm text-muted-foreground">
+                  No upcoming events. Stay tuned for updates!
+                  </div>
+                )}
+
+              
               </div>
             </CardContent>
             <CardFooter>
