@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -22,61 +22,91 @@ import {
   Facebook,
   Link2,
 } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/components/ui/toast";
+import { getEventBySlug, getPastEvents } from "@/lib/services/event-service";
 
-// Sample event data - in a real app, this would be fetched based on the ID
-const eventData = {
-  id: 1,
-  title: "Web3 for Coffee Traceability",
-  type: "Webinar",
-  date: "May 15, 2024",
-  time: "3:00 PM UTC",
-  duration: "1 hour",
-  speakers: [
-    {
-      name: "Jane Doe",
-      role: "Blockchain Specialist",
-      avatar: "JD",
-      bio: "Jane is a blockchain developer with 5+ years of experience implementing traceability solutions in agricultural supply chains.",
-    },
-    {
-      name: "John Smith",
-      role: "Coffee Industry Expert",
-      avatar: "JS",
-      bio: "John has worked with coffee cooperatives across East Africa to implement digital solutions for quality control and traceability.",
-    },
-  ],
-  description:
-    "Learn how blockchain technology can be used to create transparent and traceable coffee supply chains. We'll cover real-world examples and implementation challenges.",
-  longDescription: `
-    <p>In this webinar, we'll explore how blockchain technology is revolutionizing the coffee industry by enabling unprecedented levels of transparency and traceability from farm to cup.</p>
+
+// // Sample event data - in a real app, this would be fetched based on the ID
+// const eventData = {
+//   id: 1,
+//   title: "Web3 for Coffee Traceability",
+//   type: "Webinar",
+//   date: "May 15, 2024",
+//   time: "3:00 PM UTC",
+//   duration: "1 hour",
+//   speakers: [
+//     {
+//       name: "Jane Doe",
+//       role: "Blockchain Specialist",
+//       avatar: "JD",
+//       bio: "Jane is a blockchain developer with 5+ years of experience implementing traceability solutions in agricultural supply chains.",
+//     },
+//     {
+//       name: "John Smith",
+//       role: "Coffee Industry Expert",
+//       avatar: "JS",
+//       bio: "John has worked with coffee cooperatives across East Africa to implement digital solutions for quality control and traceability.",
+//     },
+//   ],
+//   description:
+//     "Learn how blockchain technology can be used to create transparent and traceable coffee supply chains. We'll cover real-world examples and implementation challenges.",
+//   longDescription: `
+//     <p>In this webinar, we'll explore how blockchain technology is revolutionizing the coffee industry by enabling unprecedented levels of transparency and traceability from farm to cup.</p>
     
-    <p>Our expert speakers will cover:</p>
+//     <p>Our expert speakers will cover:</p>
     
-    <ul>
-      <li>The challenges of traditional coffee supply chains</li>
-      <li>How blockchain addresses these challenges</li>
-      <li>Real-world case studies from Ethiopia and Colombia</li>
-      <li>Implementation strategies and common pitfalls</li>
-      <li>The impact on farmer livelihoods and consumer trust</li>
-    </ul>
+//     <ul>
+//       <li>The challenges of traditional coffee supply chains</li>
+//       <li>How blockchain addresses these challenges</li>
+//       <li>Real-world case studies from Ethiopia and Colombia</li>
+//       <li>Implementation strategies and common pitfalls</li>
+//       <li>The impact on farmer livelihoods and consumer trust</li>
+//     </ul>
     
-    <p>Whether you're a coffee producer, roaster, retailer, or technology enthusiast, this webinar will provide valuable insights into the future of transparent coffee supply chains.</p>
+//     <p>Whether you're a coffee producer, roaster, retailer, or technology enthusiast, this webinar will provide valuable insights into the future of transparent coffee supply chains.</p>
     
-    <p>The webinar will include a Q&A session where attendees can ask questions directly to our speakers.</p>
-  `,
-  image: "/placeholder.svg?height=400&width=800",
-  platform: "Zoom",
-  platformLink: "https://zoom.us/j/example",
-  registeredCount: 87,
-  maxAttendees: 200,
-}
+//     <p>The webinar will include a Q&A session where attendees can ask questions directly to our speakers.</p>
+//   `,
+//   image: "/placeholder.svg?height=400&width=800",
+//   platform: "Zoom",
+//   platformLink: "https://zoom.us/j/example",
+//   registeredCount: 87,
+//   maxAttendees: 200,
+// }
 
 export default function EventPage({ params }: { params: { id: string } }) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRegistered, setIsRegistered] = useState(false)
+ const [eventData, setEventData] = useState<any>(null);
+  const [pastEvents, setPastEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+ useEffect(() => {
+  async function fetchEventData() {
+    try {
+      const resolvedParams = await params; // Unwrap the params Promise
+      const { data } = await getEventBySlug(resolvedParams.id); // Use the resolved ID
+      setEventData(data);
+
+      const pastEventsData = await getPastEvents(); // Fetch past events
+      setPastEvents(pastEventsData.data);
+    } catch (error) {
+      console.error("Failed to fetch event data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load event data.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false); // Stop loading once data is fetched
+    }
+  }
+
+  fetchEventData();
+}, [params]);
+
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
@@ -103,6 +133,14 @@ export default function EventPage({ params }: { params: { id: string } }) {
     }, 1000)
   }
 
+
+   if (loading) {
+    return <div className="container py-12">Loading...</div>; // Show a loading state while fetching data
+  }
+
+  if (!eventData) {
+    return <div className="container py-12">Event not found.</div>; // Show an error state if no event data is available
+  }
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -114,7 +152,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
             <div className="lg:col-span-2 space-y-6">
               <div className="relative h-[300px] rounded-xl overflow-hidden web3-card-glow-border">
                 <Image
-                  src={eventData.image || "/placeholder.svg"}
+                  src={eventData.image_url || "/placeholder.svg"}
                   alt={eventData.title}
                   fill
                   className="object-cover"
@@ -129,12 +167,36 @@ export default function EventPage({ params }: { params: { id: string } }) {
                 <div className="flex flex-wrap gap-4 mt-4">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4 icon-emerald" />
-                    <span>{eventData.date}</span>
+                    <span>
+                       {(() => {
+                        let dateDisplay = "Coming Soon";
+                        if (eventData.date_time) {
+                          const date = new Date(eventData.date_time);
+                          dateDisplay = date.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          });
+                        }
+                        return dateDisplay;
+                      })()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 icon-emerald" />
                     <span>
-                      {eventData.time} • {eventData.duration}
+                      {(() => {
+                      let timeDisplay = "To be announced";
+                      if (eventData.date_time) {
+                        const date = new Date(`${eventData.date_time}`);
+                        timeDisplay = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        });
+                      }
+                      return `${timeDisplay} • ${eventData.duration}`;
+                    })()}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -143,7 +205,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4 icon-emerald" />
-                    <span>{eventData.registeredCount} registered</span>
+                    <span>{eventData.registered_count} registered</span>
                   </div>
                 </div>
               </div>
@@ -155,7 +217,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                 <CardContent>
                   <div
                     className="prose prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: eventData.longDescription }}
+                    dangerouslySetInnerHTML={{ __html: eventData.long_description || "No Description" }}
                   />
                 </CardContent>
               </Card>
