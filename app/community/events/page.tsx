@@ -5,88 +5,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Video, Clock } from "lucide-react"
+import { getUpcomingEvents, getPastEvents } from "@/lib/services/event-service"
 
-// Sample events data
-const upcomingEvents = [
-  {
-    id: 1,
-    title: "Web3 for Coffee Traceability",
-    type: "Webinar",
-    date: "May 15, 2024",
-    time: "3:00 PM UTC",
-    duration: "1 hour",
-    speakers: ["Jane Doe", "John Smith"],
-    description:
-      "Learn how blockchain technology can be used to create transparent and traceable coffee supply chains. We'll cover real-world examples and implementation challenges.",
-    image: "/placeholder.svg?height=200&width=400",
-  },
-  {
-    id: 2,
-    title: "Community AMA: WAGA Academy Roadmap",
-    type: "Live Session",
-    date: "May 22, 2024",
-    time: "4:00 PM UTC",
-    duration: "1.5 hours",
-    speakers: ["WAGA Team"],
-    description:
-      "Join the WAGA Academy team for an Ask Me Anything session about our roadmap, upcoming courses, and the future of the platform.",
-    image: "/placeholder.svg?height=200&width=400",
-  },
-  {
-    id: 3,
-    title: "Coffee Tokenization: Use Cases & Opportunities",
-    type: "Workshop",
-    date: "June 5, 2024",
-    time: "2:00 PM UTC",
-    duration: "2 hours",
-    speakers: ["Alice Johnson", "Bob Williams"],
-    description:
-      "Explore how coffee assets can be tokenized to enable fair pricing, financial resources, and global market access for smallholder farmers.",
-    image: "/placeholder.svg?height=200&width=400",
-  },
-  {
-    id: 4,
-    title: "Summer Camp 2024 Information Session",
-    type: "Webinar",
-    date: "June 12, 2024",
-    time: "3:30 PM UTC",
-    duration: "1 hour",
-    speakers: ["Summer Camp Team"],
-    description:
-      "Get all the details about the upcoming WAGA Summer Camp in Ethiopia, including dates, logistics, and what to expect as a volunteer.",
-    image: "/placeholder.svg?height=200&width=400",
-  },
-]
 
-const pastEvents = [
-  {
-    id: 101,
-    title: "Introduction to WAGA Academy",
-    type: "Webinar",
-    date: "April 20, 2024",
-    time: "3:00 PM UTC",
-    duration: "1 hour",
-    speakers: ["WAGA Founders"],
-    description:
-      "An introduction to WAGA Academy, our mission, and how we're using Web3 to transform the coffee industry.",
-    recording: true,
-    image: "/placeholder.svg?height=200&width=400",
-  },
-  {
-    id: 102,
-    title: "DeFi Basics for Coffee Farmers",
-    type: "Workshop",
-    date: "April 28, 2024",
-    time: "2:00 PM UTC",
-    duration: "1.5 hours",
-    speakers: ["Finance Team"],
-    description: "A beginner-friendly introduction to decentralized finance and how it can benefit coffee farmers.",
-    recording: true,
-    image: "/placeholder.svg?height=200&width=400",
-  },
-]
 
-export default function CommunityEventsPage() {
+export default async function CommunityEventsPage() {
+  const { data: upcomingEvents } = await getUpcomingEvents(6)
+  const { data: pastEvents } = await getPastEvents()
+  console.log("Upcoming Events:", upcomingEvents)
+
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -123,7 +50,7 @@ export default function CommunityEventsPage() {
 
                 return (
                   <Card
-                    key={event.id}
+                    key={event.slug}
                     className={`${cardClass} flex flex-col h-full hover:border-purple-500/40 transition-colors`}
                   >
                     <div className="relative h-48 w-full">
@@ -142,12 +69,36 @@ export default function CommunityEventsPage() {
                       <CardDescription>
                         <div className="flex items-center gap-1 mt-1">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>{event.date}</span>
+                          <span>
+                            {(() => {
+                              let dateDisplay = "Coming Soon";
+                              if (event.date_time) {
+                                const date = new Date(event.date_time);
+                                dateDisplay = date.toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                });
+                              }
+                              return dateDisplay;
+                            })()}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <span>
-                            {event.time} • {event.duration}
+                            {(() => {
+                              let timeDisplay = "To be announced";
+                              if (event.date_time) {
+                                const date = new Date(event.date_time);
+                                timeDisplay = date.toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                });
+                              }
+                              return `${timeDisplay} • ${event.duration}`;
+                            })()}
                           </span>
                         </div>
                       </CardDescription>
@@ -157,17 +108,26 @@ export default function CommunityEventsPage() {
                       <div className="mt-4">
                         <p className="text-sm font-medium">Speakers:</p>
                         <div className="flex items-center gap-2 mt-1">
-                          {event.speakers.map((speaker, index) => (
-                            <Badge key={index} variant="outline">
-                              {speaker}
-                            </Badge>
-                          ))}
+                                            
+                          {event.speakers && event.speakers.length > 0 ? (
+                            event.speakers.map((speaker) => (
+                              speaker.name ? (
+                                <Badge key={speaker.id} variant="outline">
+                                  {speaker.name}
+                                </Badge>
+                              ) : (
+                                <p  key={speaker.id} className="text-sm text-muted-foreground">No speaker assigned</p>
+                              )
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No speaker assigned</p>
+                          )}
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button asChild className="w-full">
-                        <Link href={`/community/events/${event.id}`}>Register</Link>
+                      <Button asChild className="w-full" style={{ zIndex:100 }}>
+                        <Link href={`/community/events/${event.slug}`}>Register</Link>
                       </Button>
                     </CardFooter>
                   </Card>
@@ -187,10 +147,11 @@ export default function CommunityEventsPage() {
 
                 return (
                   <Card
-                    key={event.id}
+                    key={event.slug}
                     className={`${cardClass} flex flex-col h-full hover:border-purple-500/40 transition-colors`}
                   >
                     <div className="relative h-48 w-full">
+                      
                       <Image
                         src={event.image || "/placeholder.svg"}
                         alt={event.title}
@@ -210,15 +171,39 @@ export default function CommunityEventsPage() {
                     </div>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xl">{event.title}</CardTitle>
-                      <CardDescription>
+                        <CardDescription>
                         <div className="flex items-center gap-1 mt-1">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>{event.date}</span>
+                          <span>
+                            {(() => {
+                              let dateDisplay = "Coming Soon";
+                              if (event.date_time) {
+                                const date = new Date(event.date_time);
+                                dateDisplay = date.toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                });
+                              }
+                              return dateDisplay;
+                            })()}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <span>
-                            {event.time} • {event.duration}
+                            {(() => {
+                              let timeDisplay = "To be announced";
+                              if (event.date_time) {
+                                const date = new Date(event.date_time);
+                                timeDisplay = date.toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                });
+                              }
+                              return `${timeDisplay} • ${event.duration}`;
+                            })()}
                           </span>
                         </div>
                       </CardDescription>
@@ -228,17 +213,25 @@ export default function CommunityEventsPage() {
                       <div className="mt-4">
                         <p className="text-sm font-medium">Speakers:</p>
                         <div className="flex items-center gap-2 mt-1">
-                          {event.speakers.map((speaker, index) => (
-                            <Badge key={index} variant="outline">
-                              {speaker}
-                            </Badge>
-                          ))}
+                         {event.speakers && event.speakers.length > 0 ? (
+                            event.speakers.map((speaker) => (
+                              speaker.name ? (
+                                <Badge key={speaker.id} variant="outline">
+                                  {speaker.name}
+                                </Badge>
+                              ) : (
+                                <p  key={speaker.id} className="text-sm text-muted-foreground">No speaker assigned</p>
+                              )
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No speaker assigned</p>
+                          )}
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button asChild className="w-full" variant="outline">
-                        <Link href={`/community/events/${event.id}`}>View Recording</Link>
+                      <Button asChild className="w-full" variant="outline" style={{ zIndex:100 }}>
+                        <Link href={`/community/events/${event.slug}`}>View Recording</Link>
                       </Button>
                     </CardFooter>
                   </Card>
