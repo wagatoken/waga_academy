@@ -10,6 +10,8 @@ import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/ser
 import { toast } from "@/components/ui/toast"
 
 
+
+
 export default async function CommunityForumsPage() {
    const { data: categories, error: categoriesError } = await getForumCategories();
   const { data: recentTopics, error: topicsError } = await getRecentTopics();
