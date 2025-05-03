@@ -2,7 +2,6 @@
 
 import { createServerClientInstance } from "@/lib/supabase/server"
 
-import { revalidatePath } from "next/cache"
 
 export type EventError = {
   message: string
@@ -140,4 +139,75 @@ export async function getEventBySlug(slug: string): Promise<EventResult<Event>> 
     }
 }
 
+export async function registerForEvent(eventId: string) {
+  const supabase = await createServerClientInstance()
 
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "You must be logged in to register for an event", data: null }
+  }
+
+ 
+  const { data: existingReg, error: checkError } = await supabase
+    .from("event_registrations")
+    .select("id")
+    .eq("event_id", eventId)
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (checkError) {
+    console.error("Error checking event registration:", checkError)
+    return { error: checkError.message, data: null }
+  }
+
+  if (existingReg) {
+    return { error: "You are already registered for this event", data: null }
+  }
+
+  // Check if event is full
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("max_participants")
+    .eq("id", eventId)
+    .single()
+
+  if (eventError) {
+    console.error("Error fetching event:", eventError)
+    return { error: eventError.message, data: null }
+  }
+
+  const { count, error: countError } = await supabase
+    .from("event_registrations")
+    .select("id", { count: true })
+    .eq("event_id", eventId)
+
+  if (countError) {
+    console.error("Error counting registrations:", countError)
+    return { error: countError.message, data: null }
+  }
+
+  if (event.max_participants && count >= event.max_participants) {
+    return { error: "This event is full", data: null }
+  }
+
+  // Register for the event
+  const { data, error } = await supabase
+    .from("event_registrations")
+    .insert({
+      event_id: eventId,
+      user_id: user.id,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Error registering for event:", error)
+    return { error: error.message, data: null }
+  }
+
+  // revalidatePath(`/community/events/${eventId}`)
+  return { data, error: null }
+}
