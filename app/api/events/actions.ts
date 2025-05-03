@@ -4,73 +4,73 @@ import { createServerClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 // Get upcoming events
-export async function getUpcomingEvents() {
-  const supabase = createServerClient()
+// export async function getUpcomingEvents() {
+//   const supabase = createServerClient()
 
-  const { data, error } = await supabase
-    .from("events")
-    .select(`
-      *,
-      creator:profiles(id, first_name, last_name, avatar_url),
-      registration_count:event_registrations(count)
-    `)
-    .gte("start_date", new Date().toISOString())
-    .order("start_date", { ascending: true })
+//   const { data, error } = await supabase
+//     .from("events")
+//     .select(`
+//       *,
+//       creator:profiles(id, first_name, last_name, avatar_url),
+//       registration_count:event_registrations(count)
+//     `)
+//     .gte("start_date", new Date().toISOString())
+//     .order("start_date", { ascending: true })
 
-  if (error) {
-    console.error("Error fetching upcoming events:", error)
-    return { error: error.message, data: null }
-  }
+//   if (error) {
+//     console.error("Error fetching upcoming events:", error)
+//     return { error: error.message, data: null }
+//   }
 
-  return { data, error: null }
-}
+//   return { data, error: null }
+// }
 
 // Get past events
-export async function getPastEvents() {
-  const supabase = createServerClient()
+// export async function getPastEvents() {
+//   const supabase = createServerClient()
 
-  const { data, error } = await supabase
-    .from("events")
-    .select(`
-      *,
-      creator:profiles(id, first_name, last_name, avatar_url),
-      registration_count:event_registrations(count)
-    `)
-    .lt("end_date", new Date().toISOString())
-    .order("start_date", { ascending: false })
+//   const { data, error } = await supabase
+//     .from("events")
+//     .select(`
+//       *,
+//       creator:profiles(id, first_name, last_name, avatar_url),
+//       registration_count:event_registrations(count)
+//     `)
+//     .lt("end_date", new Date().toISOString())
+//     .order("start_date", { ascending: false })
 
-  if (error) {
-    console.error("Error fetching past events:", error)
-    return { error: error.message, data: null }
-  }
+//   if (error) {
+//     console.error("Error fetching past events:", error)
+//     return { error: error.message, data: null }
+//   }
 
-  return { data, error: null }
-}
+//   return { data, error: null }
+// }
 
-// Get a single event
-export async function getEvent(eventId: string) {
-  const supabase = createServerClient()
+// // Get a single event
+// export async function getEvent(eventId: string) {
+//   const supabase = createServerClient()
 
-  const { data, error } = await supabase
-    .from("events")
-    .select(`
-      *,
-      creator:profiles(id, first_name, last_name, avatar_url),
-      registrations:event_registrations(
-        *,
-        user:profiles(id, first_name, last_name, avatar_url)
-      )
-    `)
-    .eq("id", eventId)
-    .single()
+//   const { data, error } = await supabase
+//     .from("events")
+//     .select(`
+//       *,
+//       creator:profiles(id, first_name, last_name, avatar_url),
+//       registrations:event_registrations(
+//         *,
+//         user:profiles(id, first_name, last_name, avatar_url)
+//       )
+//     `)
+//     .eq("id", eventId)
+//     .single()
 
-  if (error) {
-    console.error(`Error fetching event ${eventId}:`, error)
-    return { error: error.message, data: null }
-  }
+//   if (error) {
+//     console.error(`Error fetching event ${eventId}:`, error)
+//     return { error: error.message, data: null }
+//   }
 
-  return { data, error: null }
-}
+//   return { data, error: null }
+// }
 
 // Register for an event
 export async function registerForEvent(eventId: string) {
