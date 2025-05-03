@@ -23,7 +23,7 @@ import {
   Link2,
 } from "lucide-react"
 import { toast } from "@/components/ui/toast";
-import { getEventBySlug, getPastEvents } from "@/lib/services/event-service";
+import { getEventBySlug, getPastEvents, registerForEvent } from "@/lib/services/event-service";
 
 
 // // Sample event data - in a real app, this would be fetched based on the ID
@@ -108,39 +108,47 @@ export default function EventPage({ params }: { params: { id: string } }) {
 }, [params]);
 
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault()
+ const handleRegister = async () => {
+    setIsRegistering(true);
 
-    if (!email.trim() || !name.trim()) {
+    try {
+      const { error, data } = await registerForEvent(eventData.id)
+
+      if (error) {
+        toast({
+          title: "Registration Failed",
+          description: error,
+          variant: "destructive",
+        });
+      } else {
+        setIsRegistered(true);
+        toast({
+          title: "Registration Successful 🍾",
+          description: "You have been registered for the event.",
+          varinat: "default",
+        });
+      }
+    } catch (err) {
+      console.error("Unexpected error during registration:", err);
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive",
-      })
-      return
+      });
+    } finally {
+      setIsRegistering(false);
     }
+  };
 
-    setIsRegistering(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsRegistering(false)
-      setIsRegistered(true)
-      toast({
-        title: "Registration successful!",
-        description: "You've been registered for the event. Check your email for details.",
-      })
-    }, 1000)
-  }
-
-
-   if (loading) {
-    return <div className="container py-12">Loading...</div>; // Show a loading state while fetching data
+  if (loading) {
+    return <div className="container py-12">Loading...</div>;
   }
 
   if (!eventData) {
-    return <div className="container py-12">Event not found.</div>; // Show an error state if no event data is available
+    return <div className="container py-12">Event not found.</div>;
   }
+
+  
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -152,13 +160,13 @@ export default function EventPage({ params }: { params: { id: string } }) {
             <div className="lg:col-span-2 space-y-6">
               <div className="relative h-[300px] rounded-xl overflow-hidden web3-card-glow-border">
                 <Image
-                  src={eventData.image_url || "/placeholder.svg"}
-                  alt={eventData.title}
+                  src={eventData?.image_url || "/placeholder.svg"}
+                  alt={eventData?.title}
                   fill
                   className="object-cover"
                 />
                 <div className="absolute top-4 right-4">
-                  <Badge className="badge-emerald">{eventData.type}</Badge>
+                  <Badge className="badge-emerald">{eventData?.type}</Badge>
                 </div>
               </div>
 
@@ -170,8 +178,8 @@ export default function EventPage({ params }: { params: { id: string } }) {
                     <span>
                        {(() => {
                         let dateDisplay = "Coming Soon";
-                        if (eventData.date_time) {
-                          const date = new Date(eventData.date_time);
+                        if (eventData?.date_time) {
+                          const date = new Date(eventData?.date_time);
                           dateDisplay = date.toLocaleDateString("en-US", {
                             weekday: "long",
                             year: "numeric",
@@ -188,8 +196,8 @@ export default function EventPage({ params }: { params: { id: string } }) {
                     <span>
                       {(() => {
                       let timeDisplay = "To be announced";
-                      if (eventData.date_time) {
-                        const date = new Date(`${eventData.date_time}`);
+                      if (eventData?.date_time) {
+                        const date = new Date(`${eventData?.date_time}`);
                         timeDisplay = date.toLocaleTimeString("en-US", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -201,11 +209,11 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Video className="h-4 w-4 icon-emerald" />
-                    <span>{eventData.platform}</span>
+                    <span>{eventData?.platform}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4 icon-emerald" />
-                    <span>{eventData.registered_count} registered</span>
+                    <span>{eventData?.registered_count} registered</span>
                   </div>
                 </div>
               </div>
@@ -217,7 +225,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                 <CardContent>
                   <div
                     className="prose prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: eventData.long_description || "No Description" }}
+                    dangerouslySetInnerHTML={{ __html: eventData?.long_description || "No Description" }}
                   />
                 </CardContent>
               </Card>
@@ -228,16 +236,16 @@ export default function EventPage({ params }: { params: { id: string } }) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {eventData.speakers.map((speaker, index) => (
+                    {eventData?.speakers.map((speaker, index) => (
                       <div key={index} className="flex gap-4">
                         <Avatar className="h-12 w-12 ring-2 ring-emerald-500/30">
                           <AvatarImage src={`/placeholder.svg?height=48&width=48`} alt={speaker.name} />
-                          <AvatarFallback className="bg-emerald-900/50">{speaker.avatar}</AvatarFallback>
+                          <AvatarFallback className="bg-emerald-900/50">{speaker?.avatar}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="font-medium">{speaker.name}</h3>
-                          <p className="text-sm text-emerald-300">{speaker.role}</p>
-                          <p className="text-sm mt-2">{speaker.bio}</p>
+                          <h3 className="font-medium">{speaker?.name}</h3>
+                          <p className="text-sm text-emerald-300">{speaker?.role}</p>
+                          <p className="text-sm mt-2">{speaker?.bio}</p>
                         </div>
                       </div>
                     ))}
@@ -272,7 +280,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                       )}
                     </div>
                   ) : (
-                    <form onSubmit={handleRegister} className="space-y-4">
+                    <form  onSubmit={(e) => {e.preventDefault(); handleRegister(); }} className="space-y-4">
                       <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium">
                           Full Name
@@ -304,7 +312,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                         {isRegistering ? "Registering..." : "Register Now"}
                       </Button>
                       <p className="text-xs text-center text-muted-foreground">
-                        {eventData.registeredCount} out of {eventData.maxAttendees} spots filled
+                        {eventData.registered_count} out of {eventData.max_participants} spots filled
                       </p>
                     </form>
                   )}
