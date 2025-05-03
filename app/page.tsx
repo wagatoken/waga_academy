@@ -4,6 +4,7 @@ import { ValueChainSection } from "@/components/value-chain-section"
 import { SummerCampPromo } from "@/components/summer-camp-promo"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { CTASection } from "@/components/cta-section"
+export const runtime = "edge"
 
 export default function Home() {
   return (
