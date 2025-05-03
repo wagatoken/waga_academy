@@ -92,43 +92,7 @@ export default async function CommunityDashboard() {
   const {data: upcomingEvents} = await getUpcomingEvents();
   const { member_count=0, upcoming_event_count=0, discussion_count=0 } = stats || {};
   
-  // Fallback data if no resources are found
-  const resourcesData =
-    resources.length > 0
-      ? resources
-      : [
-          {
-            id: 1,
-            title: "Getting Started with WAGA Academy",
-            resource_type: "Guide",
-            icon: <Globe className="h-8 w-8 text-purple-400" />,
-          },
-          {
-            id: 2,
-            title: "Introduction to Blockchain",
-            resource_type: "Coming Soon",
-            icon: <Coffee className="h-8 w-8 text-blue-400" />,
-          },
-        ]
-
-  // Fallback data if no events are found
-
-
-  // Fallback data if no discussion topics are found
-  const topicsData =
-    discussionTopics.length > 0
-      ? discussionTopics
-      : [
-          {
-            id: 1,
-            title: "Welcome to the WAGA Academy Community",
-            author: "WAGATeam",
-            avatar: "WT",
-            replies: 0,
-            lastActive: "Just now",
-          },
-        ]
-
+  
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -274,43 +238,49 @@ export default async function CommunityDashboard() {
               <CardDescription>Content for community members</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {resourcesData.map((resource, index) => {
-                  // Assign different card styles based on index
-                  const bgClasses = ["bg-purple-500/10", "bg-blue-500/10", "bg-teal-500/10"]
-                  const bgClass = bgClasses[index % bgClasses.length]
+  <div className="space-y-4">
+    {resources.length > 0 ? (
+      resources.map((resource, index) => {
+        // Assign different card styles based on index
+        const bgClasses = ["bg-purple-500/10", "bg-blue-500/10", "bg-teal-500/10"];
+        const bgClass = bgClasses[index % bgClasses.length];
 
-                  // Determine icon based on resource type
-                  let icon = <Globe className="h-8 w-8 text-purple-400" />
-                  if (resource.resource_type === "Video") icon = <Coffee className="h-8 w-8 text-blue-400" />
-                  if (resource.resource_type === "PDF") icon = <Coffee className="h-8 w-8 text-teal-400" />
+        // Determine icon based on resource type
+        let icon = <Globe className="h-8 w-8 text-purple-400" />;
+        if (resource.resource_type === "Video") icon = <Coffee className="h-8 w-8 text-blue-400" />;
+        if (resource.resource_type === "PDF") icon = <Coffee className="h-8 w-8 text-teal-400" />;
 
-                  // Use provided icon if available
-                  if (resource.icon) icon = resource.icon
+        // Use provided icon if available
+        if (resource.icon) icon = resource.icon;
 
-                  return (
-                    <div key={resource.id} className="flex items-start gap-4 pb-4 border-b border-purple-500/20">
-                      <div className={`${bgClass} p-2 rounded-md`}>{icon}</div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">{resource.title}</p>
-                        <Badge variant="outline" className={`text-xs ${bgClass} border-purple-500/30 text-purple-300`}>
-                          {resource.resource_type || "Resource"}
-                        </Badge>
-                        <div className="pt-1">
-                          <Button
-                            asChild
-                            size="sm"
-                            variant="outline"
-                            className="border-purple-600/30 hover:border-purple-600/60"
-                          >
-                            <Link href={`/community/resources/${resource.id}`}>Access</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+        return (
+          <div key={resource.id} className="flex items-start gap-4 pb-4 border-b border-purple-500/20">
+            <div className={`${bgClass} p-2 rounded-md`}>{icon}</div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">{resource.title}</p>
+              <Badge variant="outline" className={`text-xs ${bgClass} border-purple-500/30 text-purple-300`}>
+                {resource.resource_type || "Resource"}
+              </Badge>
+              <div className="pt-1">
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-600/30 hover:border-purple-600/60"
+                >
+                  <Link href={`/community/resources/${resource.id}`}>Access</Link>
+                </Button>
               </div>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <div className="text-center text-sm text-muted-foreground">
+        No Resources. Stay tuned for updates!
+      </div>
+    )}
+  </div>
             </CardContent>
             <CardFooter>
               <Button asChild variant="outline" className="w-full border-purple-600/30 hover:border-purple-600/60">
@@ -323,62 +293,68 @@ export default async function CommunityDashboard() {
         <div>
           <h2 className="text-xl font-bold mb-6 web3-gradient-text">Community Discussions</h2>
           <div className="space-y-4">
-            {topicsData.map((topic, index) => {
-              // Assign different card styles based on index
-              const cardClasses = ["web3-card-purple", "web3-card-blue", "web3-card-teal", "web3-card-pink"]
-              const cardClass = cardClasses[index % cardClasses.length]
+            {discussionTopics.length > 0 ? (
+              discussionTopics.map((topic, index) => {
+                // Assign different card styles based on index
+                const cardClasses = ["web3-card-purple", "web3-card-blue", "web3-card-teal", "web3-card-pink"];
+                const cardClass = cardClasses[index % cardClasses.length];
 
-              // Get author info
-              const author = topic.user_id
-                ? `${topic.user_id.first_name || ""} ${topic.user_id.last_name || ""}`.trim()
-                : topic.author || "WAGA Team"
+                // Get author info
+                const author = topic.user_id
+                  ? `${topic.user_id.first_name || ""} ${topic.user_id.last_name || ""}`.trim()
+                  : topic.author || "WAGA Team";
 
-              // Get avatar
-              const avatar = topic.user_id?.avatar_url || topic.avatar || author.substring(0, 2)
+                // Get avatar
+                const avatar = topic.user_id?.avatar_url || topic.avatar || author.substring(0, 2);
 
-              return (
-                <Card key={topic.id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                          <AvatarImage
-                            src={typeof avatar === "string" ? avatar : `/placeholder.svg?height=40&width=40`}
-                            alt={author}
-                          />
-                          <AvatarFallback className="bg-purple-900/50">
-                            {typeof avatar === "string" ? avatar.substring(0, 2).toUpperCase() : "WT"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <Link
-                            href={`/community/forums/topics/${topic.id}`}
-                            className="font-medium hover:text-primary"
-                          >
-                            {topic.title}
-                          </Link>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">By {author}</span>
-                            <span className="text-xs text-muted-foreground">•</span>
-                            <span className="text-xs text-muted-foreground">
-                              {topic.created_at
-                                ? `Posted on ${new Date(topic.created_at).toLocaleDateString()}`
-                                : topic.lastActive || "Just now"}
-                            </span>
+                return (
+                  <Card key={topic.id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
+                            <AvatarImage
+                              src={typeof avatar === "string" ? avatar : `/placeholder.svg?height=40&width=40`}
+                              alt={author}
+                            />
+                            <AvatarFallback className="bg-purple-900/50">
+                              {typeof avatar === "string" ? avatar.substring(0, 2).toUpperCase() : "WT"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <Link
+                              href={`/community/forums/topics/${topic.id}`}
+                              className="font-medium hover:text-primary"
+                            >
+                              {topic.title}
+                            </Link>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-muted-foreground">By {author}</span>
+                              <span className="text-xs text-muted-foreground">•</span>
+                              <span className="text-xs text-muted-foreground">
+                                {topic.created_at
+                                  ? `Posted on ${new Date(topic.created_at).toLocaleDateString()}`
+                                  : topic.lastActive || "Just now"}
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <Badge
+                          variant="secondary"
+                          className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                        >
+                          {topic.replies || 0} replies
+                        </Badge>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                      >
-                        {topic.replies || 0} replies
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <div className="text-center text-sm text-muted-foreground">
+                No discussions available. Start a new discussion to engage with the community!
+              </div>
+            )}
           </div>
           <div className="mt-6 flex justify-center">
             <Button asChild className="web3-button-purple">
