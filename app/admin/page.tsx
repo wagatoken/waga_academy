@@ -7,30 +7,29 @@ import { RealtimeStats } from "@/components/admin/realtime-stats"
 
 export default async function AdminDashboard() {
   // Fetch actual counts from the database
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get counts with error handling
   const getCounts = async () => {
-    try {
-      const [coursesRes, resourcesRes, usersRes] = await Promise.all([
-        supabase.from("courses").select("*", { count: "exact", head: true }),
-        supabase.from("resources").select("*", { count: "exact", head: true }),
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-      ])
+  try {
+    const { data, error } = await supabase.from("admin_stats").select("*").single();
 
-      return {
-        courseCount: coursesRes.count || 0,
-        resourceCount: resourcesRes.count || 0,
-        userCount: usersRes.count || 0,
-      }
-    } catch (error) {
-      console.error("Error fetching counts:", error)
-      return { courseCount: 0, resourceCount: 0, userCount: 0 }
+    if (error) {
+      console.error("Error fetching stats from admin_stats view:", error);
+      return { courseCount: 0, resourceCount: 0, userCount: 0 };
     }
+
+    return {
+      courseCount: data.course_count || 0,
+      resourceCount: data.resource_count || 0,
+      userCount: data.profile_count || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching counts:", error);
+    return { courseCount: 0, resourceCount: 0, userCount: 0 };
   }
-
-  const initialStats = await getCounts()
-
+};
+const initialStats = await getCounts();
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
