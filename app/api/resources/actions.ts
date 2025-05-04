@@ -1,11 +1,11 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 // Get all resources
 export async function getResources() {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("resources")
@@ -23,9 +23,44 @@ export async function getResources() {
   return { data, error: null }
 }
 
+export async function getPaginatedResources(page: number = 1, limit: number = 10) {
+  const supabase = await createServerClientInstance();
+
+  const offset = (page - 1) * limit;
+
+  const { data, error, count } = await supabase
+    .from("resources")
+    .select(
+      `
+      *,
+      creator:profiles(id, first_name, last_name, avatar_url)
+    `,
+      { count: "exact" } 
+    )
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1); 
+
+  if (error) {
+    console.error("Error fetching resources:", error);
+    return { error: error.message, data: null, meta: null };
+  }
+
+  const totalPages = Math.ceil((count || 0) / limit); 
+
+  return {
+    data,
+    error: null,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems: count || 0,
+    },
+  };
+}
+
 // Get a single resource
 export async function getResource(resourceId: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("resources")
@@ -100,7 +135,7 @@ export async function createResource(formData: FormData) {
 
 // Admin: Update a resource
 export async function updateResource(resourceId: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   // Get the current user
   const {
@@ -156,7 +191,7 @@ export async function updateResource(resourceId: string, formData: FormData) {
 
 // Admin: Delete a resource
 export async function deleteResource(resourceId: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
