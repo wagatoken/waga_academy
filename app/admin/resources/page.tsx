@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { toast } from "@/components/ui/toast" // Import toast
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Plus, Search, Upload, Download, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { DeleteResourceButton } from "@/components/admin/delete-resource-button"
-import { getPaginatedResources } from "@/app/api/resources/actions"
+import { getPaginatedResources, deleteResource } from "@/app/api/resources/actions"
 
 export default function ResourcesAdmin() {
   const [resources, setResources] = useState([])
@@ -35,16 +36,40 @@ export default function ResourcesAdmin() {
     fetchResources()
   }, [currentPage])
 
-    const filteredResources = resources.filter((resource) => {
+  const filteredResources = resources.filter((resource) => {
     const matchesSearch =
-      searchTerm === "" || resource.title.toLowerCase().includes(searchTerm.toLowerCase());
+      searchTerm === "" || resource.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory =
-      categoryFilter === "" || categoryFilter === "all" || resource.category?.toLowerCase() === categoryFilter.toLowerCase();
-    return matchesSearch && matchesCategory;
-  });
+      categoryFilter === "" ||
+      categoryFilter === "all" ||
+      resource.category?.toLowerCase() === categoryFilter.toLowerCase()
+    return matchesSearch && matchesCategory
+  })
 
-  const handleDelete = (id: string) => {
-    setResources(resources.filter((resource) => resource.id !== id))
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await deleteResource(id)
+      if (error) {
+        toast({
+          title: "Delete failed ❌",
+          description: error,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Delete successful 🍾",
+          description: "The resource has been deleted successfully.",
+        })
+        setResources(resources.filter((resource) => resource.id !== id)) // Remove the deleted resource from the list
+      }
+    } catch (err) {
+      console.error("Error deleting resource:", err)
+      toast({
+        title: "Unexpected error ❌",
+        description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
+      })
+    }
   }
 
   const getResourceIcon = (type: string) => {
@@ -92,41 +117,41 @@ export default function ResourcesAdmin() {
           <CardDescription>Search and filter the resource library</CardDescription>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-3 md:gap-4">
-               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
-                <Input
-                  placeholder="Search resources..."
-                  className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="Farming">Farming</SelectItem>
-                  <SelectItem value="Blockchain">Blockchain</SelectItem>
-                  <SelectItem value="Supply Chain">Supply Chain</SelectItem>
-                  <SelectItem value="Web3">Web3</SelectItem>
-                  <SelectItem value="Quality">Quality</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select>
-                <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="downloads">Most Downloads</SelectItem>
-                  <SelectItem value="title">Title (A-Z)</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="grid grid-cols-3 gap-3 md:grid-cols-3 md:gap-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
+              <Input
+                placeholder="Search resources..."
+                className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Farming">Farming</SelectItem>
+                <SelectItem value="Blockchain">Blockchain</SelectItem>
+                <SelectItem value="Supply Chain">Supply Chain</SelectItem>
+                <SelectItem value="Web3">Web3</SelectItem>
+                <SelectItem value="Quality">Quality</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select>
+              <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="downloads">Most Downloads</SelectItem>
+                <SelectItem value="title">Title (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
@@ -178,7 +203,7 @@ export default function ResourcesAdmin() {
                       <DeleteResourceButton
                         resourceId={resource.id}
                         resourceName={resource.title}
-                        onDelete={handleDelete}
+                        onDelete={() => handleDelete(resource.id)} // Pass the delete handler
                       />
                     </div>
                   </div>
