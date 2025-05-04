@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileText, Plus, Search, Upload, Download, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation" // Import useRouter
 import { DeleteResourceButton } from "@/components/admin/delete-resource-button"
 import { getPaginatedResources, deleteResource } from "@/app/api/resources/actions"
 
 export default function ResourcesAdmin() {
+  const router = useRouter() // Initialize the router
   const [resources, setResources] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
@@ -67,6 +69,19 @@ export default function ResourcesAdmin() {
       toast({
         title: "Unexpected error ❌",
         description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdate = (id: string) => {
+    try {
+      router.push(`/admin/resources/update/${id}`) // Navigate to the update page with the resource ID
+    } catch (err) {
+      console.error("Error navigating to update page:", err)
+      toast({
+        title: "Navigation failed ❌",
+        description: "Unable to navigate to the update page. Please try again later.",
         variant: "destructive",
       })
     }
@@ -196,6 +211,7 @@ export default function ResourcesAdmin() {
                         variant="outline"
                         size="sm"
                         className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
+                        onClick={() => handleUpdate(resource.id)} // Handle update
                       >
                         <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
                         <span className="hidden md:inline">Update</span>
