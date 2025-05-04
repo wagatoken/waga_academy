@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,61 +8,40 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Plus, Search, Upload, Download, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { DeleteResourceButton } from "@/components/admin/delete-resource-button"
-
-// Mock data for resources
-const mockResources = [
-  {
-    id: "1",
-    title: "Coffee Farming Best Practices",
-    type: "PDF",
-    category: "Farming",
-    dateAdded: "2023-10-15",
-    downloads: 128,
-  },
-  {
-    id: "2",
-    title: "Blockchain for Beginners",
-    type: "Video",
-    category: "Blockchain",
-    dateAdded: "2023-09-22",
-    downloads: 256,
-  },
-  {
-    id: "3",
-    title: "Supply Chain Transparency Guide",
-    type: "PDF",
-    category: "Supply Chain",
-    dateAdded: "2023-11-05",
-    downloads: 87,
-  },
-  {
-    id: "4",
-    title: "Web3 Integration Tutorial",
-    type: "Video",
-    category: "Web3",
-    dateAdded: "2023-10-30",
-    downloads: 192,
-  },
-  {
-    id: "5",
-    title: "Coffee Quality Assessment",
-    type: "PDF",
-    category: "Quality",
-    dateAdded: "2023-11-12",
-    downloads: 64,
-  },
-]
+import { getPaginatedResources } from "@/app/api/resources/actions"
 
 export default function ResourcesAdmin() {
-  const [resources, setResources] = useState(mockResources)
+  const [resources, setResources] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const filteredResources = resources.filter((resource) => {
-    const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = categoryFilter === "" || categoryFilter === "all" || resource.category === categoryFilter
-    return matchesSearch && matchesCategory
-  })
+  // Fetch resources with pagination
+  useEffect(() => {
+    const fetchResources = async () => {
+      setIsLoading(true)
+      const { data, meta, error } = await getPaginatedResources(currentPage, 5) // Fetch 5 items per page
+      if (error) {
+        console.error("Error fetching resources:", error)
+      } else {
+        setResources(data)
+        setTotalPages(meta.totalPages)
+      }
+      setIsLoading(false)
+    }
+
+    fetchResources()
+  }, [currentPage])
+
+    const filteredResources = resources.filter((resource) => {
+    const matchesSearch =
+      searchTerm === "" || resource.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "" || categoryFilter === "all" || resource.category?.toLowerCase() === categoryFilter.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
 
   const handleDelete = (id: string) => {
     setResources(resources.filter((resource) => resource.id !== id))
@@ -76,6 +55,18 @@ export default function ResourcesAdmin() {
         return <ExternalLink className="h-10 w-10 text-blue-500" />
       default:
         return <FileText className="h-10 w-10 text-primary" />
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1)
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1)
     }
   }
 
@@ -101,17 +92,16 @@ export default function ResourcesAdmin() {
           <CardDescription>Search and filter the resource library</CardDescription>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
-              <Input
-                placeholder="Search resources..."
-                className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-1">
+            <div className="grid grid-cols-3 gap-3 md:grid-cols-3 md:gap-4">
+               <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
+                <Input
+                  placeholder="Search resources..."
+                  className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
                   <SelectValue placeholder="Filter by category" />
@@ -137,63 +127,86 @@ export default function ResourcesAdmin() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 gap-4">
-        {filteredResources.map((resource) => (
-          <Card
-            key={resource.id}
-            className="overflow-hidden border-purple-600/30 hover:border-purple-600/60 transition-all shadow-sm hover:shadow-md"
-          >
-            <div className="flex flex-col md:flex-row">
-              <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/10 p-3 md:p-4 flex items-center justify-center md:w-24">
-                {getResourceIcon(resource.type)}
-              </div>
-              <div className="flex-1 p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
-                  <div>
-                    <h3 className="font-semibold text-base md:text-lg">{resource.title}</h3>
-                    <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
-                      <span
-                        className={`text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full ${
-                          resource.type === "PDF"
-                            ? "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
-                            : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                        }`}
+        {isLoading ? (
+          <p>Loading resources...</p>
+        ) : (
+          filteredResources.map((resource) => (
+            <Card
+              key={resource.id}
+              className="overflow-hidden border-purple-600/30 hover:border-purple-600/60 transition-all shadow-sm hover:shadow-md"
+            >
+              <div className="flex flex-col md:flex-row">
+                <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/10 p-3 md:p-4 flex items-center justify-center md:w-24">
+                  {getResourceIcon(resource.type)}
+                </div>
+                <div className="flex-1 p-4 md:p-6">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
+                    <div>
+                      <h3 className="font-semibold text-base md:text-lg">{resource.title}</h3>
+                      <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
+                        <span
+                          className={`text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full ${
+                            resource.type === "PDF"
+                              ? "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
+                              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          }`}
+                        >
+                          {resource.type}
+                        </span>
+                        <span className="text-xs md:text-sm text-muted-foreground">Category: {resource.category}</span>
+                      </div>
+                      <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
+                        <span className="text-xs md:text-sm text-muted-foreground">Added: {resource.dateAdded}</span>
+                        <span className="text-xs md:text-sm text-muted-foreground flex items-center">
+                          <Download className="h-3 w-3 mr-1" /> {resource.downloads} downloads
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 self-end md:self-start mt-2 md:mt-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
                       >
-                        {resource.type}
-                      </span>
-                      <span className="text-xs md:text-sm text-muted-foreground">Category: {resource.category}</span>
+                        <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
+                        <span className="hidden md:inline">Update</span>
+                      </Button>
+                      <DeleteResourceButton
+                        resourceId={resource.id}
+                        resourceName={resource.title}
+                        onDelete={handleDelete}
+                      />
                     </div>
-                    <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
-                      <span className="text-xs md:text-sm text-muted-foreground">Added: {resource.dateAdded}</span>
-                      <span className="text-xs md:text-sm text-muted-foreground flex items-center">
-                        <Download className="h-3 w-3 mr-1" /> {resource.downloads} downloads
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2 self-end md:self-start mt-2 md:mt-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
-                    >
-                      <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
-                      <span className="hidden md:inline">Update</span>
-                    </Button>
-                    <DeleteResourceButton
-                      resourceId={resource.id}
-                      resourceName={resource.title}
-                      onDelete={handleDelete}
-                    />
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="border-purple-500/30 hover:bg-purple-500/10"
+        >
+          Previous
+        </Button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="border-purple-500/30 hover:bg-purple-500/10"
+        >
+          Next
+        </Button>
       </div>
     </div>
   )
