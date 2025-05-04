@@ -81,7 +81,7 @@ export async function getResource(resourceId: string) {
 
 // Admin: Create a new resource
 export async function createResource(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -135,7 +135,7 @@ export async function createResource(formData: FormData) {
 
 // Admin: Update a resource
 export async function updateResource(resourceId: string, formData: FormData) {
-  const supabase = await createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
