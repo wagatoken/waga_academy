@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Plus, Search, Upload, Download, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation" // Import useRouter
-import { DeleteResourceButton } from "@/components/admin/delete-resource-button"
+import {DeleteButton} from "@/components/admin/delete-button" // Import DeleteButton component
 import { getPaginatedResources, deleteResource } from "@/app/api/resources/actions"
 
 export default function ResourcesAdmin() {
@@ -216,10 +216,11 @@ export default function ResourcesAdmin() {
                         <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
                         <span className="hidden md:inline">Update</span>
                       </Button>
-                      <DeleteResourceButton
-                        resourceId={resource.id}
-                        resourceName={resource.title}
-                        onDelete={() => handleDelete(resource.id)} // Pass the delete handler
+                      <DeleteButton
+                       entityId={resource.id}
+                      entityName={resource.title}
+                      onDelete={handleDelete} // Pass the delete handler
+                      entityType="Resource" // Optional: Specify the entity type for better context
                       />
                     </div>
                   </div>
