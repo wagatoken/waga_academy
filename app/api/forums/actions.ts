@@ -1,11 +1,12 @@
 "use server"
 
 import { createServerClientInstance } from "@/lib/supabase/server"
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 import { revalidatePath } from "next/cache"
 
 // Get all forum categories
 export async function getForumCategories() {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_categories")
@@ -24,8 +25,8 @@ export async function getForumCategories() {
 }
 
 // Get topics for a category
-export async function getForumTopics(categoryId: string) {
-  const supabase = createServerClientInstance()
+export async function getForumTopic(categoryId: string) {
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("forum_topics")
@@ -47,41 +48,48 @@ export async function getForumTopics(categoryId: string) {
   return { data, error: null }
 }
 
-// Get a single topic with replies
-export async function getForumTopic(topicId: string) {
-  const supabase = createServerClientInstance()
+// Get topics with pagination
+export async function getForumTopics(page: number = 1, limit: number = 10) {
+  const supabase = await createServerClientInstance();
 
-  const { data, error } = await supabase
+  const offset = (page - 1) * limit;
+
+  const { data, error, count } = await supabase
     .from("forum_topics")
-    .select(`
+    .select(
+      `
       *,
       category:forum_categories(*),
       user:profiles(id, first_name, last_name, avatar_url),
-      replies:forum_replies(
-        *,
-        user:profiles(id, first_name, last_name, avatar_url)
-      )
-    `)
-    .eq("id", topicId)
-    .single()
+      reply_count:forum_replies(count)
+    `,
+      { count: "exact" } // Get the total count of topics
+    )
+    .order("is_pinned", { ascending: false }) // Pinned topics first
+    .order("created_at", { ascending: false }) // Newest topics first
+    .range(offset, offset + limit - 1); // Apply pagination range
 
   if (error) {
-    console.error(`Error fetching forum topic ${topicId}:`, error)
-    return { error: error.message, data: null }
+    console.error("Error fetching forum topics:", error);
+    return { error: error.message, data: null, meta: null };
   }
 
-  // Update view count
-  await supabase
-    .from("forum_topics")
-    .update({ views: (data.views || 0) + 1 })
-    .eq("id", topicId)
+  const totalPages = Math.ceil((count || 0) / limit); // Calculate total pages
 
-  return { data, error: null }
+  return {
+    data,
+    error: null,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems: count || 0,
+    },
+  };
 }
 
 // Create a new topic
 export async function createForumTopic(formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -95,6 +103,7 @@ export async function createForumTopic(formData: FormData) {
   const categoryId = formData.get("category_id") as string
   const title = formData.get("title") as string
   const content = formData.get("content") as string
+  const isPinned = formData.get("is_pinned") as string
 
   if (!categoryId || !title || !content) {
     return { error: "Missing required fields", data: null }
@@ -107,7 +116,8 @@ export async function createForumTopic(formData: FormData) {
       category_id: categoryId,
       title,
       content,
-      user_id: user.id,
+      profile_id: user.id,
+      is_pinned: isPinned,
     })
     .select()
     .single()
@@ -123,7 +133,7 @@ export async function createForumTopic(formData: FormData) {
 
 // Create a reply to a topic
 export async function createForumReply(formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -163,7 +173,7 @@ export async function createForumReply(formData: FormData) {
 
 // Admin: Create a new category
 export async function createForumCategory(formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -185,8 +195,8 @@ export async function createForumCategory(formData: FormData) {
   }
 
   // Extract form data
-  const name = formData.get("name") as string
-  const description = formData.get("description") as string
+  const name = formData?.get("name") as string
+  const description = formData?.get("description") as string
 
   // Generate slug from name
   const slug = name
@@ -227,7 +237,7 @@ export async function createForumCategory(formData: FormData) {
 
 // Admin: Pin/unpin a topic
 export async function togglePinTopic(topicId: string, isPinned: boolean) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -267,7 +277,7 @@ export async function togglePinTopic(topicId: string, isPinned: boolean) {
 
 // Admin: Lock/unlock a topic
 export async function toggleLockTopic(topicId: string, isLocked: boolean) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -303,4 +313,45 @@ export async function toggleLockTopic(topicId: string, isLocked: boolean) {
 
   revalidatePath(`/community/forums/topics/${topicId}`)
   return { data, error: null }
+}
+
+// Admin: Delete a topic
+export async function deleteForumTopic(topicId: string) {
+  const supabase = await createServerClientInstance();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Check if user is admin
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Delete the topic
+  const { error } = await supabase
+    .from("forum_topics")
+    .delete()
+    .eq("id", topicId);
+
+  if (error) {
+    console.error(`Error deleting forum topic ${topicId}:`, error);
+    return { error: error.message, data: null };
+  }
+
+  // Revalidate paths to reflect changes
+  revalidatePath("/admin/forums");
+  revalidatePath("/community/forums");
+
+  return { error: null, data: "Topic deleted successfully" };
 }

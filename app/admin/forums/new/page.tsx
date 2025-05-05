@@ -1,32 +1,98 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Save } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
+import type React from "react";
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Save } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { createForumTopic, getForumCategories } from "@/app/api/forums/actions";
+import { toast } from "@/components/ui/toast"; // Import toast for feedback
 
 export default function NewForumTopic() {
-  const [isSaving, setIsSaving] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
+  const router = useRouter() 
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState(""); // Store selected category ID
+  const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
+  const [categories, setCategories] = useState([]); // Store fetched categories
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      try {
+        const { data, error } = await getForumCategories();
+        if (error) {
+          throw new Error(error);
+        }
+        setCategories(data || []); // Ensure categories is always an array
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error fetching categories",
+          description: "Unable to load categories. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
 
-    // Simulate saving process
-    setTimeout(() => {
-      setIsSaving(false)
-      // In a real app, you would redirect to the forums list or show a success message
-      alert("Forum topic created successfully!")
-    }, 2000)
-  }
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    try {
+      
+        // Create a FormData object
+      const formData = new FormData();
+      formData.append("category_id", category);
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("is_pinned", isPinned ? "true" : "false");
+
+      const { error } = await createForumTopic(formData);
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast({
+        title: "Success 🎉",
+        description: "Forum topic created successfully!",
+        variant: "default",
+      });
+      router.push("/admin/forums"); // Redirect to the forums page after success
+
+      // Reset form after success
+      setTitle("");
+      setCategory("");
+      setContent("");
+      setTags("");
+      setIsPinned(false);
+    } catch (error) {
+      console.error("Error creating forum topic:", error);
+      toast({
+        title: "Error ❌",
+        description: "Failed to create forum topic. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -48,25 +114,34 @@ export default function NewForumTopic() {
                 id="title"
                 placeholder="Enter topic title"
                 required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="border-purple-500/30 focus:ring-purple-500/30"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Select required>
-                <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="blockchain">Blockchain</SelectItem>
-                  <SelectItem value="farming">Farming</SelectItem>
-                  <SelectItem value="web3">Web3</SelectItem>
-                  <SelectItem value="quality">Quality</SelectItem>
-                  <SelectItem value="events">Events</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              {isLoadingCategories ? (
+                <p>Loading categories...</p>
+              ) : (
+                <Select
+                  required
+                  value={category}
+                  onValueChange={(value) => setCategory(value)} // Set the selected category ID
+                >
+                  <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -76,13 +151,20 @@ export default function NewForumTopic() {
                 placeholder="Write your topic content here..."
                 rows={8}
                 required
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 className="border-purple-500/30 focus:ring-purple-500/30"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="tags">Tags (comma separated)</Label>
-              <Input id="tags" placeholder="coffee, blockchain, farming, etc." />
+              <Input
+                id="tags"
+                placeholder="coffee, blockchain, farming, etc."
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              />
             </div>
 
             <div className="flex items-center space-x-2 py-2">
@@ -122,5 +204,5 @@ export default function NewForumTopic() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
