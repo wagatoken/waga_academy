@@ -151,7 +151,9 @@ export default function EventsAdmin() {
           <CardDescription>Search and filter the events calendar</CardDescription>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-4">
+        
+            <div className="grid grid-cols-3 gap-3 md:grid-cols-1 md:col-span-2">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
               <Input
@@ -161,7 +163,6 @@ export default function EventsAdmin() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-1 md:col-span-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
                   <SelectValue placeholder="Filter by status" />
