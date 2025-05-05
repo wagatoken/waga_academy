@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 // Get upcoming events
@@ -72,9 +72,63 @@ import { revalidatePath } from "next/cache"
 //   return { data, error: null }
 // }
 
+export async function getEvent(EventId: string) {
+  const supabase = await createServerClientInstance()
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(`
+      *,
+      creator:profiles(id, first_name, last_name, avatar_url)
+    `)
+    .eq("id", EventId)
+    .single()
+
+  if (error) {
+    console.error(`Error fetching resource ${EventId}:`, error)
+    return { error: error.message, data: null }
+  }
+
+  return { data, error: null }
+}
+
+export async function getPaginatedEvents(page: number, limit: number) {
+  const supabase = await createServerClientInstance()
+
+  // Calculate the range for pagination
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  // Fetch paginated events
+  const { data, error, count } = await supabase
+    .from("events")
+    .select("*", { count: "exact" }) // Fetch events and total count
+    .order("date_time", { ascending: true }) // Order by start date
+    .range(from, to) // Apply pagination range
+
+  if (error) {
+    console.error("Error fetching paginated events:", error)
+    return { error: error.message, data: null, meta: null }
+  }
+
+  // Calculate total pages
+  const totalPages = Math.ceil((count || 0) / limit)
+
+  return {
+    data,
+    meta: {
+      totalPages,
+      totalCount: count || 0,
+      currentPage: page,
+      limit,
+    },
+    error: null,
+  }
+}
+
 // Register for an event
 export async function registerForEvent(eventId: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -148,7 +202,7 @@ export async function registerForEvent(eventId: string) {
 
 // Admin: Create a new event
 export async function createEvent(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -172,25 +226,32 @@ export async function createEvent(formData: FormData) {
   // Extract form data
   const title = formData.get("title") as string
   const description = formData.get("description") as string
-  const start_date = formData.get("start_date") as string
-  const end_date = formData.get("end_date") as string
+  const date_time = formData.get("date_time") as string
   const location = formData.get("location") as string
   const is_virtual = formData.get("is_virtual") === "true"
-  const meeting_url = formData.get("meeting_url") as string
-  const max_participants = Number.parseInt(formData.get("max_participants") as string) || null
-
+  const platform_link = formData.get("platform_link") as string
+  const max_participants = formData.get("max_participants")
+    ? parseInt(formData.get("max_participants") as string, 10)
+    : null
+  const platform = formData.get("platform") as string
+  const duration = formData.get("duration") as string
+  const recording = formData.get("recording") === "true"
+  const type = formData.get("type") as string
   // Create event
   const { data, error } = await supabase
     .from("events")
     .insert({
       title,
       description,
-      start_date,
-      end_date,
-      location,
+      date_time,
+      location: is_virtual ? null : location,
       is_virtual,
-      meeting_url: is_virtual ? meeting_url : null,
+      platform_link: is_virtual ? platform_link : null,
       max_participants,
+      platform,
+      type,
+      duration,
+      recording,
       created_by: user.id,
     })
     .select()
@@ -201,6 +262,7 @@ export async function createEvent(formData: FormData) {
     return { error: error.message, data: null }
   }
 
+  // Revalidate paths
   revalidatePath("/admin/events")
   revalidatePath("/community/events")
   return { data, error: null }
@@ -208,14 +270,14 @@ export async function createEvent(formData: FormData) {
 
 // Admin: Update an event
 export async function updateEvent(eventId: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance();
 
   // Get the current user
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Unauthorized", data: null }
+    return { error: "Unauthorized", data: null };
   }
 
   // Check if user is admin
@@ -223,54 +285,62 @@ export async function updateEvent(eventId: string, formData: FormData) {
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single()
+    .single();
 
   if (profileError || profile.role !== "admin") {
-    return { error: "Unauthorized", data: null }
+    return { error: "Unauthorized", data: null };
   }
 
-  // Extract form data
   const title = formData.get("title") as string
   const description = formData.get("description") as string
-  const start_date = formData.get("start_date") as string
-  const end_date = formData.get("end_date") as string
-  const location = formData.get("location") as string
-  const is_virtual = formData.get("is_virtual") === "true"
-  const meeting_url = formData.get("meeting_url") as string
-  const max_participants = Number.parseInt(formData.get("max_participants") as string) || null
+  const date_time = formData.get("date_time") as string
+  const location = formData?.get("location") as string
+  const is_virtual = formData?.get("is_virtual") === "true"
+  const platform_link = formData?.get("platform_link") as string
+  const type = formData.get("type") as string
+  const max_participants = formData?.get("max_participants")
+    ? parseInt(formData.get("max_participants") as string, 10)
+    : null
+  const platform = formData?.get("platform") as string
+  const duration = formData?.get("duration") as string
+  const recording = formData?.get("recording") === "true"
+  
 
-  // Update event
+  // Create event
   const { data, error } = await supabase
     .from("events")
     .update({
       title,
       description,
-      start_date,
-      end_date,
-      location,
+      date_time,
+      location: is_virtual ? null : location,
       is_virtual,
-      meeting_url: is_virtual ? meeting_url : null,
+      platform_link: is_virtual ? platform_link : null,
       max_participants,
-      updated_at: new Date().toISOString(),
+      type,
+      platform,
+      duration,
+      recording,
+      created_by: user.id,
     })
     .eq("id", eventId)
     .select()
     .single()
-
   if (error) {
-    console.error("Error updating event:", error)
-    return { error: error.message, data: null }
+    console.error("Error updating event:", error);
+    return { error: error.message, data: null };
   }
 
-  revalidatePath("/admin/events")
-  revalidatePath("/community/events")
-  revalidatePath(`/community/events/${eventId}`)
-  return { data, error: null }
+  // Revalidate paths
+  revalidatePath("/admin/events");
+  revalidatePath("/community/events");
+  revalidatePath(`/community/events/${eventId}`);
+  return { data, error: null };
 }
 
 // Admin: Delete an event
 export async function deleteEvent(eventId: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
