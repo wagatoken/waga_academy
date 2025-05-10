@@ -79,6 +79,28 @@ export async function getResource(resourceId: string) {
   return { data, error: null }
 }
 
+// Add a new endpoint to fetch a single resource by ID
+export async function getResourceById(resourceId: string) {
+  const supabase = await createServerClientInstance();
+
+  const { data, error } = await supabase
+    .from("resources")
+    .select(`
+      *,
+      creator:profiles(id, first_name, last_name, avatar_url)
+    `)
+    .eq("id", resourceId)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching resource with ID ${resourceId}:`, error);
+    return { error: error.message, data: null };
+  }
+
+  return { data, error: null };
+}
+
+
 // Admin: Create a new resource
 export async function createResource(formData: FormData) {
   const supabase = await createServerClientInstance()
