@@ -189,57 +189,58 @@ export default function ResourcesAdmin() {
           <p>Loading resources...</p>
         ) : (
           filteredResources.map((resource) => (
-            <Card
-              key={resource.id}
-              className="overflow-hidden border-purple-600/30 hover:border-purple-600/60 transition-all shadow-sm hover:shadow-md"
-            >
-              <div className="flex flex-col md:flex-row">
-                <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/10 p-3 md:p-4 flex items-center justify-center md:w-24">
-                  {getResourceIcon(resource.resource_type)}
-                </div>
-                <div className="flex-1 p-4 md:p-6">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
-                    <div>
-                      <h3 className="font-semibold text-base md:text-lg">{resource.title}</h3>
-                      <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
-                        <span
-                          className={`text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full ${
-                            resource.resource_type === "PDF"
-                              ? "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
-                              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                          }`}
+            <Link href={`/admin/resources/${resource.id}`} key={resource.id}>
+              <Card
+                className="overflow-hidden border-purple-600/30 hover:border-purple-600/60 transition-all shadow-sm hover:shadow-md"
+              >
+                <div className="flex flex-col md:flex-row">
+                  <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/10 p-3 md:p-4 flex items-center justify-center md:w-24">
+                    {getResourceIcon(resource.resource_type)}
+                  </div>
+                  <div className="flex-1 p-4 md:p-6">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
+                      <div>
+                        <h3 className="font-semibold text-base md:text-lg">{resource.title}</h3>
+                        <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
+                          <span
+                            className={`text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full ${
+                              resource.resource_type === "PDF"
+                                ? "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
+                                : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                            }`}
+                          >
+                            {resource.resource_type}
+                          </span>
+                          <span className="text-xs md:text-sm text-muted-foreground">Category: {resource.category}</span>
+                        </div>
+                        <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
+                          <span className="text-xs md:text-sm text-muted-foreground">Added: {resource.dateAdded}</span>
+                          <span className="text-xs md:text-sm text-muted-foreground flex items-center">
+                            <Download className="h-3 w-3 mr-1" /> {resource.downloads} downloads
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2 self-end md:self-start mt-2 md:mt-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
+                          onClick={() => handleUpdate(resource.id)} // Handle update
                         >
-                          {resource.resource_type}
-                        </span>
-                        <span className="text-xs md:text-sm text-muted-foreground">Category: {resource.category}</span>
+                          <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
+                          <span className="hidden md:inline">Update</span>
+                        </Button>
+                        <DeleteButton
+                          entityId={resource.id}
+                          entityName={resource.title}
+                          onDelete={handleDelete} // Pass the delete handler
+                        />
                       </div>
-                      <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
-                        <span className="text-xs md:text-sm text-muted-foreground">Added: {resource.dateAdded}</span>
-                        <span className="text-xs md:text-sm text-muted-foreground flex items-center">
-                          <Download className="h-3 w-3 mr-1" /> {resource.downloads} downloads
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2 self-end md:self-start mt-2 md:mt-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
-                        onClick={() => handleUpdate(resource.id)} // Handle update
-                      >
-                        <Upload className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
-                        <span className="hidden md:inline">Update</span>
-                      </Button>
-                      <DeleteButton
-                       entityId={resource.id}
-                      entityName={resource.title}
-                      onDelete={handleDelete} // Pass the delete handler
-                      />
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           ))
         )}
       </div>
