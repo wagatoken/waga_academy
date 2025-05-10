@@ -25,9 +25,9 @@ const categoryMap = {
 
 const levelMap = {
   all: "",
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
+  beginner: "beginner",
+  intermediate: "intermediate",
+  advanced: "advanced",
 }
 
 export default function CoursesPage() {
@@ -40,12 +40,14 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredCourses, setFilteredCourses] = useState([])
   const [activeTab, setActiveTab] = useState(defaultTab)
+  const [allCourses, setAllCourses] = useState([])
 
   useEffect(() => {
     const fetchCourses = async () => {
       const result = await getAllCourses()
       if (result?.data) {
-        setFilteredCourses(result.data)
+        setAllCourses(result.data) // Store the original list of courses
+        setFilteredCourses(result.data) // Initialize filtered courses with all courses
       }
     }
 
@@ -54,7 +56,7 @@ export default function CoursesPage() {
 
   // Filter courses based on all criteria
   useEffect(() => {
-    let result = [...filteredCourses]
+    let result = [...allCourses] // Use allCourses as the source for filtering
 
     // Apply category filter from dropdown
     if (selectedCategory !== "all") {
@@ -68,7 +70,7 @@ export default function CoursesPage() {
     if (selectedLevel !== "all") {
       const levelValue = levelMap[selectedLevel as keyof typeof levelMap]
       if (levelValue) {
-        result = result.filter((course) => course.level === levelValue || course.level === "All Levels")
+        result = result.filter((course) => course.difficulty_level === levelValue || course.difficulty_level === "All Levels")
       }
     }
 
@@ -97,7 +99,7 @@ export default function CoursesPage() {
     }
 
     setFilteredCourses(result)
-  }, [selectedCategory, selectedLevel, searchQuery, activeTab])
+  }, [selectedCategory, selectedLevel, searchQuery, activeTab, allCourses])
 
   // Handle tab change
   const handleTabChange = (value: string) => {
