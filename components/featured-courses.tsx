@@ -1,49 +1,42 @@
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StrategicCoffeeBeans } from "@/components/animations/strategic-coffee-beans"
+import { toast } from "@/components/ui/toast"
 
-const featuredCourses = [
-  {
-    id: 1,
-    title: "Blockchain for Coffee Traceability",
-    description:
-      "Learn how blockchain technology helps record production data for transparency and traceability in the coffee supply chain.",
-    category: "Web3 & IT Infrastructure",
-    level: "Beginner",
-    href: "/courses",
-  },
-  {
-    id: 2,
-    title: "DeFi Solutions for Coffee Farmers",
-    description:
-      "Understand how decentralized finance can provide yield-based lending and financial inclusion for smallholder farmers.",
-    category: "Finance & Accounting",
-    level: "Intermediate",
-    href: "/courses",
-  },
-  {
-    id: 3,
-    title: "Sustainable Coffee Farming Practices",
-    description:
-      "Master agroecology, smart farming tools, and sustainable coffee production methods for improved yields and quality.",
-    category: "Coffee Cultivation",
-    level: "All Levels",
-    href: "/courses",
-  },
-  {
-    id: 4,
-    title: "Coffee Tokenization Fundamentals",
-    description:
-      "Explore how coffee assets can be tokenized to enable fair pricing, financial resources, and global market access.",
-    category: "Web3 & IT Infrastructure",
-    level: "Intermediate",
-    href: "/courses",
-  },
-]
 
 export function FeaturedCourses() {
+  const [featuredCourses, setFeaturedCourses] = useState([])
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchFeaturedCourses = async () => {
+      try {
+        const response = await fetch("/api/courses/getFeaturedCourse")
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`)
+        }
+        const result = await response.json()
+        if (result?.data) {
+          setFeaturedCourses(result.data)
+        }
+      } catch (err) {
+        setError(err.message)
+        toast({
+          title: "Failed to Load Courses",
+          description: err.message,
+          variant: "destructive",
+        })
+      }
+    }
+
+    fetchFeaturedCourses()
+  }, [])
+
+  
+
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 backdrop-blur relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 to-purple-950/40 z-0"></div>
@@ -105,7 +98,7 @@ export function FeaturedCourses() {
                         variant="secondary"
                         className={`mb-2 ${isEven ? "bg-emerald-500/10 text-emerald-300" : "bg-purple-500/10 text-purple-300"}`}
                       >
-                        {course.level}
+                        {course.difficulty_level}
                       </Badge>
                     </div>
                     <CardTitle className="line-clamp-2">{course.title}</CardTitle>
@@ -116,7 +109,7 @@ export function FeaturedCourses() {
                     </CardDescription>
                   </CardContent>
                   <CardFooter>
-                    <Link href={course.href} className="w-full">
+                    <Link href={`/community/courses/${course.slug}`} className="w-full">
                       <Button className={`w-full ${buttonClass} relative z-20`}>View Course</Button>
                     </Link>
                   </CardFooter>
