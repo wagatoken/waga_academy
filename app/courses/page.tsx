@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,101 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StrategicCoffeeBeans } from "@/components/animations/strategic-coffee-beans"
+import { getAllCourses } from "@/app/api/courses/actions"
 
-const courses = [
-  {
-    id: 1,
-    title: "Blockchain for Coffee Traceability",
-    description:
-      "Learn how blockchain technology helps record production data for transparency and traceability in the coffee supply chain.",
-    category: "Web3 & IT Infrastructure",
-    level: "Beginner",
-    duration: "12 weeks",
-    href: "/courses/blockchain-coffee-traceability",
-  },
-  {
-    id: 2,
-    title: "DeFi Solutions for Coffee Farmers",
-    description:
-      "Understand how decentralized finance can provide yield-based lending and financial inclusion for smallholder farmers.",
-    category: "Finance & Accounting",
-    level: "Intermediate",
-    duration: "12 weeks",
-    href: "/courses/defi-coffee-farmers",
-  },
-  {
-    id: 3,
-    title: "Sustainable Coffee Farming Practices",
-    description:
-      "Master agroecology, smart farming tools, and sustainable coffee production methods for improved yields and quality.",
-    category: "Coffee Cultivation",
-    level: "All Levels",
-    duration: "12 weeks",
-    href: "/courses/sustainable-coffee-farming",
-  },
-  {
-    id: 4,
-    title: "Coffee Tokenization Fundamentals",
-    description:
-      "Explore how coffee assets can be tokenized to enable fair pricing, financial resources, and global market access.",
-    category: "Web3 & IT Infrastructure",
-    level: "Intermediate",
-    duration: "12 weeks",
-    href: "/courses/coffee-tokenization",
-  },
-  {
-    id: 5,
-    title: "Supply Chain Management for Coffee",
-    description:
-      "Learn comprehensive knowledge in logistics, procurement, and distribution for seamless operations across the coffee value chain.",
-    category: "Supply Chain Management",
-    level: "Intermediate",
-    duration: "12 weeks",
-    href: "/courses/supply-chain-coffee",
-  },
-  {
-    id: 6,
-    title: "Web3 Digital Marketing for Coffee Brands",
-    description:
-      "Build expertise in branding, customer loyalty, and positioning of tokenized coffee for global markets.",
-    category: "Marketing & Sales",
-    level: "Beginner",
-    duration: "12 weeks",
-    href: "/courses/digital-marketing-coffee",
-  },
-  {
-    id: 7,
-    title: "Coffee Quality Control & Processing",
-    description:
-      "Develop skills in grading, processing methods, and quality control to ensure top-quality coffee beans.",
-    category: "Coffee Processing",
-    level: "Intermediate",
-    duration: "12 weeks",
-    href: "/courses/coffee-quality-control",
-  },
-  {
-    id: 8,
-    title: "IoT for Coffee Farm Monitoring",
-    description:
-      "Learn how to implement IoT solutions for real-time monitoring of coffee farms and processing facilities.",
-    category: "Web3 & IT Infrastructure",
-    level: "Advanced",
-    duration: "12 weeks",
-    href: "/courses/iot-coffee-monitoring",
-  },
-  {
-    id: 9,
-    title: "Ethical Coffee Sourcing & Sustainability",
-    description:
-      "Promote ethical sourcing and transparency throughout the coffee supply chain, ensuring sustainability and equity.",
-    category: "Sustainability & Ethics",
-    level: "All Levels",
-    duration: "12 weeks",
-    href: "/courses/ethical-coffee-sourcing",
-  },
-]
-
-// Map dropdown values to actual category values in the data
 const categoryMap = {
   all: "",
   web3: "Web3 & IT Infrastructure",
@@ -115,7 +23,6 @@ const categoryMap = {
   sustainability: "Sustainability & Ethics",
 }
 
-// Map dropdown values to actual level values in the data
 const levelMap = {
   all: "",
   beginner: "Beginner",
@@ -123,20 +30,31 @@ const levelMap = {
   advanced: "Advanced",
 }
 
-export default function CoursesPage({ searchParams }: { searchParams: { category?: string } }) {
-  // Default to 'all' if no category is specified
-  const defaultTab = searchParams.category || "all"
+export default function CoursesPage() {
+  const searchParams = useSearchParams()
+  const defaultTab = searchParams.get("category") || "all"
 
   // State for filters
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedLevel, setSelectedLevel] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredCourses, setFilteredCourses] = useState(courses)
+  const [filteredCourses, setFilteredCourses] = useState([])
   const [activeTab, setActiveTab] = useState(defaultTab)
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const result = await getAllCourses()
+      if (result?.data) {
+        setFilteredCourses(result.data)
+      }
+    }
+
+    fetchCourses()
+  }, [])
 
   // Filter courses based on all criteria
   useEffect(() => {
-    let result = [...courses]
+    let result = [...filteredCourses]
 
     // Apply category filter from dropdown
     if (selectedCategory !== "all") {
@@ -191,7 +109,7 @@ export default function CoursesPage({ searchParams }: { searchParams: { category
   }
 
   // Render course card with appropriate styling
-  const renderCourseCard = (course: (typeof courses)[0], index: number) => {
+  const renderCourseCard = (course: any, index: number) => {
     // Assign different card styles based on category
     let cardClass = "web3-card"
     if (course.category === "Web3 & IT Infrastructure") cardClass = "web3-card-purple"
@@ -231,7 +149,7 @@ export default function CoursesPage({ searchParams }: { searchParams: { category
         </CardContent>
         <CardFooter>
           <Button asChild className="w-full web3-button-purple">
-            <Link href={course.href}>Join Waitlist</Link>
+            <Link href="">Join Waitlist</Link>
           </Button>
         </CardFooter>
       </Card>
