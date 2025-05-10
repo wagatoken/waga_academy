@@ -1,3 +1,5 @@
+"use client"
+
 import { HeroSection } from "@/components/hero-section"
 import { FeaturedCourses } from "@/components/featured-courses"
 import { ValueChainSection } from "@/components/value-chain-section"
