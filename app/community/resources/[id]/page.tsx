@@ -1,8 +1,7 @@
+"use client"
 export const runtime = 'edge'
 
-"use client"
-
-import { useState } from "react"
+import { useState, useEffect, use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,64 +9,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Download, FileText, Bookmark, Share2, ThumbsUp, MessageSquare, Calendar, User } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { format } from "date-fns"
 
-// Sample resource data - in a real app, this would be fetched based on the ID
-const resourceData = {
-  id: 1,
-  title: "Blockchain for Agriculture: A Primer",
-  type: "PDF Guide",
-  category: "Web3 & Blockchain",
-  description:
-    "An introduction to blockchain technology and its applications in agriculture, with a focus on coffee supply chains.",
-  longDescription: `
-    <p>This comprehensive guide introduces blockchain technology and its transformative potential for agricultural supply chains, with a special focus on coffee production and distribution.</p>
-    
-    <p>Inside this guide, you'll learn:</p>
-    
-    <ul>
-      <li>The fundamentals of blockchain technology explained in simple terms</li>
-      <li>How blockchain creates transparency and traceability in agricultural supply chains</li>
-      <li>Real-world examples of blockchain implementation in coffee production</li>
-      <li>The benefits for farmers, processors, distributors, and consumers</li>
-      <li>Step-by-step approach to implementing blockchain in your agricultural business</li>
-      <li>Common challenges and how to overcome them</li>
-    </ul>
-    
-    <p>Whether you're a coffee farmer, processor, distributor, or technology enthusiast, this guide provides a solid foundation for understanding how blockchain can revolutionize the agricultural industry.</p>
-  `,
-  image: "/placeholder.svg?height=400&width=800",
-  downloadable: true,
-  downloadUrl: "#",
-  fileSize: "2.4 MB",
-  fileType: "PDF",
-  datePublished: "April 15, 2024",
-  author: "WAGA Academy Team",
-  views: 342,
-  downloads: 156,
-  likes: 48,
-  comments: 12,
-}
+export default function ResourcePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
 
-// Sample related resources
-const relatedResources = [
-  {
-    id: 3,
-    title: "Setting Up a Crypto Wallet",
-    type: "Tutorial",
-    category: "Web3 & Blockchain",
-  },
-  {
-    id: 5,
-    title: "Introduction to DeFi for Coffee Farmers",
-    type: "Presentation",
-    category: "Finance & Accounting",
-  },
-]
+  const [resourceData, setResourceData] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
-export default function ResourcePage({ params }: { params: { id: string } }) {
-  const [isBookmarked, setIsBookmarked] = useState(false)
-  const [isLiked, setIsLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(resourceData.likes)
+  useEffect(() => {
+    const fetchResource = async () => {
+      try {
+        const response = await fetch(`/api/resources/${id}`);
+        const data = await response.json();
+        setResourceData(data);
+      } catch (error) {
+        console.error("Error fetching resource details:", error);
+      }
+    };
+
+    fetchResource();
+  }, [id]);
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked)
@@ -94,7 +58,6 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
   }
 
   const handleShare = () => {
-    // In a real app, this would open a share dialog or copy a link to clipboard
     navigator.clipboard.writeText(window.location.href).then(() => {
       toast({
         title: "Link copied",
@@ -102,6 +65,18 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
       })
     })
   }
+
+  if (!resourceData) {
+    return <div>Loading...</div>
+  }
+
+  const formattedDate = resourceData.created_at
+    ? format(new Date(resourceData.created_at), "MMMM dd, yyyy")
+    : "Unknown date";
+
+  const creatorName = resourceData.creator
+    ? `${resourceData.creator.first_name} ${resourceData.creator.last_name}`
+    : "Unknown creator";
 
   return (
     <div className="container py-12">
@@ -120,7 +95,7 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
                   className="object-cover"
                 />
                 <div className="absolute top-4 right-4">
-                  <Badge className="badge-emerald">{resourceData.type}</Badge>
+                  <Badge className="badge-emerald">{resourceData.resource_type}</Badge>
                 </div>
               </div>
 
@@ -135,16 +110,16 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <FileText className="h-4 w-4 icon-emerald" />
                     <span>
-                      {resourceData.fileType} • {resourceData.fileSize}
+                      {resourceData.resource_type} • {resourceData.fileSize}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4 icon-emerald" />
-                    <span>Published: {resourceData.datePublished}</span>
+                    <span>Published: {formattedDate}</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <User className="h-4 w-4 icon-emerald" />
-                    <span>By: {resourceData.author}</span>
+                    <span>By: {creatorName}</span>
                   </div>
                 </div>
               </div>
@@ -225,8 +200,10 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
                         </p>
                         <p className="text-sm text-muted-foreground mt-1">Downloaded {resourceData.downloads} times</p>
                       </div>
-                      <Button className="w-full web3-button-purple" onClick={handleDownload}>
-                        <Download className="mr-2 h-4 w-4" /> Download
+                      <Button className="w-full web3-button-purple" onClick={handleDownload} asChild>
+                        <a href={resourceData.downloadUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="mr-2 h-4 w-4" /> Download
+                        </a>
                       </Button>
                     </div>
                   </CardContent>
@@ -260,37 +237,42 @@ export default function ResourcePage({ params }: { params: { id: string } }) {
                   <CardTitle>Related Resources</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {relatedResources.map((resource) => {
-                    // Assign different background colors based on category
-                    let bgClass = "bg-emerald-500/10"
-                    let textClass = "text-emerald-400"
-                    if (resource.category === "Finance & Accounting") {
-                      bgClass = "bg-emerald-500/10"
-                      textClass = "text-emerald-400"
-                    }
+                  {resourceData.relatedResources?.length > 0 ? (
+                    resourceData.relatedResources.map((resource) => {
+                      let bgClass = "bg-emerald-500/10";
+                      let textClass = "text-emerald-400";
+                      if (resource.category === "Finance & Accounting") {
+                        bgClass = "bg-emerald-500/10";
+                        textClass = "text-emerald-400";
+                      }
 
-                    return (
-                      <div key={resource.id} className="flex items-start gap-3">
-                        <div className={`${bgClass} p-2 rounded-md`}>
-                          <FileText className={`h-4 w-4 ${textClass}`} />
-                        </div>
-                        <div>
-                          <Link
-                            href={`/community/resources/${resource.id}`}
-                            className="text-sm font-medium link-emerald"
-                          >
-                            {resource.title}
-                          </Link>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs badge-emerald">
-                              {resource.category}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">{resource.type}</span>
+                      return (
+                        <div key={resource.id} className="flex items-start gap-3">
+                          <div className={`${bgClass} p-2 rounded-md`}>
+                            <FileText className={`h-4 w-4 ${textClass}`} />
+                          </div>
+                          <div>
+                            <Link
+                              href={`/community/resources/${resource.id}`}
+                              className="text-sm font-medium link-emerald"
+                            >
+                              {resource.title}
+                            </Link>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs badge-emerald">
+                                {resource.category}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">{resource.type}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      );
+                    })
+                  ) : (
+                    <div className="text-center text-sm text-muted-foreground">
+                      No related resources available.
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
