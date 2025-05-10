@@ -17,6 +17,7 @@ export default function ResourcesAdmin() {
   const [resources, setResources] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [sortOption, setSortOption] = useState("") // Add state for sorting
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -38,15 +39,28 @@ export default function ResourcesAdmin() {
     fetchResources()
   }, [currentPage])
 
-  const filteredResources = resources.filter((resource) => {
-    const matchesSearch =
-      searchTerm === "" || resource.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory =
-      categoryFilter === "" ||
-      categoryFilter === "all" ||
-      resource.category?.toLowerCase() === categoryFilter.toLowerCase()
-    return matchesSearch && matchesCategory
-  })
+  const filteredResources = resources
+    .filter((resource) => {
+      const matchesSearch =
+        searchTerm === "" || resource.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        categoryFilter === "" ||
+        categoryFilter === "all" ||
+        resource.category?.toLowerCase() === categoryFilter.toLowerCase();
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortOption === "newest") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else if (sortOption === "oldest") {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      } else if (sortOption === "downloads") {
+        return b.downloads - a.downloads;
+      } else if (sortOption === "title") {
+        return a.title.localeCompare(b.title);
+      }
+      return 0; // Default: no sorting
+    });
 
   const handleDelete = async (id: string) => {
     try {
@@ -87,8 +101,8 @@ export default function ResourcesAdmin() {
     }
   }
 
-  const getResourceIcon = (type: string) => {
-    switch (type) {
+  const getResourceIcon = (resource_type: string) => {
+    switch (resource_type) {
       case "PDF":
         return <FileText className="h-10 w-10 text-rose-500" />
       case "Video":
@@ -155,7 +169,7 @@ export default function ResourcesAdmin() {
                 <SelectItem value="Quality">Quality</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={sortOption} onValueChange={setSortOption}>
               <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -181,7 +195,7 @@ export default function ResourcesAdmin() {
             >
               <div className="flex flex-col md:flex-row">
                 <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/10 p-3 md:p-4 flex items-center justify-center md:w-24">
-                  {getResourceIcon(resource.type)}
+                  {getResourceIcon(resource.resource_type)}
                 </div>
                 <div className="flex-1 p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
@@ -190,12 +204,12 @@ export default function ResourcesAdmin() {
                       <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
                         <span
                           className={`text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full ${
-                            resource.type === "PDF"
+                            resource.resource_type === "PDF"
                               ? "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
                               : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                           }`}
                         >
-                          {resource.type}
+                          {resource.resource_type}
                         </span>
                         <span className="text-xs md:text-sm text-muted-foreground">Category: {resource.category}</span>
                       </div>
@@ -220,7 +234,6 @@ export default function ResourcesAdmin() {
                        entityId={resource.id}
                       entityName={resource.title}
                       onDelete={handleDelete} // Pass the delete handler
-                      entityType="Resource" // Optional: Specify the entity type for better context
                       />
                     </div>
                   </div>
