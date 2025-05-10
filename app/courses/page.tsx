@@ -32,7 +32,7 @@ const levelMap = {
 
 export default function CoursesPage() {
   const searchParams = useSearchParams()
-  const defaultTab = searchParams.get("category") || "all"
+  const defaultTab = searchParams.get("tab") || "all"
 
   // State for filters
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -41,6 +41,10 @@ export default function CoursesPage() {
   const [filteredCourses, setFilteredCourses] = useState([])
   const [activeTab, setActiveTab] = useState(defaultTab)
   const [allCourses, setAllCourses] = useState([])
+
+  useEffect(() => {
+    setActiveTab(defaultTab)
+  }, [defaultTab])
 
   useEffect(() => {
     const fetchCourses = async () => {
