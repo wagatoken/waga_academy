@@ -1,133 +1,114 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Edit, Plus, Search, Trash2, MapPin, Users, Tag } from "lucide-react"
-import Link from "next/link"
-import { getPaginatedEvents, updateEvent, deleteEvent } from "@/app/api/events/actions"
-import { toast } from "@/components/ui/toast"
-import { DeleteButton } from "@/components/admin/delete-button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Edit, Plus, Search, Trash2, MapPin, Users, Tag } from "lucide-react";
+import Link from "next/link";
+import { toast } from "@/components/ui/toast";
+import { DeleteButton } from "@/components/admin/delete-button";
 
 export default function EventsAdmin() {
-  const [events, setEvents] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
-  const [typeFilter, setTypeFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
+  const [events, setEvents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch events with pagination
   useEffect(() => {
     const fetchEvents = async () => {
-      setIsLoading(true)
-      const { data, meta, error } = await getPaginatedEvents(currentPage, 5) // Fetch 5 items per page
-      if (error) {
+      setIsLoading(true);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        const res = await fetch(`${baseUrl}/api/events?type=all&page=${currentPage}&limit=5`);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch events: ${res.statusText}`);
+        }
+        const { data, meta } = await res.json();
+        console.log("Fetched events:", data);
+        setEvents(data);
+        setTotalPages(meta.totalPages);
+      } catch (error) {
+        console.error("Error fetching events:", error);
         toast({
           title: "Error fetching events ❌",
-          description: error,
+          description: error.message,
           variant: "destructive",
-        })
-      } else {
-        setEvents(data)
-        setTotalPages(meta.totalPages)
+        });
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false)
-    }
+    };
 
-    fetchEvents()
-  }, [currentPage])
+    fetchEvents();
+  }, [currentPage]);
+
+  console.log("Events:", events);
 
   const filteredEvents = events.filter((event) => {
-    const matchesSearch = searchTerm === "" || event.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "" || statusFilter === "all" || event.status === statusFilter
-    const matchesType = typeFilter === "" || typeFilter === "all" || event.type === typeFilter
-    return matchesSearch && matchesStatus && matchesType
-  })
+    const matchesSearch = searchTerm === "" || event.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "" || statusFilter === "all" || event.status === statusFilter;
+    const matchesType = typeFilter === "" || typeFilter === "all" || event.type === typeFilter;
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id) => {
     try {
-      const { error } = await deleteEvent(id)
-      if (error) {
-        toast({
-          title: "Delete failed ❌",
-          description: error,
-          variant: "destructive",
-        })
-      } else {
-        setEvents(events.filter((event) => event.id !== id))
-        toast({
-          title: "Event deleted ✅",
-          description: "The event has been successfully deleted.",
-        })
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const res = await fetch(`${baseUrl}/api/events/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to delete event: ${res.statusText}`);
       }
-    } catch (err) {
-      console.error("Error deleting event:", err)
+      setEvents(events.filter((event) => event.id !== id));
       toast({
-        title: "Unexpected error ❌",
-        description: "An unexpected error occurred. Please try again later.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleUpdate = async (id: number, updatedData: any) => {
-    try {
-      const { error } = await updateEvent(id, updatedData)
-      if (error) {
-        toast({
-          title: "Update failed ❌",
-          description: error,
-          variant: "destructive",
-        })
-      } else {
-        setEvents(events.map((event) => (event.id === id ? { ...event, ...updatedData } : event)))
-        toast({
-          title: "Event updated ✅",
-          description: "The event has been successfully updated.",
-        })
-      }
-    } catch (err) {
-      console.error("Error updating event:", err)
+        title: "Event deleted ✅",
+        description: "The event has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting event:", error);
       toast({
-        title: "Unexpected error ❌",
-        description: "An unexpected error occurred. Please try again later.",
+        title: "Delete failed ❌",
+        description: error.message,
         variant: "destructive",
-      })
+      });
     }
-  }
-
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case "Workshop":
-        return "text-blue-500"
-      case "Webinar":
-        return "text-purple-500"
-      case "Conference":
-        return "text-emerald-500"
-      case "Meetup":
-        return "text-amber-500"
-      case "Registration":
-        return "text-rose-500"
-      default:
-        return "text-gray-500"
-    }
-  }
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1)
+      setCurrentPage((prev) => prev + 1);
     }
-  }
+  };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1)
+      setCurrentPage((prev) => prev - 1);
     }
-  }
+  };
+
+  const getEventTypeColor = (type) => {
+    switch (type) {
+      case "Workshop":
+        return "text-blue-500";
+      case "Webinar":
+        return "text-purple-500";
+      case "Conference":
+        return "text-emerald-500";
+      case "Meetup":
+        return "text-amber-500";
+      case "Registration":
+        return "text-rose-500";
+      default:
+        return "text-gray-500";
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -151,18 +132,17 @@ export default function EventsAdmin() {
           <CardDescription>Search and filter the events calendar</CardDescription>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
-        
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-1 md:col-span-2">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-4">
-            <div className="relative md:col-span-2">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
-              <Input
-                placeholder="Search events..."
-                className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+          <div className="grid grid-cols-3 gap-3 md:grid-cols-1 md:col-span-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-4">
+              <div className="relative md:col-span-2">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-purple-500" />
+                <Input
+                  placeholder="Search events..."
+                  className="pl-8 border-purple-500/30 focus-visible:ring-purple-500/30"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
                   <SelectValue placeholder="Filter by status" />
@@ -225,17 +205,17 @@ export default function EventsAdmin() {
                       </div>
                       <div className="flex items-center mt-2 space-x-2 md:space-x-4 flex-wrap">
                         <span className="text-xs md:text-sm text-muted-foreground flex items-center">
-                            <Calendar className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 text-blue-500" />
-                            {new Date(event.date_time).toLocaleString("en-US", {
-                              weekday: "short", 
-                              month: "short",   
-                              day: "2-digit",   
-                              year: "numeric",  
-                              hour: "2-digit",  
-                              minute: "2-digit",
-                              hour12: false,    
-                            })}
-                          </span>
+                          <Calendar className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 text-blue-500" />
+                          {new Date(event.date_time).toLocaleString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })}
+                        </span>
                         <span className="text-xs md:text-sm text-muted-foreground flex items-center">
                           <MapPin className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 text-rose-500" /> {event.location}
                         </span>
@@ -262,12 +242,12 @@ export default function EventsAdmin() {
                           <span className="hidden md:inline">Update</span>
                         </Link>
                       </Button>
-                       <DeleteButton
-                  entityId={event.id}
-              entityName={event.title}
-              onDelete={handleDelete}
-              entityType="Event"
-                />
+                      <DeleteButton
+                        entityId={event.id}
+                        entityName={event.title}
+                        onDelete={handleDelete}
+                        entityType="Event"
+                      />
                     </div>
                   </div>
                 </div>
@@ -297,5 +277,5 @@ export default function EventsAdmin() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

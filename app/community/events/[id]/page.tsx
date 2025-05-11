@@ -1,6 +1,6 @@
+"use client"
 export const runtime = 'edge'
 
-"use client"
 
 import type React from "react"
 

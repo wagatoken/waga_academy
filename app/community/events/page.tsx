@@ -12,9 +12,18 @@ import { getUpcomingEvents, getPastEvents } from "@/lib/services/event-service"
 
 
 export default async function CommunityEventsPage() {
-  const { data: upcomingEvents } = await getUpcomingEvents(6)
-  const { data: pastEvents } = await getPastEvents()
-  console.log("Upcoming Events:", upcomingEvents)
+  const fetchEvents = async (type, limit) => {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/events?type=${type}&limit=${limit}`);
+    if (!res.ok) {
+      console.error(`Failed to fetch ${type} events:`, res.statusText);
+      return [];
+    }
+    return res.json();
+  };
+  
+  const upcomingEvents = await fetchEvents("upcoming", 6);
+  const pastEvents = await fetchEvents("past", 6);
 
   return (
     <div className="container py-12">

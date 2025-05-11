@@ -2,76 +2,65 @@
 
 import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { MinimalEvent } from "@/lib/services/event-service"
 
 // Get upcoming events
-// export async function getUpcomingEvents() {
-//   const supabase = createServerClient()
+export async function getUpcomingEvents(limit: number = 6) {
+  const supabase = await createServerClientInstance()
+  try {
+    const { data, error } = await supabase
+      .from("event_with_speakers")
+      .select(`
+        *
+      `)
+      .gte("date_time", new Date().toISOString())
+      .order("date_time", { ascending: true })
+      .limit(limit)
 
-//   const { data, error } = await supabase
-//     .from("events")
-//     .select(`
-//       *,
-//       creator:profiles(id, first_name, last_name, avatar_url),
-//       registration_count:event_registrations(count)
-//     `)
-//     .gte("start_date", new Date().toISOString())
-//     .order("start_date", { ascending: true })
+    if (error) {
+      console.error("Supabase error fetching upcoming events:", error)
+      return { data: [], error: { message: error.message } }
+    }
 
-//   if (error) {
-//     console.error("Error fetching upcoming events:", error)
-//     return { error: error.message, data: null }
-//   }
-
-//   return { data, error: null }
-// }
+    return { data: (data as MinimalEvent[]) || [], error: null }
+  } catch (error) {
+    console.error("Unexpected error fetching upcoming events:", error)
+    return {
+      data: [], 
+      error: { message: "An unexpected error occurred while fetching upcoming events." },
+    }
+  }
+}
 
 // Get past events
-// export async function getPastEvents() {
-//   const supabase = createServerClient()
+export async function getPastEvents(limit: number = 6) {
+  const supabase = await createServerClientInstance()
+  try {
+    const { data, error } = await supabase
+      .from("event_with_speakers")
+      .select(`
+        *
+      `)
+      .lt("date_time", new Date().toISOString())
+      .order("date_time", { ascending: false }) 
+      .limit(limit)
 
-//   const { data, error } = await supabase
-//     .from("events")
-//     .select(`
-//       *,
-//       creator:profiles(id, first_name, last_name, avatar_url),
-//       registration_count:event_registrations(count)
-//     `)
-//     .lt("end_date", new Date().toISOString())
-//     .order("start_date", { ascending: false })
+    if (error) {
+      console.error("Supabase error fetching past events:", error)
+      return { data: [], error: { message: error.message } }
+    }
 
-//   if (error) {
-//     console.error("Error fetching past events:", error)
-//     return { error: error.message, data: null }
-//   }
+    return { data: (data as MinimalEvent[]) || [], error: null }
+  } catch (error) {
+    console.error("Unexpected error fetching past events:", error)
+    return {
+      data: [], 
+      error: { message: "An unexpected error occurred while fetching past events." },
+    }
+  }
+}
 
-//   return { data, error: null }
-// }
-
-// // Get a single event
-// export async function getEvent(eventId: string) {
-//   const supabase = createServerClient()
-
-//   const { data, error } = await supabase
-//     .from("events")
-//     .select(`
-//       *,
-//       creator:profiles(id, first_name, last_name, avatar_url),
-//       registrations:event_registrations(
-//         *,
-//         user:profiles(id, first_name, last_name, avatar_url)
-//       )
-//     `)
-//     .eq("id", eventId)
-//     .single()
-
-//   if (error) {
-//     console.error(`Error fetching event ${eventId}:`, error)
-//     return { error: error.message, data: null }
-//   }
-
-//   return { data, error: null }
-// }
-
+// Get a single event
 export async function getEvent(EventId: string) {
   const supabase = await createServerClientInstance()
 
@@ -169,7 +158,7 @@ export async function registerForEvent(eventId: string) {
 
   const { count, error: countError } = await supabase
     .from("event_registrations")
-    .select("id", { count: true })
+    .select("id", { count: "exact" })
     .eq("event_id", eventId)
 
   if (countError) {
