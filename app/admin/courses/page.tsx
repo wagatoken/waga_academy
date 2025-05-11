@@ -1,97 +1,82 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Eye, Plus, Search, Trash2, Users, Clock, BookOpen } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-
-// Mock data for courses
-const mockCourses = [
-  {
-    id: 1,
-    title: "Introduction to Blockchain for Coffee",
-    instructor: "Dr. Sarah Johnson",
-    level: "Beginner",
-    duration: "4 weeks",
-    students: 156,
-    status: "Published",
-    image: "/placeholder.svg?height=100&width=180",
-  },
-  {
-    id: 2,
-    title: "Advanced Supply Chain Transparency",
-    instructor: "Prof. Michael Chen",
-    level: "Advanced",
-    duration: "6 weeks",
-    students: 89,
-    status: "Published",
-    image: "/placeholder.svg?height=100&width=180",
-  },
-  {
-    id: 3,
-    title: "Coffee Farming Best Practices",
-    instructor: "Maria Rodriguez",
-    level: "Intermediate",
-    duration: "5 weeks",
-    students: 124,
-    status: "Published",
-    image: "/placeholder.svg?height=100&width=180",
-  },
-  {
-    id: 4,
-    title: "Web3 Integration for Agricultural Products",
-    instructor: "Dr. James Wilson",
-    level: "Advanced",
-    duration: "8 weeks",
-    students: 67,
-    status: "Draft",
-    image: "/placeholder.svg?height=100&width=180",
-  },
-  {
-    id: 5,
-    title: "Sustainable Coffee Production",
-    instructor: "Emma Thompson",
-    level: "Beginner",
-    duration: "3 weeks",
-    students: 0,
-    status: "Scheduled",
-    image: "/placeholder.svg?height=100&width=180",
-  },
-]
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Edit, Eye, Plus, Search, Trash2, Users, Clock, BookOpen } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { getAdminCourses } from "@/app/api/courses/actions";
+import { DeleteButton } from "@/components/admin/delete-button";
+import { toast } from "@/components/ui/toast";
 
 export default function CoursesAdmin() {
-  const [courses, setCourses] = useState(mockCourses)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
-  const [levelFilter, setLevelFilter] = useState("")
+  const [courses, setCourses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [levelFilter, setLevelFilter] = useState("all"); // Default to "all"
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filteredCourses = courses.filter((course) => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "" || statusFilter === "all" || course.status === statusFilter
-    const matchesLevel = levelFilter === "" || levelFilter === "all" || course.level === levelFilter
-    return matchesSearch && matchesStatus && matchesLevel
-  })
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const result = await getAdminCourses({
+        page: currentPage,
+        search: searchTerm,
+        status: statusFilter === "all" ? "" : statusFilter,
+        level: levelFilter === "all" ? "" : levelFilter, 
+      });
 
-  const handleDelete = (id: number) => {
-    setCourses(courses.filter((course) => course.id !== id))
-  }
+      if (result?.data) {
+        setCourses(result.data.courses);
+        setTotalPages(result.data.totalPages);
+      }
+    };
 
-  const getLevelColor = (level: string) => {
+    fetchCourses();
+  }, [currentPage, searchTerm, statusFilter, levelFilter]);
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/api/courses/delete?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete course");
+      }
+
+      setCourses(courses.filter((course) => course.id !== id));
+
+      toast({
+        title: "Course Delete 🎉",
+        description: "The course has been successfully removed from the catalog. 🗑️✨",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      toast({
+        title: "Deletion Failed 🚨",
+        description: "Something went wrong while trying to delete the course. Please try again. 😢",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getLevelColor = (level) => {
     switch (level) {
       case "Beginner":
-        return "text-green-500"
+        return "text-green-500";
       case "Intermediate":
-        return "text-blue-500"
+        return "text-blue-500";
       case "Advanced":
-        return "text-purple-500"
+        return "text-purple-500";
       default:
-        return "text-gray-500"
+        return "text-gray-500";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -155,7 +140,7 @@ export default function CoursesAdmin() {
       </Card>
 
       <div className="grid grid-cols-1 gap-4">
-        {filteredCourses.map((course) => (
+        {courses.map((course) => (
           <Card
             key={course.id}
             className="overflow-hidden border border-purple-600/30 hover:border-purple-600/60 transition-all shadow-sm hover:shadow-md"
@@ -180,8 +165,8 @@ export default function CoursesAdmin() {
                           course.status === "Published"
                             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                             : course.status === "Draft"
-                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                            : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                         }`}
                       >
                         {course.status}
@@ -192,8 +177,8 @@ export default function CoursesAdmin() {
                         <BookOpen className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 text-purple-500" /> Instructor:{" "}
                         {course.instructor}
                       </span>
-                      <span className={`text-xs md:text-sm flex items-center ${getLevelColor(course.level)}`}>
-                        <span className="text-muted-foreground mr-1">Level:</span> {course.level}
+                      <span className={`text-xs md:text-sm flex items-center ${getLevelColor(course.difficulty_level)}`}>
+                        <span className="text-muted-foreground mr-1">Level:</span> {course.difficulty_level}
                       </span>
                     </div>
                     <div className="flex items-center mt-1 space-x-2 md:space-x-4 flex-wrap">
@@ -223,15 +208,11 @@ export default function CoursesAdmin() {
                       <Edit className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
                       <span className="hidden md:inline">Edit</span>
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(course.id)}
-                      className="bg-red-500/90 hover:bg-red-600 h-8 w-8 md:w-auto md:px-3"
-                    >
-                      <Trash2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                      <span className="hidden md:inline ml-2">Delete</span>
-                    </Button>
+                    <DeleteButton
+                      entityId={course.id}
+                      entityName={course.title}
+                      onDelete={handleDelete}
+                    />
                   </div>
                 </div>
               </div>
@@ -239,6 +220,24 @@ export default function CoursesAdmin() {
           </Card>
         ))}
       </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        >
+          Previous
+        </Button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        >
+          Next
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
