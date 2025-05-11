@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Download, FileText, Bookmark, Share2, ThumbsUp, MessageSquare, Calendar, User } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/components/ui/toast"
 import { format } from "date-fns"
 
 export default function ResourcePage({ params }: { params: Promise<{ id: string }> }) {
@@ -24,7 +24,11 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
       try {
         const response = await fetch(`/api/resources/${id}`);
         const data = await response.json();
+
         setResourceData(data);
+        setIsLiked(data.isliked || false); // Initialize isLiked state from API response
+        setLikeCount(data.likeCount || 0); // Initialize likeCount state from API response
+        setIsBookmarked(data.isbookmarked || false); // Initialize isBookmarked state from API response
       } catch (error) {
         console.error("Error fetching resource details:", error);
       }
@@ -33,26 +37,84 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
     fetchResource();
   }, [id]);
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked)
-    toast({
-      title: isBookmarked ? "Bookmark removed" : "Bookmark added",
-      description: isBookmarked ? "Resource removed from your bookmarks" : "Resource added to your bookmarks",
-    })
-  }
+  console.log("Resource Data:", resourceData);
 
-  const handleLike = () => {
-    if (isLiked) {
-      setLikeCount(likeCount - 1)
-    } else {
-      setLikeCount(likeCount + 1)
+  const handleBookmark = async () => {
+    const previousIsBookmarked = isBookmarked;
+
+    // Optimistically update the state
+    setIsBookmarked(!isBookmarked);
+
+    try {
+      const response = await fetch(`/api/resources/${id}/bookmark`, {
+        method: isBookmarked ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ resourceId: id }),
+      });
+
+      let responseData;
+      try {
+        const responseText = await response.text();
+        console.log("Raw Response Text:", responseText);
+        responseData = responseText ? JSON.parse(responseText) : null;
+      } catch (jsonError) {
+        console.error("Error parsing JSON response:", jsonError);
+        throw new Error("Invalid JSON response from server");
+      }
+
+      console.log("API Response:", responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData?.error || "Failed to toggle bookmark");
+      }
+
+      toast({
+        title: isBookmarked ? "Bookmark removed 🍾" : "Bookmark added 🥂",
+        description: isBookmarked
+          ? "Resource removed from your bookmarks"
+          : "Resource added to your bookmarks",
+      });
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+
+      // Revert state on error
+      setIsBookmarked(previousIsBookmarked);
     }
-    setIsLiked(!isLiked)
-  }
+  };
+
+  const handleLike = async () => {
+    const previousIsLiked = isLiked;
+
+    // Optimistically update the state
+    setIsLiked(!isLiked);
+
+    try {
+      const response = await fetch(`/api/resources/${id}/like`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to toggle like");
+      }
+
+      const { isLiked: updatedIsLiked, likeCount: updatedLikeCount } = await response.json();
+
+      // Update state with the response from the server
+      setIsLiked(updatedIsLiked);
+      setLikeCount(updatedLikeCount || likeCount);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+
+      // Revert state on error
+      setIsLiked(previousIsLiked);
+    }
+  };
 
   const handleDownload = () => {
     toast({
-      title: "Download started",
+      title: "Download started 🚀",
       description: "Your download should begin shortly",
     })
   }
@@ -60,7 +122,7 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       toast({
-        title: "Link copied",
+        title: "Link copied to clipboard 📋",
         description: "Resource link copied to clipboard",
       })
     })
@@ -74,8 +136,9 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
     ? format(new Date(resourceData.created_at), "MMMM dd, yyyy")
     : "Unknown date";
 
-  const creatorName = resourceData.creator
-    ? `${resourceData.creator.first_name} ${resourceData.creator.last_name}`
+
+  const creatorName = (resourceData.creator_first_name && resourceData.creator_last_name)
+    ? `${resourceData.creator_first_name} ${resourceData.creator_last_name}`
     : "Unknown creator";
 
   return (
@@ -89,13 +152,13 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
             <div className="lg:col-span-2 space-y-6">
               <div className="relative h-[300px] rounded-xl overflow-hidden web3-card-glow-border">
                 <Image
-                  src={resourceData.image || "/placeholder.svg"}
-                  alt={resourceData.title}
+                  src={resourceData?.image || "/placeholder.svg"}
+                  alt={resourceData?.title || "Placeholder"}
                   fill
                   className="object-cover"
                 />
                 <div className="absolute top-4 right-4">
-                  <Badge className="badge-emerald">{resourceData.resource_type}</Badge>
+                  <Badge className="badge-emerald">{resourceData?.resource_type}</Badge>
                 </div>
               </div>
 
@@ -110,7 +173,7 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <FileText className="h-4 w-4 icon-emerald" />
                     <span>
-                      {resourceData.resource_type} • {resourceData.fileSize}
+                      {resourceData.resource_type} • {resourceData.fileSize ? resourceData.fileSize : "N/A"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -139,21 +202,26 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={handleLike}
+                      onClick={handleLike} // Attach the handleLike function to the onClick event
                       className={
                         isLiked
                           ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
                           : "border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/10"
                       }
                     >
-                      <ThumbsUp className="mr-1 h-4 w-4" /> {likeCount}
+                      <ThumbsUp className="mr-1 h-4 w-4" /> {isLiked ? "Liked" : "Like"}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/10"
+                      disabled={!resourceData.downloadUrl}
+                      className={
+                        resourceData.downloadUrl
+                          ? "border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/10"
+                          : "border-gray-300 text-gray-400 cursor-not-allowed"
+                      }
                     >
-                      <MessageSquare className="mr-1 h-4 w-4" /> {resourceData.comments}
+                      <Download className="mr-1 h-4 w-4" /> Download
                     </Button>
                   </div>
                   <div className="flex gap-2">

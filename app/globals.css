@@ -719,6 +719,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1; /* Ensure it doesn't block interactive elements */
 }
 
 .web3-card-purple:hover {
@@ -938,6 +939,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card-gradient:hover {

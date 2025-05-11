@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, MessageSquare, Users, Coffee, Globe } from "lucide-react"
 import { createServerClientInstance } from "@/lib/supabase/server"
 import { getUpcomingEvents, MinimalEvent } from "@/lib/services/event-service"
+import LatestResourcesCard from "@/components/LatestResourcesCard"
 
 // Fetch resources from the database
 async function getResources() {
@@ -240,49 +241,7 @@ export default async function CommunityDashboard() {
               <CardDescription>Content for community members</CardDescription>
             </CardHeader>
             <CardContent>
-  <div className="space-y-4">
-    {resources.length > 0 ? (
-      resources.map((resource, index) => {
-        // Assign different card styles based on index
-        const bgClasses = ["bg-purple-500/10", "bg-blue-500/10", "bg-teal-500/10"];
-        const bgClass = bgClasses[index % bgClasses.length];
-
-        // Determine icon based on resource type
-        let icon = <Globe className="h-8 w-8 text-purple-400" />;
-        if (resource.resource_type === "Video") icon = <Coffee className="h-8 w-8 text-blue-400" />;
-        if (resource.resource_type === "PDF") icon = <Coffee className="h-8 w-8 text-teal-400" />;
-
-        // Use provided icon if available
-        if (resource.icon) icon = resource.icon;
-
-        return (
-          <div key={resource.id} className="flex items-start gap-4 pb-4 border-b border-purple-500/20">
-            <div className={`${bgClass} p-2 rounded-md`}>{icon}</div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium">{resource.title}</p>
-              <Badge variant="outline" className={`text-xs ${bgClass} border-purple-500/30 text-purple-300`}>
-                {resource.resource_type || "Resource"}
-              </Badge>
-              <div className="pt-1">
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="border-purple-600/30 hover:border-purple-600/60"
-                >
-                  <Link href={`/community/resources/${resource.id}`}>Access</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        );
-      })
-    ) : (
-      <div className="text-center text-sm text-muted-foreground">
-        No Resources. Stay tuned for updates!
-      </div>
-    )}
-  </div>
+              <LatestResourcesCard resources={resources} />
             </CardContent>
             <CardFooter>
               <Button asChild variant="outline" className="w-full border-purple-600/30 hover:border-purple-600/60">

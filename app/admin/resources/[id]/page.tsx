@@ -49,7 +49,7 @@ export default function ResourceDetails() {
         <CardContent className="pt-4 md:pt-6">
           <p className="text-muted-foreground">Category: {resource.category}</p>
           <p className="text-muted-foreground">Type: {resource.resource_type}</p>
-          <p className="text-muted-foreground">Added: {resource.dateAdded}</p>
+          <p className="text-muted-foreground">Added: {resource.created_at}</p>
           <div className="mt-4">
             {resource.resource_type === "PDF" ? (
               <iframe

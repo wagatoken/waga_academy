@@ -11,7 +11,7 @@ export async function getResources() {
     .from("resources")
     .select(`
       *,
-      creator:profiles(id, first_name, last_name, avatar_url)
+      created_by:profiles(id, first_name, last_name, avatar_url)
     `)
     .order("created_at", { ascending: false })
 
@@ -84,10 +84,9 @@ export async function getResourceById(resourceId: string) {
   const supabase = await createServerClientInstance();
 
   const { data, error } = await supabase
-    .from("resources")
+    .from("resource_details")
     .select(`
-      *,
-      creator:profiles(id, first_name, last_name, avatar_url)
+      *
     `)
     .eq("id", resourceId)
     .single();
@@ -99,7 +98,6 @@ export async function getResourceById(resourceId: string) {
 
   return { data, error: null };
 }
-
 
 // Admin: Create a new resource
 export async function createResource(formData: FormData) {
@@ -245,4 +243,20 @@ export async function deleteResource(resourceId: string) {
   revalidatePath("/admin/resources")
   revalidatePath("/community/resources")
   return { error: null, success: true }
+}
+
+// Toggle like for a resource
+export async function toggleLike(resourceId: string) {
+  const supabase = await createServerClientInstance();
+
+  const { data, error } = await supabase.rpc("toggle_like", { input_resource_id: resourceId });
+
+  if (error) {
+    console.error("Error toggling like:", error);
+    return { error: error.message, data: null };
+  }
+
+  const isLiked = data?.isLiked ?? false; // Ensure `isLiked` is explicitly returned from the RPC function
+
+  return { data: { isLiked }, error: null };
 }
