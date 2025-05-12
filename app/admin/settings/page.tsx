@@ -1,13 +1,78 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bell, Lock, User, Globe, Shield, Key, Mail, Smartphone } from "lucide-react"
+"use client";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bell, Lock, User, Globe, Shield, Key, Mail, Smartphone } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/auth-context";
+import { toast } from "@/components/ui/toast";
 
 export default function AdminSettingsPage() {
+  const { profile, updateProfile, isLoading } = useAuth();
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    role: "",
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        email: profile.email || "",
+        role: profile.role || "",
+      });
+    }
+  }, [profile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsUpdating(true);
+
+    try {
+      const { error } = await updateProfile(formData);
+      if (error) {
+        toast({
+          title: "Update Failed",
+          description: error,
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Profile Updated 🥂",
+        description: "Your profile has been updated successfully.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Update Failed 💔",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container mx-auto py-6 space-y-8">
       <div className="flex justify-between items-center">
@@ -60,57 +125,56 @@ export default function AdminSettingsPage() {
               <CardDescription>Update your admin profile information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
-                  <User className="h-10 w-10" />
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      name="first_name"
+                      value={formData.first_name}
+                      onChange={handleChange}
+                      className="border-purple-500/20 focus-visible:ring-purple-500/30"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input
+                      id="last_name"
+                      name="last_name"
+                      value={formData.last_name}
+                      onChange={handleChange}
+                      className="border-purple-500/20 focus-visible:ring-purple-500/30"
+                    />
+                  </div>
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="border-purple-500/20 focus-visible:ring-purple-500/30"
+                    />
+                  </div>
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label htmlFor="role">Role</Label>
+                    <Input
+                      id="role"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="border-purple-500/20 focus-visible:ring-purple-500/30"
+                    />
+                  </div>
                 </div>
-                <Button className="border-purple-600/30 hover:border-purple-600/60 transition">Change Avatar</Button>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    defaultValue="Admin"
-                    className="border-purple-500/20 focus-visible:ring-purple-500/30"
-                  />
+                <div className="flex justify-end mt-4">
+                  <Button type="submit" disabled={isUpdating} className="web3-button-purple">
+                    {isUpdating ? "Updating..." : "Save Changes"}
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    defaultValue="User"
-                    className="border-purple-500/20 focus-visible:ring-purple-500/30"
-                  />
-                </div>
-                <div className="space-y-2 col-span-1 md:col-span-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    defaultValue="admin@wagaacademy.com"
-                    className="border-purple-500/20 focus-visible:ring-purple-500/30"
-                  />
-                </div>
-                <div className="space-y-2 col-span-1 md:col-span-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select defaultValue="admin">
-                    <SelectTrigger id="role" className="border-purple-500/20 focus:ring-purple-500/30">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                      <SelectItem value="moderator">Moderator</SelectItem>
-                      <SelectItem value="editor">Content Editor</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button className="web3-button-purple">Save Changes</Button>
-              </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -352,5 +416,5 @@ export default function AdminSettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
