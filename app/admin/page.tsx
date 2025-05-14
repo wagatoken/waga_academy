@@ -1,3 +1,4 @@
+"use client"
 export const runtime = 'edge'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
