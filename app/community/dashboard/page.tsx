@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, MessageSquare, Users, Coffee, Globe } from "lucide-react"
-import { createServerClientInstance } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/server"
 import { getUpcomingEvents, MinimalEvent } from "@/lib/services/event-service"
 import LatestResourcesCard from "@/components/LatestResourcesCard"
 

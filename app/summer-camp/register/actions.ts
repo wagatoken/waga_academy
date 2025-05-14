@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClientInstance } from "@/lib/supabase/server"
+import { createServerClientInstance } from "@/server"
 import { z } from "zod"
 
 // Define the schema for validation

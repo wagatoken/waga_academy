@@ -1,4 +1,4 @@
-import { createServerClientInstance } from "@/lib/supabase/server";
+import { createServerClientInstance } from "@/server";
 
 export async function GET(req: Request) {
     const supabase = await createServerClientInstance();
