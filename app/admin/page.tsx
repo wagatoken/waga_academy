@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BookOpen, Calendar, FileText, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { createServerClientInstance } from "@/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { RealtimeStats } from "@/components/admin/realtime-stats"
 
 export default async function AdminDashboard() {

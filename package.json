@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
+    "@edge-runtime/cookies": "^6.0.0",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "latest",
     "@radix-ui/react-accordion": "latest",

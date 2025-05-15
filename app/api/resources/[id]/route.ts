@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getResourceById, toggleLike } from "../actions";
+export const runtime = "edge"
 
 export async function GET(request: Request, context: { params: { id: string } }) {
   const params = await context.params; // Await the resolution of `params`

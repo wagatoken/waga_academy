@@ -1,5 +1,6 @@
-import { createServerClientInstance } from "@/server";
+export const runtime = "edge"
 
+import { createServerClientInstance } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   const { resourceId } = await req.json();

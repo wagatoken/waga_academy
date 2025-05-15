@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClientInstance } from "@/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 
 
 export type EventError = {

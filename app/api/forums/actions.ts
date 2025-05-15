@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClientInstance } from "@/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 import { revalidatePath } from "next/cache"
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getResources } from "./actions"; // Assuming getResources is defined in actions.ts
+export const runtime = "edge"
 
 export async function GET() {
   try {

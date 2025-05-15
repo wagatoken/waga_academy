@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClientInstance } from "@/server"
+import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export type CourseError = {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClientInstance } from "@/server";
+import { createServerClientInstance } from "@/lib/supabase/server";
+export const runtime = "edge"
 
 async function deleteCourseById(id: string) {
   const supabase = await createServerClientInstance();

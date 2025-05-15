@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge"
 
 import { useRouter } from "next/navigation"; // Use next/navigation instead of next/router
 import { usePathname } from "next/navigation"; // Import usePathname to extract the ID

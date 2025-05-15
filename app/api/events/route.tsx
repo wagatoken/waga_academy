@@ -1,4 +1,5 @@
 import { getUpcomingEvents, getPastEvents, getPaginatedEvents } from "./actions";
+export const runtime = "edge"
 
 export async function GET(req) {
   const url = new URL(req.url);
