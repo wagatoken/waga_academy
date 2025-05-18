@@ -11,7 +11,7 @@ export async function GET() {
       *,
       creator:profiles(id, first_name, last_name, avatar_url)
     `)
-    .eq("status", "published")
+    .eq("status", "Published")
     .eq("is_featured", true)
     .order("created_at", { ascending: false });
 
