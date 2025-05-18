@@ -196,17 +196,23 @@ export default function CoursesAdmin() {
                       variant="outline"
                       size="sm"
                       className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
+                      asChild
                     >
-                      <Eye className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
-                      <span className="hidden md:inline">Preview</span>
+                      <Link href={`/courses/${course.slug}`}>
+                        <Eye className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
+                        <span className="hidden md:inline">Preview</span>
+                      </Link>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       className="border-purple-500/30 hover:bg-purple-500/10 h-8 px-2 md:px-3"
+                      asChild
                     >
-                      <Edit className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
-                      <span className="hidden md:inline">Edit</span>
+                      <Link href={`/admin/courses/${course.id}/edit`}>
+                        <Edit className="h-3.5 w-3.5 md:h-4 md:w-4 md:mr-2 text-purple-500" />
+                        <span className="hidden md:inline">Edit</span>
+                      </Link>
                     </Button>
                     <DeleteButton
                       entityId={course.id}
