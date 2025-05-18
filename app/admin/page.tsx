@@ -2,37 +2,44 @@
 export const runtime = 'edge'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, Calendar, FileText, MessageSquare } from "lucide-react"
+import { BookOpen, Calendar, FileText, MessageSquare, UserCog } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { createServerClientInstance } from "@/lib/supabase/server"
 import { RealtimeStats } from "@/components/admin/realtime-stats"
+import { useEffect, useState } from "react"
+import AdminDashboardLoading from "./loading"
 
-export default async function AdminDashboard() {
-  // Fetch actual counts from the database
-  const supabase = await createServerClientInstance()
+export default function AdminDashboard() {
+  const [initialData, setInitialData] = useState({
+    courseCount: 0,
+    resourceCount: 0,
+    userCount: 0,
+  })
+  const [loading, setLoading] = useState(true)
 
-  // Get counts with error handling
-  const getCounts = async () => {
-  try {
-    const { data, error } = await supabase.from("admin_stats").select("*").single();
-
-    if (error) {
-      console.error("Error fetching stats from admin_stats view:", error);
-      return { courseCount: 0, resourceCount: 0, userCount: 0 };
+  useEffect(() => {
+    async function fetchInitialStats() {
+      try {
+        const res = await fetch("/api/admin/stats")
+        const result = await res.json()
+        if (result.data) {
+          setInitialData({
+            courseCount: result.data.course_count || 0,
+            resourceCount: result.data.resource_count || 0,
+            userCount: result.data.profile_count || 0,
+          })
+        }
+      } catch (e) {
+        // fallback to zeros
+      } finally {
+        setLoading(false)
+      }
     }
+    fetchInitialStats()
+  }, [])
 
-    return {
-      courseCount: data.course_count || 0,
-      resourceCount: data.resource_count || 0,
-      userCount: data.profile_count || 0,
-    };
-  } catch (error) {
-    console.error("Error fetching counts:", error);
-    return { courseCount: 0, resourceCount: 0, userCount: 0 };
-  }
-};
-const initialStats = await getCounts();
+  if (loading) return <AdminDashboardLoading/>
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
@@ -55,7 +62,7 @@ const initialStats = await getCounts();
       </div>
 
       {/* Replace static stats with real-time stats */}
-      <RealtimeStats initialData={initialStats} />
+      <RealtimeStats initialData={initialData} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 web3-card-featured">
@@ -76,7 +83,7 @@ const initialStats = await getCounts();
                   <div className="flex justify-between items-start">
                     <h3 className="text-sm md:font-medium">Create Your First Course</h3>
                     <div className="bg-purple-500/10 border-purple-500/30 text-purple-300 px-1 py-0.5 md:px-2 md:py-1 rounded-md text-[10px] md:text-xs">
-                      {initialStats.courseCount > 0 ? "Completed" : "Pending"}
+                      {initialData.courseCount > 0 ? "Completed" : "Pending"}
                     </div>
                   </div>
                   <p className="text-xs md:text-sm text-muted-foreground">
@@ -104,7 +111,7 @@ const initialStats = await getCounts();
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium">Add Learning Resources</h3>
                     <div className="bg-blue-500/10 border-blue-500/30 text-blue-300 px-2 py-1 rounded-md text-xs">
-                      {initialStats.resourceCount > 0 ? "Completed" : "Pending"}
+                      {initialData.resourceCount > 0 ? "Completed" : "Pending"}
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">Upload guides and materials for your students</p>
