@@ -18,44 +18,45 @@ export function RealtimeStats({ initialData }: { initialData: StatsData }) {
 
   useEffect(() => {
     // Set up realtime subscriptions
+    const profilesChannel = supabase
+      .channel("public:profiles")
+      .on("INSERT", () => fetchStats())
+      .on("DELETE", () => fetchStats())
+      .subscribe()
 
-    // Subscribe to INSERT and DELETE on the admin_stats view
-    const adminStatsChannel = supabase
-      .channel('admin-stats-view')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'admin_stats' },
-        (payload) => {
-          console.log('INSERT on admin_stats', payload)
-          fetchStats()
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'admin_stats' },
-        (payload) => {
-          console.log('DELETE on admin_stats', payload)
-          fetchStats()
-        }
-      )
+    const coursesChannel = supabase
+      .channel("public:courses")
+      .on("INSERT", () => fetchStats())
+      .on("DELETE", () => fetchStats())
+      .subscribe()
+
+    const resourcesChannel = supabase
+      .channel("public:resources")
+      .on("INSERT", () => fetchStats())
+      .on("DELETE", () => fetchStats())
       .subscribe()
 
     // Clean up subscriptions
     return () => {
-      supabase.removeChannel(adminStatsChannel)
+      supabase.removeChannel(profilesChannel)
+      supabase.removeChannel(coursesChannel)
+      supabase.removeChannel(resourcesChannel)
     }
   }, [supabase])
 
   const fetchStats = async () => {
     try {
       setLoading(true)
-      // Fetch from the admin_stats view
-      const { data, error } = await supabase.from("admin_stats").select("*").single()
-      if (error) throw error
+      const [coursesRes, resourcesRes, usersRes] = await Promise.all([
+        supabase.from("courses").select("*", { count: "exact", head: true }),
+        supabase.from("resources").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+      ])
+
       setStats({
-        courseCount: data?.course_count || 0,
-        resourceCount: data?.resource_count || 0,
-        userCount: data?.user_count || 0,
+        courseCount: coursesRes.count || 0,
+        resourceCount: resourcesRes.count || 0,
+        userCount: usersRes.count || 0,
       })
     } catch (error) {
       console.error("Error fetching stats:", error)
