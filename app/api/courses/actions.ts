@@ -2,10 +2,11 @@
 
 import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { NextResponse } from "next/server";
 
 // Admin: Create a new course
 export async function createCourse(formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -29,8 +30,12 @@ export async function createCourse(formData: FormData) {
   // Extract form data
   const title = formData.get("title") as string
   const description = formData.get("description") as string
-  const level = formData.get("level") as string
-  const duration = Number.parseInt(formData.get("duration") as string) || 0
+  const duration = formData.get("duration") as string 
+  const difficulty_level = formData.get("difficulty_level") as string
+  const language = formData.get("language") as string
+  const instructor = formData.get("instructor") as string
+  const tags = formData.get("tags") as string
+  const image_url = formData.get("image_url") as string
 
   // Generate slug from title
   const slug = title
@@ -45,12 +50,16 @@ export async function createCourse(formData: FormData) {
       title,
       slug,
       description,
-      level,
       duration,
+      difficulty_level,
+      tags,
+      language,
+      image_url,
+      instructor,
       created_by: user.id,
       is_published: false,
     })
-    .select()
+    .select("id")
     .single()
 
   if (error) {
@@ -59,12 +68,63 @@ export async function createCourse(formData: FormData) {
   }
 
   revalidatePath("/admin/courses")
+  return { data: { id: data.id }, error: null }
+}
+
+type Lesson = {
+  order_index: number
+  id: string
+  title: string
+  content: string
+  video_url: string
+  duration: string
+}
+
+type Module = {
+  order_index: number
+  id: string
+  title: string
+  description: string
+  lessons: Lesson[]
+}
+
+export async function updateCourseWithModulesAndLessons(
+  courseId: string,
+  modules: Module[]
+) {
+  const supabase = await createServerClientInstance()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Unauthorized", data: null }
+  }
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single()
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null }
+  }
+
+  // Call the RPC function with the modules/lessons JSON
+  const { data, error } = await supabase.rpc("insert_module_with_lessons", {
+    course_id: courseId,
+    modules_json: modules, // This must match the expected argument in your RPC
+  })
+
+  if (error) {
+    console.error("Error inserting modules and lessons:", error)
+    return { error: error.message, data: null }
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`)
   return { data, error: null }
 }
 
+
 // Admin: Update a course
 export async function updateCourse(courseId: string, formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -88,8 +148,8 @@ export async function updateCourse(courseId: string, formData: FormData) {
   // Extract form data
   const title = formData.get("title") as string
   const description = formData.get("description") as string
-  const level = formData.get("level") as string
-  const duration = Number.parseInt(formData.get("duration") as string) || 0
+  const difficulty_level = formData.get("difficulty_level") as string
+  const duration = formData.get("duration") as string || 0
   const is_published = formData.get("is_published") === "true"
 
   // Update course
@@ -98,7 +158,7 @@ export async function updateCourse(courseId: string, formData: FormData) {
     .update({
       title,
       description,
-      level,
+      difficulty_level,
       duration,
       is_published,
       updated_at: new Date().toISOString(),
@@ -119,7 +179,7 @@ export async function updateCourse(courseId: string, formData: FormData) {
 
 // Admin: Delete a course
 export async function deleteCourse(courseId: string) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -154,7 +214,7 @@ export async function deleteCourse(courseId: string) {
 
 // Admin: Add a module to a course
 export async function addModuleToCourse(courseId: string, formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -212,7 +272,7 @@ export async function addModuleToCourse(courseId: string, formData: FormData) {
 
 // Admin: Add a lesson to a module
 export async function addLessonToModule(moduleId: string, formData: FormData) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -282,9 +342,187 @@ export async function addLessonToModule(moduleId: string, formData: FormData) {
   return { data, error: null }
 }
 
+// Admin: Create modules for a course
+export async function createModules(courseId: string, modules: { title: string; description: string }[]) {
+  const supabase = await createServerClientInstance();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Check if user is admin
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Insert modules
+  const formattedModules = modules.map((module, index) => ({
+    course_id: courseId,
+    title: module.title,
+    description: module.description,
+    order_index: index,
+  }));
+
+  const { data, error } = await supabase.from("modules").insert(formattedModules).select();
+
+  if (error) {
+    console.error("Error creating modules:", error);
+    return { error: error.message, data: null };
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data, error: null };
+}
+
+// Admin: Update course requirements
+export async function updateRequirements(courseId: string, requirements: { prerequisites: string; target_audience: string; learning_objectives: string }) {
+  const supabase = await createServerClientInstance();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Check if user is admin
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Update requirements
+  const { data, error } = await supabase
+    .from("courses")
+    .update({
+      prerequisites: requirements.prerequisites,
+      target_audience: requirements.target_audience,
+      learning_objectives: requirements.learning_objectives,
+    })
+    .eq("id", courseId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating requirements:", error);
+    return { error: error.message, data: null };
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data, error: null };
+}
+
+// Admin: Update course settings
+export async function updateSettings(courseId: string, settings: { status: string; visibility: string; certificate: boolean }) {
+  const supabase = await createServerClientInstance();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Check if user is admin
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Update settings
+  const { data, error } = await supabase
+    .from("courses")
+    .update({
+      status: settings.status,
+      visibility: settings.visibility,
+      certificate: settings.certificate,
+    })
+    .eq("id", courseId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating settings:", error);
+    return { error: error.message, data: null };
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data, error: null };
+}
+
+// Admin: Update course settings with additional resources
+export async function updateCourseSettings(
+  courseId: string,
+  settings: { status: string; visibility: string; certificate: boolean; additional_resources: string }
+) {
+  const supabase = await createServerClientInstance();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Check if user is admin
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || profile.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
+  // Update settings
+  const { data, error } = await supabase
+    .from("courses")
+    .update({
+      status: settings.status,
+      visibility: settings.visibility,
+      certificate: settings.certificate,
+      additional_resources: settings.additional_resources,
+    })
+    .eq("id", courseId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating settings:", error);
+    return { error: error.message, data: null };
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data, error: null };
+}
+
 // Student: Enroll in a course
 export async function enrollInCourse(courseId: string) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -333,7 +571,7 @@ export async function enrollInCourse(courseId: string) {
 
 // Student: Update course progress
 export async function updateCourseProgress(enrollmentId: string, progress: number) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   // Get the current user
   const {
@@ -366,29 +604,28 @@ export async function updateCourseProgress(enrollmentId: string, progress: numbe
 
 // Get all courses (public)
 export async function getAllCourses() {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance();
 
   const { data, error } = await supabase
     .from("courses")
     .select(`
       *,
-      creator:profiles(id, first_name, last_name, avatar_url),
-      enrollment_count:enrollments(count)
+      creator:profiles(id, first_name, last_name, avatar_url)
     `)
-    .eq("is_published", true)
-    .order("created_at", { ascending: false })
+    .eq("status", "Published")
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching courses:", error)
-    return { error: error.message, data: null }
+    console.error("Error fetching courses:", error);
+    return { error: error.message, data: null };
   }
 
-  return { data, error: null }
+  return { data, error: null };
 }
 
 // Get course by slug (public)
 export async function getCourseBySlug(slug: string) {
-  const supabase = createServerClientInstance()
+  const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
     .from("courses")
@@ -411,16 +648,58 @@ export async function getCourseBySlug(slug: string) {
   return { data, error: null }
 }
 
-// Admin: Get all courses (including unpublished)
-export async function getAdminCourses() {
-  const supabase = createServerClientInstance()
+// Admin: Get all courses (including unpublished) with pagination, search, filter, and sort
+export async function getAdminCourses({ page = 1, search = "", status = "", level = "" }) {
+  const supabase = await createServerClientInstance();
+
+  // Pagination settings
+  const pageSize = 10;
+  const offset = (page - 1) * pageSize;
+
+  // Build query with filters
+  let query = supabase
+    .from("courses")
+    .select(`
+      *,
+      creator:profiles(id, first_name, last_name, avatar_url)
+    `, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(offset, offset + pageSize - 1);
+
+  if (search) {
+    query = query.ilike("title", `%${search}%`);
+  }
+
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  }
+
+  if (level && level !== "all") {
+    query = query.eq("difficulty_level", level);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error("Error fetching admin courses:", error);
+    return { error: error.message, data: null };
+  }
+
+  const totalPages = Math.ceil((count || 0) / pageSize);
+
+  return { data: { courses: data, totalPages }, error: null };
+}
+
+// Admin: Update course requirements
+export async function updateCourseRequirements(courseId: string, requirements: { prerequisites: string; target_audience: string; learning_objectives: string }) {
+  const supabase = await createServerClientInstance();
 
   // Get the current user
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
   if (!user) {
-    return { error: "Unauthorized", data: null }
+    return { error: "Unauthorized", data: null };
   }
 
   // Check if user is admin
@@ -428,26 +707,32 @@ export async function getAdminCourses() {
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single()
+    .single();
 
   if (profileError || profile.role !== "admin") {
-    return { error: "Unauthorized", data: null }
+    return { error: "Unauthorized", data: null };
   }
 
+  // Update requirements
   const { data, error } = await supabase
     .from("courses")
-    .select(`
-      *,
-      creator:profiles(id, first_name, last_name, avatar_url),
-      enrollment_count:enrollments(count),
-      module_count:modules(count)
-    `)
-    .order("created_at", { ascending: false })
+    .update({
+      prerequisites: requirements.prerequisites,
+      target_audience: requirements.target_audience,
+      learning_objectives: requirements.learning_objectives,
+    })
+    .eq("id", courseId)
+    .select()
+    .single();
 
   if (error) {
-    console.error("Error fetching admin courses:", error)
-    return { error: error.message, data: null }
+    console.error("Error updating requirements:", error);
+    return { error: error.message, data: null };
   }
 
-  return { data, error: null }
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data, error: null };
 }
+
+
+
