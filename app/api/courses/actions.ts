@@ -3,6 +3,7 @@
 import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server";
+export const runtime = 'edge';
 
 // Admin: Create a new course
 export async function createCourse(formData: FormData) {
@@ -31,6 +32,7 @@ export async function createCourse(formData: FormData) {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const duration = formData.get("duration") as string 
+  const category = formData.get("category") as string
   const difficulty_level = formData.get("difficulty_level") as string
   const language = formData.get("language") as string
   const instructor = formData.get("instructor") as string
@@ -52,6 +54,7 @@ export async function createCourse(formData: FormData) {
       description,
       duration,
       difficulty_level,
+      category,
       tags,
       language,
       image_url,
@@ -88,37 +91,108 @@ type Module = {
   lessons: Lesson[]
 }
 
-export async function updateCourseWithModulesAndLessons(
-  courseId: string,
-  modules: Module[]
-) {
-  const supabase = await createServerClientInstance()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { error: "Unauthorized", data: null }
+// Fix: Use unique variable names in updateCourseWithModulesAndLessons to avoid redeclaration errors
+export async function updateCourseWithModulesAndLessons(courseId: string, modules: any[]) {
+  const supabase = await createServerClientInstance();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData?.user) {
+    return { error: "Unauthorized", data: null };
   }
-  const { data: profile, error: profileError } = await supabase
+  const { data: profileData, error: profileErr } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", user.id)
-    .single()
-  if (profileError || profile.role !== "admin") {
-    return { error: "Unauthorized", data: null }
+    .eq("id", userData.user.id)
+    .single();
+  if (profileErr || profileData.role !== "admin") {
+    return { error: "Unauthorized", data: null };
   }
 
-  // Call the RPC function with the modules/lessons JSON
-  const { data, error } = await supabase.rpc("insert_module_with_lessons", {
-    course_id: courseId,
-    modules_json: modules, // This must match the expected argument in your RPC
-  })
+  // 1. Fetch all current modules and lessons for the course
+  const { data: dbModules, error: dbModulesError } = await supabase
+    .from("modules")
+    .select("id")
+    .eq("course_id", courseId);
+  if (dbModulesError) {
+    return { error: dbModulesError.message, data: null };
+  }
+  const dbModuleIds = dbModules.map((m: any) => m.id);
 
-  if (error) {
-    console.error("Error inserting modules and lessons:", error)
-    return { error: error.message, data: null }
+  const { data: dbLessons, error: dbLessonsError } = await supabase
+    .from("lessons")
+    .select("id, module_id")
+    .in("module_id", dbModuleIds.length ? dbModuleIds : ["00000000-0000-0000-0000-000000000000"]);
+  if (dbLessonsError) {
+    return { error: dbLessonsError.message, data: null };
+  }
+  const dbLessonIds = dbLessons.map((l: any) => l.id);
+
+  // 2. Prepare sets for comparison
+  const incomingModuleIds = modules.filter(m => m.id && m.id.length === 36).map(m => m.id);
+  const incomingLessonIds = modules.flatMap(m => (m.lessons || []).filter(l => l.id && l.id.length === 36).map(l => l.id));
+
+  // 3. Delete removed lessons
+  const lessonsToDelete = dbLessons.filter(l => !incomingLessonIds.includes(l.id));
+  for (const lesson of lessonsToDelete) {
+    await supabase.from("lessons").delete().eq("id", lesson.id);
   }
 
-  revalidatePath(`/admin/courses/${courseId}`)
-  return { data, error: null }
+  // 4. Delete removed modules (and cascade lessons)
+  const modulesToDelete = dbModules.filter(m => !incomingModuleIds.includes(m.id));
+  for (const mod of modulesToDelete) {
+    await supabase.from("modules").delete().eq("id", mod.id);
+  }
+
+  // 5. Upsert modules and lessons
+  for (const mod of modules) {
+    let moduleId = mod.id;
+    if (mod.id && mod.id.length === 36 && dbModuleIds.includes(mod.id)) {
+      // Update existing module
+      await supabase.from("modules").update({
+        title: mod.title,
+        description: mod.description,
+        order_index: mod.order_index,
+        updated_at: new Date().toISOString(),
+      }).eq("id", mod.id);
+    } else {
+      // Insert new module
+      const { data: newMod, error: newModError } = await supabase.from("modules").insert({
+        course_id: courseId,
+        title: mod.title,
+        description: mod.description,
+        order_index: mod.order_index,
+      }).select("id").single();
+      if (newMod && newMod.id) {
+        moduleId = newMod.id;
+      }
+    }
+    // Upsert lessons for this module
+    for (const lesson of mod.lessons || []) {
+      if (lesson.id && lesson.id.length === 36 && dbLessonIds.includes(lesson.id)) {
+        // Update existing lesson
+        await supabase.from("lessons").update({
+          title: lesson.title,
+          content: lesson.content,
+          video_url: lesson.video_url,
+          duration: lesson.duration,
+          order_index: lesson.order_index,
+          updated_at: new Date().toISOString(),
+        }).eq("id", lesson.id);
+      } else {
+        // Insert new lesson
+        await supabase.from("lessons").insert({
+          module_id: moduleId,
+          title: lesson.title,
+          content: lesson.content,
+          video_url: lesson.video_url,
+          duration: lesson.duration,
+          order_index: lesson.order_index,
+        });
+      }
+    }
+  }
+
+  revalidatePath(`/admin/courses/${courseId}`);
+  return { data: true, error: null };
 }
 
 
