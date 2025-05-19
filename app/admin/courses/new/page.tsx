@@ -1,4 +1,5 @@
 "use client"
+export const runtime = 'edge';
 
 import type React from "react"
 
@@ -300,7 +301,21 @@ export default function NewCourse() {
         let result
         if (courseId) {
           // Still use the function for update (or you can refactor to use API as well)
-          result = await updateCourse(courseId, formDataInstance)
+          formDataInstance.append("courseId", courseId)
+                  const res = await fetch("/api/courses/update", {
+                    method: "POST",
+                    body: formDataInstance,
+                  })
+                  result = await res.json()
+                  if (result?.data) {
+                    toast({
+                      title: "Success 🎉",
+                      description: "Course updated successfully!",
+                      variant: "default",
+                    })
+                  } else {
+                    throw new Error(result?.error || "Failed to update course.")
+                  }
         } else {
           // Use API endpoint for creation
           const res = await fetch("/api/courses/create", {
@@ -562,13 +577,15 @@ export default function NewCourse() {
                       <SelectTrigger className="border-purple-500/30 focus:ring-purple-500/30">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="blockchain">Blockchain</SelectItem>
-                        <SelectItem value="farming">Coffee Farming</SelectItem>
-                        <SelectItem value="supply-chain">Supply Chain</SelectItem>
-                        <SelectItem value="web3">Web3</SelectItem>
-                        <SelectItem value="sustainability">Sustainability</SelectItem>
-                      </SelectContent>
+                       <SelectContent>
+                                               <SelectItem value="Coffee Processing">Blockchain</SelectItem>
+                                               <SelectItem value="Coffee Cultivation">Coffee Cultivation</SelectItem>
+                                               <SelectItem value="Finance & Accounting">Finance & Accounting</SelectItem>
+                                               <SelectItem value="Web3 & IT Infrastructure">Web3 & IT Infrastructure</SelectItem>
+                                               <SelectItem value="Supply Chain Management">Supply Chain Management</SelectItem>
+                                               <SelectItem value="Marketing & Sales">Marketing & Sales</SelectItem>
+                                               <SelectItem value="Sustainability & Ethics">Sustainability & Ethics</SelectItem>
+                        </SelectContent>
                     </Select>
                   </div>
                 </div>
