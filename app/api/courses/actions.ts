@@ -1,9 +1,10 @@
 "use server"
 
+
 import { createServerClientInstance } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server";
-export const runtime = 'edge';
+
 
 // Admin: Create a new course
 export async function createCourse(formData: FormData) {
