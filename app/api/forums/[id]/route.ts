@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getForumRepliesForTopic, createForumReply } from "@/app/api/forums/actions";
 
