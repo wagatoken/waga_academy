@@ -1,5 +1,7 @@
+"use client"
 export const runtime = 'edge'
 
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,23 +13,46 @@ import { MessageSquare, Plus, Search } from "lucide-react"
 import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
 import { toast } from "@/components/ui/toast"
 
+export default function CommunityForumsPage() {
+  const [categories, setCategories] = useState<any[]>([])
+  const [recentTopics, setRecentTopics] = useState<any[]>([])
+  const [popularTopics, setPopularTopics] = useState<any[]>([])
+  const [categoriesError, setCategoriesError] = useState<string | null>(null)
+  const [topicsError, setTopicsError] = useState<string | null>(null)
+  const [popularTopicsError, setPopularTopicsError] = useState<string | null>(null)
+  const [search, setSearch] = useState("")
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const { data: catData, error: catErr } = await getForumCategories();
+        setCategories(catData || [])
+        setCategoriesError(catErr ? catErr.message || String(catErr) : null)
+        const { data: recData, error: recErr } = await getRecentTopics();
+        setRecentTopics(recData || [])
+        setTopicsError(recErr ? recErr.message || String(recErr) : null)
+        const { data: popData, error: popErr } = await getPopularTopics();
+        setPopularTopics(popData || [])
+        setPopularTopicsError(popErr ? popErr.message || String(popErr) : null)
+      } catch (e: any) {
+        setCategoriesError(e.message || String(e))
+        setTopicsError(e.message || String(e))
+        setPopularTopicsError(e.message || String(e))
+      }
+    }
+    fetchData()
+  }, [])
 
-
-export default async function CommunityForumsPage() {
-   const { data: categories, error: categoriesError } = await getForumCategories();
-  const { data: recentTopics, error: topicsError } = await getRecentTopics();
-  const {data: popularTopics, error: popularTopicsError} = await getPopularTopics()
-
-
-  if (categoriesError || topicsError || popularTopicsError) {
-    console.error("Error fetching data:", categoriesError || topicsError || popularTopicsError);  
-    toast({
+  useEffect(() => {
+    if (categoriesError || topicsError || popularTopicsError) {
+      toast({
         title: "Error loading forum data ❌",
         description: "Error loading forum data. Please try again later.",
         variant: "destructive",
-  })
-  }
+      })
+    }
+  }, [categoriesError, topicsError, popularTopicsError])
+
   return (
     <div className="container py-12">
       <div className="space-y-8">
@@ -47,21 +72,23 @@ export default async function CommunityForumsPage() {
             </Button>
           </div>
         </div>
-
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search forums..." className="pl-10 web3-input" />
+            <Input
+              placeholder="Search forums..."
+              className="pl-10 web3-input"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
         </div>
-
         <Tabs defaultValue="categories" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="recent">Recent Discussions</TabsTrigger>
             <TabsTrigger value="popular">Popular Topics</TabsTrigger>
           </TabsList>
-
           <TabsContent value="categories" className="mt-6">
             <div className="space-y-4">
               {(categories || []).map((category) => {
@@ -102,67 +129,78 @@ export default async function CommunityForumsPage() {
               })}
             </div>
           </TabsContent>
-
           <TabsContent value="recent" className="mt-6">
             <div className="space-y-4">
-              {(recentTopics || []).map((topic) => {
-                // Assign different card styles based on category
-                let cardClass = "web3-card"
-                if (topic.category.slug === "web3-blockchain") cardClass = "web3-card-purple"
-                else if (topic.category.slug === "coffee-industry") cardClass = "web3-card-blue"
-                else if (topic.category.slug === "education-training") cardClass = "web3-card-teal"
-                else if (topic.category.slug === "summer-camp") cardClass = "web3-card-pink"
-                else cardClass = "web3-card-amber"
+              {(recentTopics || [])
+                .filter(topic =>
+                  search.trim() === "" ||
+                  topic.title.toLowerCase().includes(search.toLowerCase()) ||
+                  (topic.author?.first_name + " " + (topic.author?.last_name || "")).toLowerCase().includes(search.toLowerCase()) ||
+                  topic.category?.name?.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((topic) => {
+                  // Assign different card styles based on category
+                  let cardClass = "web3-card"
+                  if (topic.category.slug === "web3-blockchain") cardClass = "web3-card-purple"
+                  else if (topic.category.slug === "coffee-industry") cardClass = "web3-card-blue"
+                  else if (topic.category.slug === "education-training") cardClass = "web3-card-teal"
+                  else if (topic.category.slug === "summer-camp") cardClass = "web3-card-pink"
+                  else cardClass = "web3-card-amber"
 
-                return (
-                  <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-4">
-                          <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                            <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name} />
-                            <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <Link
-                              href={`/community/forums/topics/${topic.id}`}
-                              className="font-medium hover:text-primary"
-                            >
-                              {topic.title}
-                            </Link>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge
-                                variant="outline"
-                                className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
+                  return (
+                    <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
+                              <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name} />
+                              <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <Link
+                                href={`/community/forums/topics/${topic.topic_id}`}
+                                className="font-medium hover:text-primary"
                               >
-                                {topic.category.name}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
-                              <span className="text-xs text-muted-foreground">•</span>
-                              <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
+                                {topic.title}
+                              </Link>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
+                                >
+                                  {topic.category.name}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
+                                <span className="text-xs text-muted-foreground">•</span>
+                                <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
+                              </div>
                             </div>
                           </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <Badge
+                              variant="secondary"
+                              className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                            >
+                              {topic.replies_count} replies
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">{topic.views_count} views</span>
+                          </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <Badge
-                            variant="secondary"
-                            className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                          >
-                            {topic.replies_count} replies
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{topic.views_count} views</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
             </div>
           </TabsContent>
-
           <TabsContent value="popular" className="mt-6">
             <div className="space-y-4">
               {(popularTopics || [])
+                .filter(topic =>
+                  search.trim() === "" ||
+                  topic.title.toLowerCase().includes(search.toLowerCase()) ||
+                  (topic.author?.first_name + " " + (topic.author?.last_name || "")).toLowerCase().includes(search.toLowerCase()) ||
+                  topic.category?.name?.toLowerCase().includes(search.toLowerCase())
+                )
                 .sort((a, b) => b.views - a.views)
                 .map((topic) => {
                   // Assign different card styles based on category
@@ -185,7 +223,7 @@ export default async function CommunityForumsPage() {
                             </Avatar>
                             <div>
                               <Link
-                                href={`/community/forums/topics/${topic.id}`}
+                                href={`/community/forums/topics/${topic.topic_id}`}
                                 className="font-medium hover:text-primary"
                               >
                                 {topic.title}
