@@ -909,6 +909,7 @@
   opacity: 0;
   transition: opacity 0.4s ease;
   animation: gradientShift 6s linear infinite;
+  z-index: -1;
 }
 
 .web3-card-glass:hover {
