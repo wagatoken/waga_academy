@@ -156,7 +156,7 @@ export default function CoursesPage() {
         </CardContent>
         <CardFooter>
           <Button asChild className="w-full web3-button-purple">
-            <Link href="">Join Waitlist</Link>
+            <Link href={`/courses/${course.slug}`}>Join Waitlist</Link>
           </Button>
         </CardFooter>
       </Card>
