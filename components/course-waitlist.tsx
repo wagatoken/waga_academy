@@ -9,13 +9,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
-import { createServerClient } from "@/lib/supabase/client"
 
 interface CourseWaitlistProps {
-  courseName: string
+  courseId: string;
+  courseName?: string;
 }
 
-export function CourseWaitlist({ courseName }: CourseWaitlistProps) {
+export function CourseWaitlist({ courseId, courseName }: CourseWaitlistProps) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
@@ -37,18 +37,23 @@ export function CourseWaitlist({ courseName }: CourseWaitlistProps) {
     setIsSubmitting(true)
 
     try {
-      // Create a Supabase client
-      const supabase = createServerClient()
-
-      // Store the waitlist entry
-      const { error } = await supabase.from("course_waitlist").insert({
-        course_name: courseName,
-        email,
-        name,
-        message: message || null,
+      const res = await fetch("/api/courses/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, course_id: courseId, message }),
       })
-
-      if (error) throw error
+      const data = await res.json()
+      // Show a specific error if missing required fields (400)
+      if (res.status === 400 && data.error && data.error.toLowerCase().includes('missing')) {
+        toast({
+          title: "Missing Information",
+          description: data.error,
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
+      if (!res.ok || data.error) throw new Error(data.error || "Failed to join waitlist")
 
       setIsSubmitted(true)
       toast({
