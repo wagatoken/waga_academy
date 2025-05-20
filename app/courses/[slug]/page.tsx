@@ -229,7 +229,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           </div>
 
           <div className="space-y-6">
-            <CourseWaitlist courseName={course.title} />
+            <CourseWaitlist courseName={course.title} courseId={course.id} />
 
             <Card className="web3-card-glass hover-lift">
               <CardHeader className="card-header-gradient">
