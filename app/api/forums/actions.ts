@@ -1,7 +1,6 @@
 "use server"
 
 import { createServerClientInstance } from "@/lib/supabase/server"
-import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 import { revalidatePath } from "next/cache"
 
 // Get all forum categories
@@ -131,42 +130,110 @@ export async function createForumTopic(formData: FormData) {
   return { data, error: null }
 }
 
-// Create a reply to a topic
+// Get all replies for a topic, flat (for building nested tree on frontend)
+export async function getForumRepliesForTopic(topicId: string) {
+  const supabase = await createServerClientInstance();
+
+  // Fetch topic details
+  const { data: topicData, error: topicError } = await supabase
+    .from("forum_topics")
+    .select(`
+      id,
+      title,
+      content,
+      created_at,
+      category:forum_categories(name),
+      user:profiles(id, first_name, last_name, avatar_url)
+    `)
+    .eq("id", topicId)
+    .single();
+
+  if (topicError) {
+    console.error(`Error fetching topic ${topicId}:`, topicError);
+    return { error: topicError.message, data: null };
+  }
+
+ 
+
+  // Fetch replies
+  const { data: replies, error } = await supabase
+    .from("forum_replies")
+    .select(`
+      id,
+      topic_id,
+      author_id,
+      content,
+      parent_id,
+      created_at,
+      profiles:author_id(id, first_name, last_name, avatar_url)
+    `)
+    .eq("topic_id", topicId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error(`Error fetching replies for topic ${topicId}:`, error);
+    return { error: error.message, data: null };
+  }
+
+  // Build topic object for frontend
+  const topic = {
+    id: topicData.id,
+    title: topicData.title,
+    content: topicData.content,
+    author: topicData.user?.first_name && topicData.user?.last_name
+      ? `${topicData.user.first_name} ${topicData.user.last_name}`
+      : "Unknown",
+    avatar: topicData.user?.avatar_url || (topicData.user?.first_name ? topicData.user.first_name[0] : "U"),
+    category: topicData.category?.name || "",
+    date: topicData.created_at,
+  };
+
+  return { data: { topic, replies }, error: null };
+}
+
+// Create a reply (top-level or nested)
 export async function createForumReply(formData: FormData) {
-  const supabase = await createServerClientInstance()
+  const supabase = await createServerClientInstance();
 
   // Get the current user
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: "You must be logged in to reply", data: null }
   }
 
   // Extract form data
-  const topicId = formData.get("topic_id") as string
-  const content = formData.get("content") as string
+  const topicId = formData.get("topic_id") as string;
+  const content = formData.get("content") as string;
+  const parentId = formData.get("parent_id") as string | null;
 
   if (!topicId || !content) {
     return { error: "Missing required fields", data: null }
   }
 
-  // Create reply
+  // Create reply (with parent_id for nested replies)
   const { data, error } = await supabase
     .from("forum_replies")
     .insert({
       topic_id: topicId,
       content,
-      user_id: user.id,
+      author_id: user.id,
+      parent_id: parentId || null,
     })
-    .select()
-    .single()
+    .select(`
+      *,
+      profiles:author_id(id, first_name, last_name, avatar_url)
+    `)
+    .single();
+  
 
   if (error) {
     console.error("Error creating forum reply:", error)
     return { error: error.message, data: null }
   }
 
+  // Revalidate topic page
   revalidatePath(`/community/forums/topics/${topicId}`)
   return { data, error: null }
 }
@@ -188,7 +255,12 @@ export async function createForumCategory(formData: FormData) {
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single()
+    .select(`
+      *,
+      profiles:author_id(id, first_name, last_name, avatar_url)
+    `)
+    .single();
+    
 
   if (profileError || profile.role !== "admin") {
     return { error: "Unauthorized", data: null }
