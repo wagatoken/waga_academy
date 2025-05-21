@@ -688,6 +688,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card:hover {
@@ -783,6 +784,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card-teal:hover {
@@ -814,6 +816,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card-pink:hover {
@@ -845,6 +848,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card-amber:hover {
@@ -876,6 +880,7 @@
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .web3-card-emerald:hover {
@@ -1296,6 +1301,7 @@ section.bg-purple-950\/50 {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: 0.5s;
+  z-index: -1;
 }
 
 .web3-button:hover::before {
@@ -1328,6 +1334,7 @@ section.bg-purple-950\/50 {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: 0.5s;
+  z-index: -1;
 }
 
 .web3-button-purple:hover::before {
