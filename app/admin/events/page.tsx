@@ -25,8 +25,7 @@ export default function EventsAdmin() {
     const fetchEvents = async () => {
       setIsLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/events?type=all&page=${currentPage}&limit=5`);
+        const res = await fetch(`/api/events?type=all&page=${currentPage}&limit=5`);
         if (!res.ok) {
           throw new Error(`Failed to fetch events: ${res.statusText}`);
         }
@@ -60,8 +59,7 @@ export default function EventsAdmin() {
 
   const handleDelete = async (id) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-      const res = await fetch(`${baseUrl}/api/events/${id}`, {
+      const res = await fetch(`/api/events/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
