@@ -61,21 +61,22 @@ export function MainNav() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-emerald-500/20 bg-emerald-950/80 backdrop-blur supports-[backdrop-filter]:bg-emerald-950/60">
-        <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-purple-600 hover:to-indigo-500 transition-all duration-300">
+      <div className="container flex h-16 items-center justify-between px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 min-w-0">
+          <Link href="/" className="flex items-center space-x-2 min-w-0">
+            <span className="truncate text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-purple-600 hover:to-indigo-500 transition-all duration-300">
               WAGA Academy
             </span>
           </Link>
-          <nav className="hidden md:flex gap-4">
+          {/* Hide nav on <=md screens, show only on lg+ */}
+          <nav className="hidden lg:flex gap-2 sm:gap-4">
             {routes.map((route) => (
               <Link
                 key={route.href}
                 href={route.href}
                 scroll={true}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary relative web3-glow group",
+                  "text-sm font-medium transition-colors hover:text-primary relative web3-glow group whitespace-nowrap",
                   route.active ? "text-primary" : "text-muted-foreground",
                 )}
               >
@@ -91,7 +92,7 @@ export function MainNav() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
 
           {!user && !isAuthPage && (
@@ -186,10 +187,11 @@ export function MainNav() {
             </div>
           )}
 
+          {/* Hamburger always visible on <=lg screens */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden relative overflow-hidden group"
+            className="lg:hidden relative overflow-hidden group"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <span className="relative z-10">
@@ -200,8 +202,9 @@ export function MainNav() {
         </div>
       </div>
 
+      {/* Mobile/Tablet menu: show on <=lg screens */}
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div className="lg:hidden w-full">
           <div className="flex flex-col space-y-3 p-4 bg-emerald-950/90 backdrop-blur border-t border-emerald-500/20 web3-card-emerald">
             {routes.map((route) => (
               <Link
@@ -209,7 +212,7 @@ export function MainNav() {
                 href={route.href}
                 scroll={true}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary p-2 relative overflow-hidden group",
+                  "text-sm font-medium transition-colors hover:text-primary p-2 relative overflow-hidden group whitespace-nowrap",
                   route.active
                     ? "text-primary bg-gradient-to-r from-emerald-500/10 to-purple-500/10 rounded-md"
                     : "text-muted-foreground",
