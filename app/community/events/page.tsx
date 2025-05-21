@@ -1,4 +1,5 @@
 export const runtime = 'edge'
+"use client"
 
 import Link from "next/link"
 import Image from "next/image"
@@ -7,22 +8,40 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Video, Clock } from "lucide-react"
-import { getUpcomingEvents, getPastEvents } from "@/lib/services/event-service"
+import { useEffect, useState } from "react"
 
+export default function CommunityEventsPage() {
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchEvents = async (type, limit) => {
+      try {
+        const res = await fetch(`/api/events?type=${type}&limit=${limit}`);
+        if (!res.ok) {
+          console.error(`Failed to fetch ${type} events:`, res.statusText);
+          return [];
+        }
+        return res.json();
+      } catch (err) {
+        console.error(`Error fetching ${type} events:`, err);
+        return [];
+      }
+    };
+    Promise.all([
+      fetchEvents("upcoming", 6),
+      fetchEvents("past", 6)
+    ]).then(([upcoming, past]) => {
+      setUpcomingEvents(upcoming);
+      setPastEvents(past);
+      setLoading(false);
+    });
+  }, []);
 
-export default async function CommunityEventsPage() {
-  const fetchEvents = async (type, limit) => {
-    const res = await fetch(`/api/events?type=${type}&limit=${limit}`);
-    if (!res.ok) {
-      console.error(`Failed to fetch ${type} events:`, res.statusText);
-      return [];
-    }
-    return res.json();
-  };
-  
-  const upcomingEvents = await fetchEvents("upcoming", 6);
-  const pastEvents = await fetchEvents("past", 6);
+  if (loading) {
+    return <div className="container py-12">Loading events...</div>;
+  }
 
   return (
     <div className="container py-12">
