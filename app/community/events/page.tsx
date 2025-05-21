@@ -13,8 +13,7 @@ import { getUpcomingEvents, getPastEvents } from "@/lib/services/event-service"
 
 export default async function CommunityEventsPage() {
   const fetchEvents = async (type, limit) => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/events?type=${type}&limit=${limit}`);
+    const res = await fetch(`/api/events?type=${type}&limit=${limit}`);
     if (!res.ok) {
       console.error(`Failed to fetch ${type} events:`, res.statusText);
       return [];
