@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@components/ui/toast"
 import { submitCampRegistration, type VolunteerFormValues } from "./actions"
 import { Loader2 } from "lucide-react"
 

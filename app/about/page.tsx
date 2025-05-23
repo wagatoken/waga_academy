@@ -636,7 +636,7 @@ export default function AboutPage() {
                     Share your expertise at our Summer Camp in Ethiopia
                   </p>
                   <Button asChild className="web3-button-purple w-full">
-                    <Link href="/summer-camp/register">Apply Now</Link>
+                    <Link href="/bootcamp/register">Apply Now</Link>
                   </Button>
                 </CardContent>
               </Card>

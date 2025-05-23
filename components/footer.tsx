@@ -41,11 +41,11 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/summer-camp"
+                  href="/bootcamp"
                   scroll={true}
                   className="text-sm text-muted-foreground hover:text-emerald-300 transition-colors"
                 >
-                  Summer Camp
+                  Bootcamp
                 </Link>
               </li>
               <li>

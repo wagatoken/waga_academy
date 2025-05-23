@@ -578,7 +578,7 @@ export default function AcademyPage() {
                 <Link href="/courses">Explore Courses</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-purple-500/30 hover:border-purple-500/60">
-                <Link href="/summer-camp">Join Summer Camp</Link>
+                <Link href="/bootcamp">Join Bootcamp</Link>
               </Button>
             </div>
           </div>

@@ -33,7 +33,7 @@ export function CTASection() {
               variant="outline"
               className="border-emerald-500/30 hover:border-emerald-500/60 animate-fade-in animation-delay-300 animate-border-glow"
             >
-              <Link href="/summer-camp/register">Volunteer for Summer Camp</Link>
+              <Link href="/bootcamp/register">Volunteer for Bootcamp</Link>
             </Button>
           </div>
         </div>

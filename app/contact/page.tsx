@@ -271,7 +271,7 @@ export default function ContactPage() {
                 <Link href="/courses">Explore Our Courses</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-purple-500/30 hover:border-purple-500/60">
-                <Link href="/summer-camp/register">Join Summer Camp</Link>
+                <Link href="/bootcamp/register">Join Bootcamp</Link>
               </Button>
             </div>
           </div>

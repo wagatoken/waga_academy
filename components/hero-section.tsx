@@ -31,13 +31,13 @@ export function HeroSection() {
                 Explore Courses
               </Button>
             </Link>
-            <Link href="/summer-camp">
+            <Link href="/bootcamp">
               <Button
                 size="lg"
                 variant="outline"
                 className="border-purple-500/30 hover:border-purple-500/60 backdrop-blur animate-purple-border-glow relative z-20"
               >
-                Join Summer Camp
+                Join Bootcamp
               </Button>
             </Link>
           </div>
