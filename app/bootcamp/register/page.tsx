@@ -94,7 +94,7 @@ export default function VolunteerRegistrationPage() {
       console.error("Error submitting form:", error)
       toast({
         title: "Submission Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "An unexpected error occurred. Please try again.", error,
         variant: "destructive",
       })
     } finally {
