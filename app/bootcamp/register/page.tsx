@@ -213,7 +213,13 @@ export default function VolunteerRegistrationPage() {
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                      <form
+                      onSubmit={e => {
+                        e.preventDefault();
+                        form.handleSubmit(onSubmit)(e);
+                      }}
+                      className="space-y-8"
+                    >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <FormField
                           control={form.control}
