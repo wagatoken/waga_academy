@@ -124,7 +124,7 @@ export default function VolunteerRegistrationPage() {
       <div className="space-y-6 relative z-10">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl web3-gradient-text">
-            WAGA Summer Camp Registration
+            WAGA Bootcamp Registration
           </h1>
           <p className="text-muted-foreground md:text-xl">
             Join our immersive volunteer program in Ethiopia's coffee-producing regions
@@ -135,7 +135,7 @@ export default function VolunteerRegistrationPage() {
           <Card className="web3-card-featured web3-card-glow">
             <CardHeader>
               <CardTitle className="web3-gradient-text-vibrant">Registration Successful!</CardTitle>
-              <CardDescription>Thank you for your interest in the WAGA Summer Camp</CardDescription>
+              <CardDescription>Thank you for your interest in the WAGA Bootcamp</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <p>

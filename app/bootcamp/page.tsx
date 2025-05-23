@@ -24,10 +24,10 @@ export default function SummerCampPage() {
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
               <div className="inline-block rounded-lg bg-purple-500/20 border border-purple-500/30 px-3 py-1 text-sm text-purple-300">
-                July - September 2024
+                July - September 2025
               </div>
               <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none web3-dual-gradient-text-glow">
-                WAGA Summer Camp
+                WAGA Bootcamp
               </h1>
               <p className="text-muted-foreground md:text-xl">A Web3 & Coffee Innovation Experience in Ethiopia</p>
               <p className="text-muted-foreground">
@@ -36,7 +36,7 @@ export default function SummerCampPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button asChild size="lg" className="web3-button-purple">
-                  <Link href="/summer-camp/register">Register Now</Link>
+                  <Link href="/bootcamp/register">Register Now</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="border-purple-500/30 hover:border-purple-500/60">
                   <Link href="#faq">Learn More</Link>
@@ -237,7 +237,7 @@ export default function SummerCampPage() {
       <section className="w-full py-12 md:py-24 bg-muted/30">
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight web3-dual-gradient-text-glow text-center">
-            WAGA Summer Camp Curriculum Framework
+            WAGA Bootcamp Curriculum Framework
           </h2>
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -418,7 +418,7 @@ export default function SummerCampPage() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Find answers to common questions about the WAGA Summer Camp
+                Find answers to common questions about the WAGA Bootcamp
               </p>
             </div>
             <div className="w-full max-w-3xl pt-8">
@@ -428,7 +428,7 @@ export default function SummerCampPage() {
                     What is the duration of the program?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground mt-2">
-                    The WAGA Summer Camp runs from July to September 2024. Volunteers can choose flexible 2-4 week participation windows, with multiple start dates available. This ensures that you can join the program at a time that works best for your schedule and commitments.
+                    The WAGA Bootcamp runs from July to September 2024. Volunteers can choose flexible 2-4 week participation windows, with multiple start dates available. This ensures that you can join the program at a time that works best for your schedule and commitments.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="faq2">
@@ -470,7 +470,7 @@ export default function SummerCampPage() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                By volunteering at WAGA Summer Camp, you're not just teaching Web3 – you're empowering farmers, shaping
+                By volunteering at WAGA Bootcamp, you're not just teaching Web3 – you're empowering farmers, shaping
                 sustainable economies, and revolutionizing global trade.
               </p>
             </div>

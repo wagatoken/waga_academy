@@ -35,9 +35,9 @@ export function MainNav() {
       active: pathname === "/courses" || pathname.startsWith("/courses/"),
     },
     {
-      href: "/summer-camp",
-      label: "Summer Camp",
-      active: pathname === "/summer-camp",
+      href: "/bootcamp",
+      label: "Bootcamp",
+      active: pathname === "/bootcamp",
     },
     {
       href: "/about",
