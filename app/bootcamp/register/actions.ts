@@ -44,7 +44,7 @@ export async function submitCampRegistration(formData: VolunteerFormValues) {
     const validatedData = volunteerFormSchema.parse(formData)
 
     // Create a Supabase client
-    const supabase = createServerClientInstance()
+    const supabase = await createServerClientInstance()
 
     // Insert the registration into the database
     const { data, error } = await supabase
