@@ -393,7 +393,7 @@ export default function SummerCampPage() {
               </p>
               <div className="pt-4">
                 <Button asChild size="lg" className="web3-button-purple">
-                  <Link href="/summer-camp/register">Apply Now</Link>
+                  <Link href="/bootcamp/register">Apply Now</Link>
                 </Button>
               </div>
             </div>
@@ -476,7 +476,7 @@ export default function SummerCampPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="web3-button-purple">
-                <Link href="/summer-camp/register">Apply Now</Link>
+                <Link href="/bootcamp/register">Apply Now</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-purple-500/30 hover:border-purple-500/60">
                 <Link href="/contact">Contact Us</Link>
