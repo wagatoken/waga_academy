@@ -22,7 +22,7 @@ export function SummerCampPromo() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="web3-button-purple">
-                <Link href="/summer-camp/register">Register Now</Link>
+                <Link href="/bootcamp/register">Register Now</Link>
               </Button>
               <Button
                 asChild
@@ -30,7 +30,7 @@ export function SummerCampPromo() {
                 variant="outline"
                 className="border-emerald-500/30 hover:border-emerald-500/60 animate-border-glow"
               >
-                <Link href="/summer-camp">Learn More</Link>
+                <Link href="/bootcamp">Learn More</Link>
               </Button>
             </div>
           </div>
@@ -38,7 +38,7 @@ export function SummerCampPromo() {
             <Card className="web3-card-glass animate-float animation-delay-100 bg-purple-900/20 border-purple-500/30">
               <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
                 <CalendarDays className="h-8 w-8 text-purple-400 mb-2" />
-                <h3 className="font-bold text-purple-100">July - September 2024</h3>
+                <h3 className="font-bold text-purple-100">July - September 2025</h3>
                 <p className="text-sm text-purple-300/80">Flexible 2-4 week volunteer program</p>
               </CardContent>
             </Card>
