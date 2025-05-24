@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/components/ui/toast";
-import { createTopic, getForumCategories } from "@/lib/services/forum-service";
 
 export default function NewTopicPage() {
   const router = useRouter();
@@ -20,25 +19,32 @@ export default function NewTopicPage() {
     category: "",
     content: "",
   });
-  const [categories, setCategories] = useState([]);
-  const [categoriesError, setCategoriesError] = useState(null);
 
-  // Fetch categories on component mount
+  // Fetch categories from API
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchCategories = async () => {
+      setCategoriesLoading(true);
+      setCategoriesError(null);
       try {
-        const { data, error } = await getForumCategories();
+        const res = await fetch("/api/forums/categories");
+        const { data, error } = await res.json();
         if (error) {
           setCategoriesError(error.message);
-          return;
+          setCategories([]);
+        } else {
+          setCategories(data || []);
         }
-        setCategories(data || []);
       } catch (err) {
-        console.error("Error fetching categories:", err);
         setCategoriesError("Failed to fetch categories.");
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -67,12 +73,17 @@ export default function NewTopicPage() {
     setIsSubmitting(true);
 
     try {
-      // Call the createTopic function
-      const { data, error } = await createTopic({
-        title: formData.title,
-        category: formData.category, 
-        content: formData.content,
+      // Call the API route to create a topic
+      const res = await fetch("/api/forums/topics/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title,
+          category: formData.category,
+          content: formData.content,
+        }),
       });
+      const { data, error } = await res.json();
 
       if (error) {
         console.error("Error creating topic:", error);
@@ -138,21 +149,23 @@ export default function NewTopicPage() {
                 <label htmlFor="category" className="text-sm font-medium">
                   Category
                 </label>
-                <Select onValueChange={handleCategoryChange} value={formData.category}>
+                <Select onValueChange={handleCategoryChange} value={formData.category} disabled={categoriesLoading || !!categoriesError}>
                   <SelectTrigger className="web3-input">
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={categoriesLoading ? "Loading..." : categoriesError ? "Failed to load categories" : "Select a category"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.length > 0 ? (
-                      categories.map((category) => (
+                    {categoriesLoading ? (
+                      <SelectItem value="loading" disabled>Loading...</SelectItem>
+                    ) : categoriesError ? (
+                      <SelectItem value="error" disabled>Error loading categories</SelectItem>
+                    ) : categories.length > 0 ? (
+                      categories.map((category: any) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="x" disabled>
-                        "No categories available"
-                      </SelectItem>
+                      <SelectItem value="no-categories" disabled>No categories available</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
