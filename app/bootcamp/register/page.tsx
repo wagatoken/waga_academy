@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/components/ui/toast";
-import { submitCampRegistration, type VolunteerFormValues } from "./actions"
 import { Loader2 } from "lucide-react"
 
 const volunteerFormSchema = z.object({
@@ -73,32 +72,40 @@ export default function VolunteerRegistrationPage() {
   async function onSubmit(values: z.infer<typeof volunteerFormSchema>) {
     setIsSubmitting(true)
     try {
-      const result = await submitCampRegistration(values as VolunteerFormValues)
-      console.log(result)
+      const response = await fetch("/api/bootcamp/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const result = await response.json();
+      console.log(result);
       if (result.success) {
         toast({
           title: "Application Submitted!",
           description: result.message,
-        })
-        setSubmissionSuccess(true)
+        });
+        setSubmissionSuccess(true);
         // Reset form after successful submission
-        form.reset()
+        form.reset();
       } else {
         toast({
           title: "Submission Failed",
           description: result.message,
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
       toast({
         title: "Submission Error",
-        description: "An unexpected error occurred. Please try again.", error,
+        description: "An unexpected error occurred. Please try again.",
+        error,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
