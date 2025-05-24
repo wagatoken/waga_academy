@@ -16,6 +16,18 @@ import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 
 
+// Simple markdown parser for bold, italic, and links
+function simpleMarkdown(text: string) {
+  if (!text) return "";
+  return text
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/\n/g, "<br>");
+}
+
 // Add type for nested replies
 type ReplyType = {
   id: string
@@ -130,7 +142,7 @@ function Reply({
                 </span>
                 <span className="text-xs text-muted-foreground">{reply.date}</span>
               </div>
-              <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: reply.content }} />
+              <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: simpleMarkdown(reply.content) }} />
               <div className="flex items-center gap-4 pt-4">
                 <Button
                   variant="ghost"
@@ -466,7 +478,7 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
                 </div>
                 <div
                   className="prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: topic?.content || "" }}
+                  dangerouslySetInnerHTML={{ __html: simpleMarkdown(topic?.content || "") }}
                 />
                 <div className="flex items-center gap-4 pt-4">
                   <Button
