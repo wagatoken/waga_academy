@@ -19,13 +19,28 @@ import { useRouter } from "next/navigation"
 // Simple markdown parser for bold, italic, and links
 function simpleMarkdown(text: string) {
   if (!text) return "";
-  return text
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
-    .replace(/\n/g, "<br>");
+  // Escape HTML
+  text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Bold: **text**
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  // Italic: *text*
+  text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+  // Links: [text](url)
+  text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+  // Ordered lists: 1. item\n2. item
+  text = text.replace(/(^|\n)(\d+\. .+(?:\n\d+\. .+)*)/g, function(_, p1, p2) {
+    const items = p2.split(/\n/).map(line => line.replace(/^\d+\. /, "").trim());
+    return p1 + '<ol>' + items.map(i => `<li>${i}</li>`).join("") + '</ol>';
+  });
+  // Unordered lists: - item or * item
+  text = text.replace(/(^|\n)((?:[-*] .+(?:\n)?)+)/g, function(_, p1, p2) {
+    const items = p2.split(/\n/).filter(Boolean).map(line => line.replace(/^[-*] /, "").trim());
+    if (items.length < 1) return p1 + p2;
+    return p1 + '<ul>' + items.map(i => `<li>${i}</li>`).join("") + '</ul>';
+  });
+  // Line breaks
+  text = text.replace(/\n/g, "<br>");
+  return text;
 }
 
 // Add type for nested replies
