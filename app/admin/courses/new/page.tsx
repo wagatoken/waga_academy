@@ -578,7 +578,7 @@ export default function NewCourse() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                        <SelectContent>
-                                               <SelectItem value="Coffee Processing">Blockchain</SelectItem>
+                                               <SelectItem value="Coffee Processing">Coffee Processing</SelectItem>
                                                <SelectItem value="Coffee Cultivation">Coffee Cultivation</SelectItem>
                                                <SelectItem value="Finance & Accounting">Finance & Accounting</SelectItem>
                                                <SelectItem value="Web3 & IT Infrastructure">Web3 & IT Infrastructure</SelectItem>
@@ -602,6 +602,7 @@ export default function NewCourse() {
                         <SelectValue placeholder="Select level" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="All Levels">All Levels</SelectItem>
                         <SelectItem value="Beginner">Beginner</SelectItem>
                         <SelectItem value="Intermediate">Intermediate</SelectItem>
                         <SelectItem value="Advanced">Advanced</SelectItem>
