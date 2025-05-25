@@ -21,11 +21,18 @@ export async function POST(request: Request) {
       .from('course_waitlist')
       .select('id', { count: 'exact', head: true })
       .eq('course_id', course_id)
-      .or(`email.eq.${email}${user_id ? `,user_id.eq.${user_id}` : ''}`);
+      .or(
+        user_id
+          ? `email.eq.${email},user_id.eq.${user_id}`
+          : `email.eq.${email}`
+      );
 
-    const { count } = await duplicateQuery;
+    const { count, error: dupError } = await duplicateQuery;
+    if (dupError) {
+      return NextResponse.json({ error: true, message: dupError.message }, { status: 500 });
+    }
     if (count && count > 0) {
-      return NextResponse.json({ error: 'You have already joined the waitlist for this course.' }, { status: 400 });
+      return NextResponse.json({ error: true, message: 'You have already joined the waitlist for this course.' }, { status: 200 });
     }
 
     // Insert new waitlist entry
@@ -34,13 +41,13 @@ export async function POST(request: Request) {
     ]);
 
     if (error) {
-      // Handle unique constraint violation
-      if (error.code === '23505' || error.message.includes('duplicate key')) {
-        return NextResponse.json({ error: 'You have already joined the waitlist for this course.' }, { status: 400 });
+      // Handle unique constraint violation (for both email and user_id)
+      if (error.code === '23505' || error.message.toLowerCase().includes('duplicate')) {
+        return NextResponse.json({ error: true, message: 'You have already joined the waitlist for this course.' }, { status: 200 });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: true, message: error.message }, { status: 500 });
     }
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ error: false, message: 'Successfully joined the waitlist!' });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
