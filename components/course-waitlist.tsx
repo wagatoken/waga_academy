@@ -13,14 +13,15 @@ import { toast } from "@/hooks/use-toast"
 interface CourseWaitlistProps {
   courseId: string;
   courseName?: string;
+  isWaitlisted?: boolean;
 }
 
-export function CourseWaitlist({ courseId, courseName }: CourseWaitlistProps) {
+export function CourseWaitlist({ courseId, courseName, isWaitlisted }: CourseWaitlistProps) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(!!isWaitlisted)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
