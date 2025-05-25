@@ -12,6 +12,7 @@ import { ArrowLeft, BookOpen, Calendar, Coffee, Download } from "lucide-react"
 import { CourseWaitlist } from "@/components/course-waitlist"
 import { CourseCurriculumExpanded } from "@/components/course-curriculum-expanded"
 import { CourseIllustration } from "@/components/course-illustration"
+import { toast } from "@/components/ui/toast";
 
 export default function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -31,6 +32,13 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         // Map API data to UI structure
         const data = apiData.data
         if (!data) throw new Error("No course data found")
+        if (data.in_waitlist) {
+          toast({
+            title: "Already Registered",
+            description: "You are already on the waitlist for this course.",
+            variant: "default",
+          })
+        }
         const mappedCourse = {
           ...data,
           category: data.category || "",
