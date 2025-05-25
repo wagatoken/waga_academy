@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/components/ui/toast"
 
 interface CourseWaitlistProps {
   courseId: string;
@@ -44,25 +44,46 @@ export function CourseWaitlist({ courseId, courseName, isWaitlisted }: CourseWai
         body: JSON.stringify({ name, email, course_id: courseId, message }),
       })
       const data = await res.json()
-      // Show a specific error if missing required fields (400)
-      if (res.status === 400 && data.error && data.error.toLowerCase().includes('missing')) {
+      // Show a specific error if missing required fields (400 or 200)
+      const errorMsg = typeof data.error === 'string' ? data.error : '';
+      // Show a specific error if missing required fields
+      if ((res.status === 400 || res.status === 200) && errorMsg.toLowerCase().includes('missing')) {
         toast({
           title: "Missing Information",
-          description: data.error,
+          description: errorMsg || data.message,
           variant: "destructive",
         })
         setIsSubmitting(false)
         return
       }
-      if (!res.ok || data.error) throw new Error(data.error || "Failed to join waitlist")
+      // Show a toast if already registered (duplicate email/user)
+      if ((res.status === 400 || res.status === 200) && errorMsg.toLowerCase().includes('already')) {
+        toast({
+          title: "Already Registered",
+          description: errorMsg || data.message,
+          variant: "default",
+        })
+        setIsSubmitted(true)
+        setIsSubmitting(false)
+        return
+      }
+      if (!res.ok || data.error) {
+        toast({
+          title: "Failed to join waitlist 😕",
+          description: errorMsg || data.message || "Failed to join waitlist",
+          variant: "default",
+        })
+        setIsSubmitting(false)
+        return
+      }
 
       setIsSubmitted(true)
       toast({
         title: "Success!",
-        description: "You've been added to the waitlist. We'll notify you when the course is available.",
+        description: data.message || "You've been added to the waitlist. We'll notify you when the course is available.",
       })
     } catch (error) {
-      console.error("Error submitting waitlist form:", error)
+      // Handle error gracefully
       toast({
         title: "Something went wrong",
         description: "Please try again later",
