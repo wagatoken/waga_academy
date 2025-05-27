@@ -106,7 +106,7 @@ export default function CommunityForumsPage() {
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="space-y-1">
                           <Link
-                            href={`/community/forums/categories/${category.id}`}
+                            href={`/community/forums/categories/${category.slug}`}
                             className="text-lg font-medium hover:text-primary"
                           >
                             {category.name}
