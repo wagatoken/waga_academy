@@ -41,12 +41,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ data: null, error: { message: error.message } }, { status: 500 });
     }
 
-    const rpcResult = await supabase.rpc("increment_forum_stats", { topic_id: body.topic_id, column_name: "reply" });
-    if (rpcResult.error) {
-      return NextResponse.json({ data, error: { message: `Reply created but failed to increment reply count: ${rpcResult.error.message}` }, debug: { rpcResult } }, { status: 500 });
-    }
 
-    return NextResponse.json({ data, error: null, debug: { rpcResult } });
+    return NextResponse.json({ data, error: null });
   } catch (error) {
     return NextResponse.json({ data: null, error: { message: "An unexpected error occurred while creating the reply." } }, { status: 500 });
   }
