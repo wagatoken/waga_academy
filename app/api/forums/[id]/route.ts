@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   // Increment view count for the topic
   const supabase = await createServerClientInstance();
-  await supabase.rpc("increment_forum_stats", { topic_id: topicId, column_name: "views" });
+  await supabase.rpc("increment_topic_view_count", { topic_id: topicId });
 
   const { data, error } = await getForumRepliesForTopic(topicId);
   if (error) {
