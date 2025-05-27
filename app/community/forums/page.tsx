@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MessageSquare, Plus, Search } from "lucide-react"
-import { getForumCategories, getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
+import { getRecentTopics, getPopularTopics } from "@/lib/services/forum-service";
 import { toast } from "@/components/ui/toast"
 
 export default function CommunityForumsPage() {
@@ -25,9 +25,11 @@ export default function CommunityForumsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: catData, error: catErr } = await getForumCategories();
-        setCategories(catData || [])
-        setCategoriesError(catErr ? catErr.message || String(catErr) : null)
+        // Call the API endpoint directly instead of the server function
+        const res = await fetch("/api/forums/categories");
+        const { data: catData, error: catErr } = await res.json();
+        setCategories(catData || []);
+        setCategoriesError(catErr ? catErr.message || String(catErr) : null);
         const { data: recData, error: recErr } = await getRecentTopics();
         setRecentTopics(recData || [])
         setTopicsError(recErr ? recErr.message || String(recErr) : null)
@@ -119,7 +121,7 @@ export default function CommunityForumsPage() {
                             <span>{category.topics_count} topics</span>
                           </div>
                           <div>
-                            <span>{category.posts_count} posts</span>
+                            <span>{category.replies_count} posts</span>
                           </div>
                         </div>
                       </div>
@@ -172,7 +174,7 @@ export default function CommunityForumsPage() {
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
                                 <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">{topic.last_active ? " Last active " +  topic.last_active : " No activity yet"}</span>
+                                <span className="text-xs text-muted-foreground">{topic.last_active ? `Last active ${new Date(topic.last_active).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : "No activity yet"}</span>
                               </div>
                             </div>
                           </div>
