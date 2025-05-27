@@ -324,7 +324,7 @@ export async function getTopicsByCategory(categorySlug: string): Promise<ForumRe
   // Step 2: Use the category id to select from the view
   const { data, error } = await supabase
     .from("forum_topics_with_user_and_reply_count")
-    .select("*")
+    .select("*, category:forum_categories(name, description)")
     .eq("category_id", category.id)
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false });
