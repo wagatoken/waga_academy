@@ -226,7 +226,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                             </span>
                             <span className="text-xs text-muted-foreground">•</span>
                             <span className="text-xs text-muted-foreground">
-                              {topic.last_active ? " Last active " + topic.last_active : " No activity yet"}
+                              {topic.last_active ? `Last active ${new Date(topic.last_active).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : "No activity yet"}
                             </span>
                           </div>
                         </div>
