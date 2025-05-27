@@ -116,13 +116,17 @@ export default function CommunityForumsPage() {
                           <p className="text-sm text-muted-foreground">{category.description}</p>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1">
                             <MessageSquare className="h-4 w-4" />
-                            <span>{category.topics_count} topics</span>
-                          </div>
-                          <div>
-                            <span>{category.replies_count} posts</span>
-                          </div>
+                            <span>
+                              {category.topics_count} {category.topics_count === 1 ? "topic" : "topics"}
+                            </span>
+                            </div>
+                            <div>
+                            <span>
+                              {category.replies_count} {category.replies_count === 1 ? "post" : "posts"}
+                            </span>
+                            </div>
                         </div>
                       </div>
                     </CardContent>
