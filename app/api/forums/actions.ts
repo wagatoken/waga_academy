@@ -8,10 +8,9 @@ export async function getForumCategories() {
   const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
-    .from("forum_categories")
+    .from("forum_topic_reply_counts")
     .select(`
-      *,
-      topic_count:forum_topics(count)
+      *
     `)
     .order("order_index", { ascending: true })
 
@@ -469,3 +468,5 @@ export async function getForumCategoryBySlug(slug: string): Promise<{ data: any 
   }
   return { data, error: null };
 }
+
+
