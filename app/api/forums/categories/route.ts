@@ -6,7 +6,7 @@ export async function GET() {
   const supabase = await createServerClientInstance();
   try {
     const { data, error } = await supabase
-      .from("forum_categories")
+      .from("forum_topic_reply_counts")
       .select("*")
       .order("order_index", { ascending: true });
     if (error) {
