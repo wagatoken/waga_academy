@@ -37,9 +37,9 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
           })
           return
         }
-        
-        setCategory(data?.category || data)
-        setTopics(Array.isArray(data) ? data : data?.topics || data?.data || [])
+        // data is an array of topics, each with a .category property
+        setTopics(Array.isArray(data) ? data : [])
+        setCategory(Array.isArray(data) && data.length > 0 ? data[0].category : null)
       } catch (e: any) {
         setError(e.message || String(e))
         toast({
@@ -53,6 +53,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
     }
     fetchData()
   }, [slug])
+  
 
   // Get card class based on category slug
   const getCategoryCardClass = (slug: string) => {
