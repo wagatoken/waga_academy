@@ -307,6 +307,35 @@ export async function createForumCategory(formData: FormData) {
   return { data, error: null }
 }
 
+export async function getTopicsByCategory(categorySlug: string): Promise<ForumResult<any[]>> {
+  const supabase = await createServerClientInstance();
+
+  // Step 1: Get the category id for the given slug
+  const { data: category, error: categoryError } = await supabase
+    .from("forum_categories")
+    .select("id")
+    .eq("slug", categorySlug)
+    .single();
+
+  if (categoryError || !category) {
+    return { data: null, error: { message: categoryError?.message || "Category not found" } };
+  }
+
+  // Step 2: Use the category id to select from the view
+  const { data, error } = await supabase
+    .from("forum_topics_with_user_and_reply_count")
+    .select("*")
+    .eq("category_id", category.id)
+    .order("is_pinned", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return { data: null, error: { message: error.message } };
+  }
+
+  return { data, error: null };
+}
+
 // Admin: Pin/unpin a topic
 export async function togglePinTopic(topicId: string, isPinned: boolean) {
   const supabase = await createServerClientInstance()
@@ -426,4 +455,17 @@ export async function deleteForumTopic(topicId: string) {
   revalidatePath("/community/forums");
 
   return { error: null, data: "Topic deleted successfully" };
+}
+
+export async function getForumCategoryBySlug(slug: string): Promise<{ data: any | null; error: string | null }> {
+  const supabase = await createServerClientInstance();
+  const { data, error } = await supabase
+    .from("forum_categories")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+  if (error) {
+    return { data: null, error: error.message };
+  }
+  return { data, error: null };
 }
