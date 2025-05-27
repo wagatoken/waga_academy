@@ -37,6 +37,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
           })
           return
         }
+        console.log("Fetched category data:", data)
         setCategory(data?.category || data)
         setTopics(Array.isArray(data) ? data : data?.topics || data?.data || [])
       } catch (e: any) {
@@ -89,7 +90,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
           ) : (
             <div>
               <h1 className="text-3xl font-bold tracking-tighter web3-dual-gradient-text-glow">
-                {category?.name || "Category"}
+                {category?.name}
               </h1>
               <p className="text-muted-foreground">{category?.description}</p>
             </div>
@@ -103,11 +104,14 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
               <>
                 <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   <MessageSquare className="mr-1 h-3 w-3" />
-                  {category?.topics_count || 0} topics
+                   {topics.length == 1 ?  `${topics.length} topic` : `${topics.length} topics`}
                 </Badge>
                 <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   <Users className="mr-1 h-3 w-3" />
-                  {category?.posts_count || 0} posts
+                  {(() => {
+                  const postCount = topics.reduce((sum, t) => sum + (t.replies_count || 0), 0)
+                  return `${postCount} ${postCount === 1 ? "post" : "posts"}`
+                  })()}
                 </Badge>
               </>
             )}
@@ -231,9 +235,11 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                           variant="secondary"
                           className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
                         >
-                          {topic.replies_count || 0} replies
+                          {topic.replies_count || 0} {((topic.replies_count || 0) === 1 ? "reply" : "replies")}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">{topic.views_count || 0} views</span>
+                        <span className="text-xs text-muted-foreground">
+                          {topic.views_count || 0} {((topic.views_count || 0) === 1 ? "view" : "views")}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
