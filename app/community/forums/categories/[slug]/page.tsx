@@ -37,7 +37,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
           })
           return
         }
-        console.log("Fetched category data:", data)
+        
         setCategory(data?.category || data)
         setTopics(Array.isArray(data) ? data : data?.topics || data?.data || [])
       } catch (e: any) {
