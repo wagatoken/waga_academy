@@ -1,13 +1,19 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getForumRepliesForTopic, createForumReply } from "@/app/api/forums/actions";
+import { createServerClientInstance } from "@/lib/supabase/server";
 
 // GET /api/forums/[id] - Get all replies for a topic (flat, for nesting on frontend)
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const topicId = await params.id;
+  const topicId = params.id;
   if (!topicId) {
     return NextResponse.json({ error: "Missing topic id" }, { status: 400 });
   }
+
+  // Increment view count for the topic
+  const supabase = await createServerClientInstance();
+  await supabase.rpc("increment_forum_stats", { topic_id: topicId, column_name: "views" });
+
   const { data, error } = await getForumRepliesForTopic(topicId);
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
