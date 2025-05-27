@@ -352,7 +352,9 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
     setIsSubmitting(true)
     const formData = new FormData()
     formData.set("content", replyContent)
-    // topic_id is set by the API route
+    formData.set("topic_id", topicId) // Pass topic_id explicitly
+
+    // topic_id is set by the API rdoute
     const res = await fetch(`/api/forums/${topicId}`, {
       method: "POST",
       body: formData,
