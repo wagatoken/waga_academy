@@ -226,7 +226,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                             </span>
                             <span className="text-xs text-muted-foreground">•</span>
                             <span className="text-xs text-muted-foreground">
-                              {topic.lastActive ? " Last active " + topic.lastActive : " No activity yet"}
+                              {topic.last_active ? " Last active " + topic.last_active : " No activity yet"}
                             </span>
                           </div>
                         </div>

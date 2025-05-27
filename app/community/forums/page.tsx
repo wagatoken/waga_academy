@@ -172,7 +172,7 @@ export default function CommunityForumsPage() {
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
                                 <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
+                                <span className="text-xs text-muted-foreground">{topic.last_active ? " Last active " +  topic.last_active : " No activity yet"}</span>
                               </div>
                             </div>
                           </div>
