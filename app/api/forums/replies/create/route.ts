@@ -1,9 +1,24 @@
-export const runtime = 'edge';
+// export const runtime = 'edge';
 import { NextResponse } from "next/server";
 import { createServerClientInstance } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  let body: any;
+  // Try to parse as JSON, fallback to FormData
+  try {
+    body = await req.json();
+  } catch {
+    const formData = await req.formData();
+    body = Object.fromEntries(formData.entries());
+  }
+  // Ensure topic_id is present and a string
+  if (!body.topic_id && body["topic_id"]) body.topic_id = body["topic_id"];
+  if (!body.topic_id) {
+    return NextResponse.json({ data: null, error: { message: "Missing topic_id in request body" } }, { status: 400 });
+  }
+  body.topic_id = String(body.topic_id);
+  console.log("Reply body:", body);
+
   const supabase = await createServerClientInstance();
   try {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -25,7 +40,13 @@ export async function POST(req: Request) {
     if (error) {
       return NextResponse.json({ data: null, error: { message: error.message } }, { status: 500 });
     }
-    return NextResponse.json({ data, error: null });
+
+    const rpcResult = await supabase.rpc("increment_forum_stats", { topic_id: body.topic_id, column_name: "reply" });
+    if (rpcResult.error) {
+      return NextResponse.json({ data, error: { message: `Reply created but failed to increment reply count: ${rpcResult.error.message}` }, debug: { rpcResult } }, { status: 500 });
+    }
+
+    return NextResponse.json({ data, error: null, debug: { rpcResult } });
   } catch (error) {
     return NextResponse.json({ data: null, error: { message: "An unexpected error occurred while creating the reply." } }, { status: 500 });
   }
