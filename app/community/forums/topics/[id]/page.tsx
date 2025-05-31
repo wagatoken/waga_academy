@@ -11,7 +11,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Heart, Flag, Share2, MessageSquare } from "lucide-react"
+import { ArrowLeft, Flag, Share2, MessageSquare, Reply as ReplyIcon } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 
@@ -159,23 +159,14 @@ function Reply({
               </div>
               <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: simpleMarkdown(reply.content) }} />
               <div className="flex items-center gap-4 pt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={
-                    `hover:text-emerald-400 hover:bg-emerald-500/10 ` +
-                    (isLiked ? "text-emerald-400" : "text-muted-foreground")
-                  }
-                  onClick={() => onLike(reply.id)}
-                >
-                  <Heart className={`mr-1 h-4 w-4 ${isLiked ? "fill-emerald-400" : ""}`} /> {reply.likes}
-                </Button>
+                {/* Like button removed as requested */}
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                   onClick={handleReplyClick}
                 >
+                  <ReplyIcon />
                   Reply
                 </Button>
                 {hasReplies && (
@@ -189,20 +180,20 @@ function Reply({
                     {isCollapsed ? `Show ${replyCount} ${replyCount === 1 ? "reply" : "replies"}` : "Hide replies"}
                   </Button>
                 )}
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                 >
                   <Share2 className="mr-1 h-4 w-4" /> Share
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                 >
                   <Flag className="mr-1 h-4 w-4" /> Report
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
@@ -419,40 +410,40 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
   }
 
   // Like/unlike logic for replies
-  const handleLike = (replyId: string) => {
-    setReplies((prev) => prev.map((r) => likeReplyRecursive(r, replyId)))
-    setLikedIds((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(replyId)) {
-        newSet.delete(replyId)
-        toast({ title: "Unliked", description: "You unliked this reply" })
-      } else {
-        newSet.add(replyId)
-        toast({ title: "Liked", description: "You liked this reply" })
-      }
-      return newSet
-    })
-  }
+  // const handleLike = (replyId: string) => {
+  //   setReplies((prev) => prev.map((r) => likeReplyRecursive(r, replyId)))
+  //   setLikedIds((prev) => {
+  //     const newSet = new Set(prev)
+  //     if (newSet.has(replyId)) {
+  //       newSet.delete(replyId)
+  //       toast({ title: "Unliked", description: "You unliked this reply" })
+  //     } else {
+  //       newSet.add(replyId)
+  //       toast({ title: "Liked", description: "You liked this reply" })
+  //     }
+  //     return newSet
+  //   })
+  // }
 
-  function likeReplyRecursive(reply: ReplyType, replyId: string): ReplyType {
-    if (reply.id === replyId) {
-      return { ...reply, likes: likedIds.has(replyId) ? reply.likes - 1 : reply.likes + 1 }
-    } else if (reply.replies && reply.replies.length > 0) {
-      return { ...reply, replies: reply.replies.map((child) => likeReplyRecursive(child, replyId)) }
-    } else {
-      return reply
-    }
-  }
+  // function likeReplyRecursive(reply: ReplyType, replyId: string): ReplyType {
+  //   if (reply.id === replyId) {
+  //     return { ...reply, likes: likedIds.has(replyId) ? reply.likes - 1 : reply.likes + 1 }
+  //   } else if (reply.replies && reply.replies.length > 0) {
+  //     return { ...reply, replies: reply.replies.map((child) => likeReplyRecursive(child, replyId)) }
+  //   } else {
+  //     return reply
+  //   }
+  // }
 
   // Like/unlike logic for main post
-  const handleMainPostLike = () => {
-    setMainPostLikes((likes) => (mainPostLiked ? likes - 1 : likes + 1))
-    setMainPostLiked((liked) => !liked)
-    toast({
-      title: mainPostLiked ? "Unliked" : "Liked",
-      description: mainPostLiked ? "You unliked this post" : "You liked this post",
-    })
-  }
+  // const handleMainPostLike = () => {
+  //   setMainPostLikes((likes) => (mainPostLiked ? likes - 1 : likes + 1))
+  //   setMainPostLiked((liked) => !liked)
+  //   toast({
+  //     title: mainPostLiked ? "Unliked" : "Liked",
+  //     description: mainPostLiked ? "You unliked this post" : "You liked this post",
+  //   })
+  // }
   
   return (
     <div className="container py-12">
@@ -498,7 +489,8 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
                   dangerouslySetInnerHTML={{ __html: simpleMarkdown(topic?.content || "") }}
                 />
                 <div className="flex items-center gap-4 pt-4">
-                  <Button
+                  {/* Temporarilly remove likes */}
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className={
@@ -508,8 +500,8 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
                     onClick={handleMainPostLike}
                   >
                     <Heart className={`mr-1 h-4 w-4 ${mainPostLiked ? "fill-emerald-400" : ""}`} /> {mainPostLikes}
-                  </Button>
-                  <Button
+                  </Button> */}
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
@@ -522,7 +514,7 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
                     className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                   >
                     <Flag className="mr-1 h-4 w-4" /> Report
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
@@ -532,7 +524,13 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
         <div className="space-y-4">
           <h2 className="text-xl font-bold web3-gradient-text">Replies ({replies.length})</h2>
           {replies.map((reply) => (
-            <Reply key={reply.id} reply={reply} onReply={handleReplyToReply} onLike={handleLike} likedIds={likedIds} />
+            <Reply
+              key={reply.id}
+              reply={reply}
+              onReply={handleReplyToReply}
+              onLike={() => {}}
+              likedIds={likedIds}
+            />
           ))}
         </div>
 
