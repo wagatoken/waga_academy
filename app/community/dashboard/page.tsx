@@ -41,12 +41,9 @@ async function getDiscussionTopics() {
   const supabase = await createServerClientInstance()
 
   const { data, error } = await supabase
-    .from("forum_topics")
+    .from("forum_topics_view")
     .select(`
-      id,
-      title,
-      created_at,
-      user_id:profiles(id, first_name, last_name, avatar_url)
+      *
     `)
     .order("created_at", { ascending: false })
     .limit(3)
@@ -261,15 +258,18 @@ export default async function CommunityDashboard() {
                 const cardClass = cardClasses[index % cardClasses.length];
 
                 // Get author info
-                const author = topic.user_id
-                  ? `${topic.user_id.first_name || ""} ${topic.user_id.last_name || ""}`.trim()
-                  : topic.author || "WAGA Team";
+                const authorObj = topic.user_id || topic.author;
+                const author = authorObj && typeof authorObj === 'object'
+                  ? `${authorObj.first_name || ''} ${authorObj.last_name || ''}`.trim() || 'WAGA Team'
+                  : (typeof topic.author === 'string' ? topic.author : 'WAGA Team');
 
                 // Get avatar
-                const avatar = topic.user_id?.avatar_url || topic.avatar || author.substring(0, 2);
+                const avatar = (authorObj && typeof authorObj === 'object' && authorObj.avatar_url)
+                  ? authorObj.avatar_url
+                  : (typeof author === 'string' ? author.substring(0, 2) : 'WT');
 
                 return (
-                  <Card key={topic.id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
+                  <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-4">
@@ -279,12 +279,12 @@ export default async function CommunityDashboard() {
                               alt={author}
                             />
                             <AvatarFallback className="bg-purple-900/50">
-                              {typeof avatar === "string" ? avatar.substring(0, 2).toUpperCase() : "WT"}
+                              {typeof author === 'string' ? author.substring(0, 2).toUpperCase() : 'WT'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <Link
-                              href={`/community/forums/topics/${topic.id}`}
+                              href={`/community/forums/topics/${topic.topic_id}`}
                               className="font-medium hover:text-primary"
                             >
                               {topic.title}
@@ -304,7 +304,7 @@ export default async function CommunityDashboard() {
                           variant="secondary"
                           className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
                         >
-                          {topic.replies || 0} replies
+                          {topic.replies_count || 0} replies
                         </Badge>
                       </div>
                     </CardContent>
