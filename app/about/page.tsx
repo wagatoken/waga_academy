@@ -274,7 +274,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Team Section */}
-      <section className="w-full py-12 md:py-24 bg-black/30 backdrop-blur relative overflow-hidden">
+      {/* <section className="w-full py-12 md:py-24 bg-black/30 backdrop-blur relative overflow-hidden">
         <div className="absolute inset-0 z-0 web3-grid-bg"></div>
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -318,7 +318,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Roadmap Section */}
       <section className="w-full py-12 md:py-24">
