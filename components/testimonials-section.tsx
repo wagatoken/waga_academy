@@ -6,23 +6,23 @@ const visionStatements = [
   {
     quote:
       "We envision a future where blockchain technology empowers coffee farmers to trace their beans from farm to cup, ensuring fair compensation and transparent supply chains.",
-    name: "John Doe",
-    role: "Founder & Executive Director",
-    avatar: "JD",
+    name: "",
+    role: "",
+    avatar: "",
   },
   {
     quote:
       "The intersection of Web3 and agriculture represents one of the most promising opportunities for real-world blockchain adoption, with potential to transform livelihoods across the coffee belt.",
-    name: "Jane Doe",
-    role: "Head of Web3 Education",
-    avatar: "JD",
+    name: "",
+    role: "",
+    avatar: "",
   },
   {
     quote:
       "By equipping the next generation with both agricultural knowledge and digital skills, we can create sustainable coffee communities that thrive in the digital economy.",
-    name: "Alice Smith",
-    role: "Coffee Value Chain Lead",
-    avatar: "AS",
+    name: "",
+    role: "",
+    avatar: "",
   },
 ]
 
@@ -71,7 +71,7 @@ export function TestimonialsSection() {
                     <Quote className={`h-8 w-8 mx-auto mb-4 ${quoteColor} opacity-50`} />
                     <p className="text-muted-foreground">"{statement.quote}"</p>
                   </CardContent>
-                  <CardFooter className="flex flex-col items-center pb-6">
+                  {/* <CardFooter className="flex flex-col items-center pb-6">
                     <Avatar className={`h-12 w-12 mb-2 ring-2 ${avatarRingColor} animate-border-glow`}>
                       <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={statement.name} />
                       <AvatarFallback className={avatarBgColor}>{statement.avatar}</AvatarFallback>
@@ -80,7 +80,7 @@ export function TestimonialsSection() {
                       <p className="font-medium">{statement.name}</p>
                       <p className="text-sm text-muted-foreground">{statement.role}</p>
                     </div>
-                  </CardFooter>
+                  </CardFooter> */}
                 </Card>
               )
             })}
