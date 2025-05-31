@@ -43,6 +43,26 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           ...data,
           category: data.category || "",
           level: data.difficulty_level || "",
+          // Calculate total duration from all lessons
+          totalDuration: (() => {
+            let total = 0;
+            if (Array.isArray(data.modules)) {
+              data.modules.forEach((mod: any) => {
+                if (Array.isArray(mod.lessons)) {
+                  mod.lessons.forEach((lesson: any) => {
+                    // Parse duration like "30 min"
+                    if (lesson.lesson_duration) {
+                      const match = /([0-9]+)\s*min/.exec(lesson.lesson_duration);
+                      if (match) {
+                        total += parseInt(match[1], 10);
+                      }
+                    }
+                  });
+                }
+              });
+            }
+            return total;
+          })(),
           duration: data.duration || "",
           instructor: data.instructor || "",
           modules: Array.isArray(data.modules) ? data.modules.map((mod: any) => ({
