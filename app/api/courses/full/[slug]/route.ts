@@ -22,6 +22,20 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Fetch related courses (by category, excluding current course)
+  let relatedCourses = [];
+  if (data?.category) {
+    const { data: related, error: relatedError } = await supabase
+      .from("courses")
+      .select("id, title, slug, description")
+      .eq("category", data.category)
+      .neq("id", data.id)
+      .limit(3);
+    if (!relatedError && related) {
+      relatedCourses = related;
+    }
+  }
+
   // Get user session (if signed in)
   const { data: sessionData } = await supabase.auth.getSession();
   const user_id = sessionData?.session?.user?.id ?? null;
@@ -36,5 +50,5 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     in_waitlist = !!(count && count > 0);
   }
 
-  return NextResponse.json({ data: { ...data, in_waitlist } });
+  return NextResponse.json({ data: { ...data, in_waitlist, relatedCourses } });
 }
