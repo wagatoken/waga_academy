@@ -13,7 +13,7 @@ import { useAuth } from "@/context/auth-context"
 import { toast } from "@/components/ui/toast"
 
 export function MainNav() {
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -49,15 +49,14 @@ export function MainNav() {
       label: "Community",
       active: pathname.startsWith("/community"),
     },
-    {
-      href: "/admin",
-      label: "Admin",
-      active: pathname === "/admin" || pathname.startsWith("/admin/"),
-    },
+    // Admin route will be conditionally rendered below
   ]
 
   // Check if user is on login or register page
   const isAuthPage = pathname === "/login" || pathname === "/register"
+
+  // Only show Admin nav if user is admin (from profile table)
+  const isAdmin = profile && profile.role === "admin"
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-emerald-500/20 bg-emerald-950/80 backdrop-blur supports-[backdrop-filter]:bg-emerald-950/60">
@@ -90,6 +89,26 @@ export function MainNav() {
                 )}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                key="/admin"
+                href="/admin"
+                scroll={true}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary relative web3-glow group whitespace-nowrap",
+                  pathname === "/admin" || pathname.startsWith("/admin/") ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                <span className="relative z-10 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-emerald-400 transition-all duration-300">
+                  Admin
+                </span>
+                {(pathname === "/admin" || pathname.startsWith("/admin/")) ? (
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-purple-500"></span>
+                ) : (
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 scale-x-0 group-hover:scale-x-100 bg-gradient-to-r from-purple-500 to-emerald-500 transition-transform duration-300 origin-left"></span>
+                )}
+              </Link>
+            )}
           </nav>
         </div>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -226,6 +245,26 @@ export function MainNav() {
                 <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                key="/admin"
+                href="/admin"
+                scroll={true}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary p-2 relative overflow-hidden group whitespace-nowrap",
+                  (pathname === "/admin" || pathname.startsWith("/admin/"))
+                    ? "text-primary bg-gradient-to-r from-emerald-500/10 to-purple-500/10 rounded-md"
+                    : "text-muted-foreground",
+                )}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span className="relative z-10">Admin</span>
+                {(pathname === "/admin" || pathname.startsWith("/admin/")) && (
+                  <span className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-emerald-500 to-purple-500"></span>
+                )}
+                <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              </Link>
+            )}
 
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
