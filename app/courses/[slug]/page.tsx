@@ -75,7 +75,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               title: lesson.lesson_title,
               content: lesson.content,
               video_url: lesson.video_url,
-              duration: lesson.lesson_duration,
+              duration: typeof lesson.lesson_duration === 'string' && lesson.lesson_duration.match(/^[0-9]+ min$/) ? lesson.lesson_duration : (lesson.lesson_duration ? `${lesson.lesson_duration} min` : '0 min'),
               order_index: lesson.lesson_order_index,
             })) : [],
           })) : [],
@@ -292,45 +292,27 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-md bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                      <Coffee className="h-6 w-6 icon-emerald" />
-                    </div>
-                    <div>
-                      <Link href="/courses/coffee-tokenization" className="font-medium link-emerald">
-                        Coffee Tokenization Fundamentals
-                      </Link>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Learn how to tokenize coffee assets for fair pricing and market access
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-md bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                      <Coffee className="h-6 w-6 icon-emerald" />
-                    </div>
-                    <div>
-                      <Link href="/courses/defi-coffee-farmers" className="font-medium link-emerald">
-                        DeFi Solutions for Coffee Farmers
-                      </Link>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Explore decentralized finance for yield-based lending and financial inclusion
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 rounded-md bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                      <Coffee className="h-6 w-6 icon-emerald" />
-                    </div>
-                    <div>
-                      <Link href="/courses/iot-coffee-monitoring" className="font-medium link-emerald">
-                        IoT for Coffee Farm Monitoring
-                      </Link>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Implement IoT solutions for real-time monitoring of coffee farms
-                      </p>
-                    </div>
-                  </div>
+                  {Array.isArray(course.relatedCourses) && course.relatedCourses.length > 0 ? (
+                    course.relatedCourses.map((related: any) => (
+                      <div key={related.id} className="flex items-start gap-3">
+                        <div className="h-12 w-12 rounded-md bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                          <Coffee className="h-6 w-6 icon-emerald" />
+                        </div>
+                        <div>
+                          <Link href={`/courses/${related.slug}`} className="font-medium link-emerald">
+                            {related.title}
+                          </Link>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {related.description && related.description.length > 100
+                              ? related.description.slice(0, 100) + '...'
+                              : related.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-muted-foreground">No related courses found.</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
