@@ -43,11 +43,29 @@ export default function LoginPage() {
       const { error } = await signIn(values.email, values.password)
 
       if (error) {
-          // TODO: Remove and replace with proper logging for production
-        console.error("Login error:", error)
+        // Map known error messages to user-friendly descriptions
+        const errorMappings = [
+          {
+            match: /user not found|invalid login credentials/i,
+            message: "No account found with that email or password. Please try again or sign up.",
+          },
+          {
+            match: /email not confirmed|email not verified/i,
+            message: "Your email is not verified. Please check your inbox for a verification link.",
+          },
+        ];
+        let description = "Invalid email or password. Please try again.";
+        if (error) {
+          for (const mapping of errorMappings) {
+            if (mapping.match.test(error)) {
+              description = mapping.message;
+              break;
+            }
+          }
+        }
         toast({
           title: "Login failed ❌",
-          description: "An unexpected error occurred. Please try again later.",
+          description,
           variant: "destructive",
         })
         setIsLoading(false)
