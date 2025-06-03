@@ -39,6 +39,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
         }
         // data is an array of topics, each with a .category property
         setTopics(Array.isArray(data) ? data : [])
+        console.log("Fetched topics:", data)
         setCategory(Array.isArray(data) && data.length > 0 ? data[0].category : null)
       } catch (e: any) {
         setError(e.message || String(e))
@@ -207,10 +208,10 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                     <div className="flex justify-between items-start">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                          <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={`${topic.user?.first_name || ""} ${topic.user?.last_name || ""}`} />
+                          <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={`${topic.first_name || ""} ${topic.last_name || ""}`} />
                           <AvatarFallback className="bg-purple-900/50">
-                            {topic.user?.first_name?.[0]}
-                            {topic.user?.last_name?.[0]}
+                            {topic.first_name?.[0]}
+                            {topic.last_name?.[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -222,7 +223,7 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-muted-foreground">
-                              By {topic.user?.first_name} {topic.user?.last_name}
+                              By {topic.first_name} {topic.last_name}
                             </span>
                             <span className="text-xs text-muted-foreground">•</span>
                             <span className="text-xs text-muted-foreground">
