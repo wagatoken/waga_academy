@@ -113,14 +113,12 @@ export async function getPastEvents(limit: number = 2): Promise<EventResult<Mini
     }
 }
 
-export async function getEventBySlug(slug: string): Promise<EventResult<Event>> {
+export async function getEventBySlug(slug: string): Promise<EventResult<Event & { is_registered: boolean }>> {
     const supabase = await createServerClientInstance()
     try {
         const { data, error } = await supabase
             .from("event_with_speakers")
-            .select(`
-                *
-            `)
+            .select(`*`)
             .eq("slug", slug)
             .single()
 
@@ -129,7 +127,24 @@ export async function getEventBySlug(slug: string): Promise<EventResult<Event>> 
             return { data: [], error: { message: error.message } }
         }
 
-        return { data: (data as Event) || null, error: null }
+        // Get current user
+        const { data: userData } = await supabase.auth.getUser();
+        const user = userData?.user;
+        let is_registered = false;
+
+        if (user && data?.id) {
+            // Check if user is registered for this event
+            const { count, error: regError } = await supabase
+                .from("event_registrations")
+                .select("id", { count: "exact", head: true })
+                .eq("event_id", data.id)
+                .eq("user_id", user.id);
+            if (!regError && count && count > 0) {
+                is_registered = true;
+            }
+        }
+
+        return { data: { ...(data as Event), is_registered }, error: null }
     } catch (error) {
         console.error("Unexpected error fetching event by slug:", error)
         return {
