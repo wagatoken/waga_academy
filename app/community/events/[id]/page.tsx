@@ -79,41 +79,40 @@ export default function EventPage({ params }: { params: { id: string } }) {
   const [name, setName] = useState("")
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRegistered, setIsRegistered] = useState(false)
- const [eventData, setEventData] = useState<any>(null);
+  const [eventData, setEventData] = useState<any>(null);
   const [pastEvents, setPastEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-  async function fetchEventData() {
-    try {
-      const resolvedParams = await params; // Unwrap the params Promise
-      const { data } = await getEventBySlug(resolvedParams.id); // Use the resolved ID
-      setEventData(data);
+  useEffect(() => {
+    async function fetchEventData() {
+      try {
+        const resolvedParams = await params; // Unwrap the params Promise
+        const { data } = await getEventBySlug(resolvedParams.id); // Use the resolved ID
+        setEventData(data);
+        setIsRegistered(Array.isArray(data) ? false : !!data?.is_registered); // Set registration state from backend
 
-      const pastEventsData = await getPastEvents(); // Fetch past events
-      setPastEvents(pastEventsData.data);
-    } catch (error) {
-      console.error("Failed to fetch event data:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load event data.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false); // Stop loading once data is fetched
+        const pastEventsData = await getPastEvents(); // Fetch past events
+        setPastEvents(pastEventsData.data);
+      } catch (error) {
+        console.error("Failed to fetch event data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load event data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false); // Stop loading once data is fetched
+      }
     }
-  }
 
-  fetchEventData();
-}, [params]);
+    fetchEventData();
+  }, [params]);
 
 
  const handleRegister = async () => {
     setIsRegistering(true);
-
     try {
       const { error, data } = await registerForEvent(eventData.id)
-
       if (error) {
         toast({
           title: "Registration Failed",
@@ -122,6 +121,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
         });
       } else {
         setIsRegistered(true);
+        // Optionally, update eventData.registered_count here if you want to reflect the new count
         toast({
           title: "Registration Successful 🍾",
           description: "You have been registered for the event.",
@@ -213,7 +213,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4 icon-emerald" />
-                    <span>{eventData?.registered_count} registered</span>
+                    <span>{eventData?.registered_user_count} registered</span>
                   </div>
                 </div>
               </div>
