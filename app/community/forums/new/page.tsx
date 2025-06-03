@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { toast } from "@/components/ui/toast";
 
 export default function NewTopicPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -24,6 +25,7 @@ export default function NewTopicPage() {
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const [categoryLocked, setCategoryLocked] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -47,6 +49,18 @@ export default function NewTopicPage() {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const urlCategory = searchParams.get("category");
+    if (urlCategory && categories.length > 0) {
+      // Find the category by slug
+      const found = categories.find((cat: any) => cat.slug === urlCategory);
+      if (found) {
+        setFormData((prev) => ({ ...prev, category: found.id }));
+        setCategoryLocked(true);
+      }
+    }
+  }, [searchParams, categories]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -149,7 +163,7 @@ export default function NewTopicPage() {
                 <label htmlFor="category" className="text-sm font-medium">
                   Category
                 </label>
-                <Select onValueChange={handleCategoryChange} value={formData.category} disabled={categoriesLoading || !!categoriesError}>
+                <Select onValueChange={handleCategoryChange} value={formData.category} disabled={categoryLocked || categoriesLoading || !!categoriesError}>
                   <SelectTrigger className="web3-input">
                     <SelectValue placeholder={categoriesLoading ? "Loading..." : categoriesError ? "Failed to load categories" : "Select a category"} />
                   </SelectTrigger>
