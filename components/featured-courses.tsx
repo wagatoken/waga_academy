@@ -60,7 +60,7 @@ export function FeaturedCourses() {
               Launching Q4 2025
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 w-full pt-8 relative">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full pt-8 relative">
             {/* Strategic coffee bean in the grid */}
             <StrategicCoffeeBeans position="bottom-left" size={25} opacity={0.7} zIndex={5} />
 
@@ -91,17 +91,17 @@ export function FeaturedCourses() {
                   )}
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <Badge variant="outline" className={`mb-2 ${badgeClass}`}>
+                      <Badge variant="outline" className={`mb-2 ${badgeClass} px-2 py-1 md:px-3 md:py-1.5 md:text-xs`}>
                         {course.category}
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className={`mb-2 ${isEven ? "bg-emerald-500/10 text-emerald-300" : "bg-purple-500/10 text-purple-300"}`}
+                        className={`mb-2 ${isEven ? "bg-emerald-500/10 text-emerald-300" : "bg-purple-500/10 text-purple-300"} px-2 py-1 md:px-3 md:py-1.5 md:text-xs`}
                       >
                         {course.difficulty_level}
                       </Badge>
                     </div>
-                    <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+                    <CardTitle className="line-clamp-2 lg:pt-4">{course.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex-grow">
                     <CardDescription className="line-clamp-4 text-muted-foreground">
