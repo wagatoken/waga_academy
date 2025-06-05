@@ -54,7 +54,7 @@ export default function AcademyPage() {
                 </Button>
               </div>
             </div>
-            <div className="relative h-[300px] sm:h-[400px] lg:h-[500px] rounded-xl overflow-hidden web3-card-featured">
+            <div className="relative h-[200px] xs:h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] rounded-xl overflow-hidden web3-card-featured">
               <BlockchainPlaceholder
                 height="100%"
                 variant="circular"
