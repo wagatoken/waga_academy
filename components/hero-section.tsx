@@ -25,7 +25,7 @@ export function HeroSection() {
           <div className="space-x-4 relative z-20">
             <Link href="/courses">
               <Button
-                size="lg"
+                size="default"
                 className="web3-button-glow bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-500/30 hover:border-purple-500/50 relative z-20"
               >
                 Explore Courses
@@ -33,7 +33,7 @@ export function HeroSection() {
             </Link>
             <Link href="/bootcamp">
               <Button
-                size="lg"
+                size="default"
                 variant="outline"
                 className="border-purple-500/30 hover:border-purple-500/60 backdrop-blur animate-purple-border-glow relative z-20"
               >
