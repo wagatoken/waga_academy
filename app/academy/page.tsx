@@ -137,7 +137,7 @@ export default function AcademyPage() {
               <StrategicCoffeeBeans position="top-right" size={25} quantity={2} />
 
               <Tabs defaultValue="cultivation" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+                <TabsList className="grid grid-cols-5 w-full gap-2 text-[0.6rem]">
                   <TabsTrigger value="cultivation">Cultivation</TabsTrigger>
                   <TabsTrigger value="processing">Processing</TabsTrigger>
                   <TabsTrigger value="logistics">Logistics</TabsTrigger>
@@ -145,8 +145,8 @@ export default function AcademyPage() {
                   <TabsTrigger value="sales">Sales</TabsTrigger>
                 </TabsList>
                 <TabsContent value="cultivation" className="p-4 border rounded-md mt-2 web3-card-teal">
-                  <div className="flex flex-col md:flex-row gap-4 items-start">
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div className="flex-shrink-0 flex justify-center md:block">
                       <Coffee className="h-12 w-12 text-teal-400" />
                     </div>
                     <div>
@@ -181,8 +181,8 @@ export default function AcademyPage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="processing" className="p-4 border rounded-md mt-2 web3-card-blue">
-                  <div className="flex flex-col md:flex-row gap-4 items-start">
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div className="flex-shrink-0 flex justify-center md:block">
                       <Factory className="h-12 w-12 text-blue-400" />
                     </div>
                     <div>
@@ -217,8 +217,8 @@ export default function AcademyPage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="logistics" className="p-4 border rounded-md mt-2 web3-card-amber">
-                  <div className="flex flex-col md:flex-row gap-4 items-start">
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div className="flex-shrink-0 flex justify-center md:block">
                       <Truck className="h-12 w-12 text-amber-400" />
                     </div>
                     <div>
@@ -253,8 +253,8 @@ export default function AcademyPage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="roasting" className="p-4 border rounded-md mt-2 web3-card-pink">
-                  <div className="flex flex-col md:flex-row gap-4 items-start">
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div className="flex-shrink-0 flex justify-center md:block">
                       <ShoppingBag className="h-12 w-12 text-pink-400" />
                     </div>
                     <div>
@@ -289,8 +289,8 @@ export default function AcademyPage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="sales" className="p-4 border rounded-md mt-2 web3-card-purple">
-                  <div className="flex flex-col md:flex-row gap-4 items-start">
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div className="flex-shrink-0 flex justify-center md:block">
                       <BarChart3 className="h-12 w-12 text-purple-400" />
                     </div>
                     <div>
