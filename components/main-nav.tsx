@@ -267,36 +267,26 @@ export function MainNav() {
             )}
 
             <div className="flex flex-col gap-2 pt-2">
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-emerald-500/30 hover:border-emerald-500/60 bg-emerald-500/10 h-8 px-2 emerald-glow relative overflow-hidden group"
-                    >
-                      <span className="relative z-10">Account</span>
-                      <ChevronDown className="ml-1 h-3 w-3 relative z-10" />
-                      <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-48 bg-emerald-950/95 backdrop-blur border-emerald-500/20 web3-card-emerald"
-                  >
-                    <DropdownMenuItem asChild>
-                      <Link href="/community/profile" className="flex items-center cursor-pointer group">
+              <div className="flex flex-col space-y-2 border-t border-emerald-500/20 pt-3">
+                <h3 className="text-sm font-medium text-muted-foreground px-2">Account</h3>
+                {user ? (
+                  <>
+                    <Button variant="ghost" asChild className="justify-start group">
+                      <Link href="/community/profile" onClick={() => setIsMenuOpen(false)}>
                         <User className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
                         <span>My Profile</span>
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start group"
                       onClick={async () => {
                         try {
                           await signOut();
+                          setIsMenuOpen(false);
                           router.push("/login");
                           toast({
-                            title: "Logged Out",
+                            title: "Logged Out 😔",
                             description: "You have successfully logged out.",
                             variant: "default",
                           });
@@ -309,18 +299,14 @@ export function MainNav() {
                           });
                         }
                       }}
-                      className="flex items-center cursor-pointer group"
                     >
                       <LogOut className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
                       <span>Logout</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                !isAuthPage && (
-                  <>
-                    <div className="flex flex-col space-y-2 border-t border-emerald-500/20 pt-3">
-                      <h3 className="text-sm font-medium text-muted-foreground px-2">Account</h3>
+                    </Button>
+                  </>
+                ) : (
+                  !isAuthPage && (
+                    <>
                       <Button variant="ghost" asChild className="justify-start group">
                         <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                           <LogIn className="mr-2 h-4 w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
@@ -333,12 +319,14 @@ export function MainNav() {
                           <span>Sign Up</span>
                         </Link>
                       </Button>
-                    </div>
-                    <div className="pt-2">
-                      <ConnectWalletButton />
-                    </div>
-                  </>
-                )
+                    </>
+                  )
+                )}
+              </div>
+              {!user && !isAuthPage && (
+                <div className="pt-2">
+                  <ConnectWalletButton />
+                </div>
               )}
             </div>
           </div>
