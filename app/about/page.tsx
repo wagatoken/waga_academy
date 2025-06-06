@@ -332,110 +332,123 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-purple-600 to-indigo-600"></div>
+          {/* Mobile-first responsive timeline */}
+          <div className="relative max-w-4xl mx-auto">
+            {/* Timeline line - responsive */}
+            <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-600 to-indigo-600"></div>
 
-            <div className="space-y-12 relative">
+            <div className="space-y-8 md:space-y-12">
               {/* Q1 2025 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
-                  <div className="web3-card-purple p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q1 2025</h3>
-                    <p className="text-muted-foreground">
-                      Launch of WAGA Academy platform with initial course offerings focused on Web3 fundamentals and
-                      coffee value chain basics.
-                    </p>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">1</span>
+                </div>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="md:text-right md:pr-8">
+                    <div className="web3-card-purple p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q1 2025</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Launch of WAGA Academy platform with initial course offerings focused on Web3 fundamentals and
+                        coffee value chain basics.
+                      </p>
+                    </div>
                   </div>
+                  <div className="hidden md:block"></div>
                 </div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">1</span>
-                </div>
-                <div className="md:w-1/2 md:pl-12 invisible md:visible"></div>
               </div>
 
               {/* Q2 2025 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 invisible md:visible"></div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">2</span>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">2</span>
                 </div>
-                <div className="md:w-1/2 md:pl-12 mb-4 md:mb-0">
-                  <div className="web3-card-blue p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q2 2025</h3>
-                    <p className="text-muted-foreground">
-                      Development of comprehensive curriculum for coffee value chain education, with specialized modules
-                      on blockchain integration and sustainable farming practices.
-                    </p>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="hidden md:block"></div>
+                  <div className="md:pl-8">
+                    <div className="web3-card-blue p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q2 2025</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Development of comprehensive curriculum for coffee value chain education, with specialized modules
+                        on blockchain integration and sustainable farming practices.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Q3 2025 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
-                  <div className="web3-card-teal p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q3 2025</h3>
-                    <p className="text-muted-foreground">
-                      First WAGA Summer Camp in Ethiopia, training 100 farmers in blockchain traceability and digital
-                      skills, with hands-on workshops and community-based learning.
-                    </p>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">3</span>
+                </div>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="md:text-right md:pr-8">
+                    <div className="web3-card-teal p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q3 2025</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        First WAGA Summer Camp in Ethiopia, training 100 farmers in blockchain traceability and digital
+                        skills, with hands-on workshops and community-based learning.
+                      </p>
+                    </div>
                   </div>
+                  <div className="hidden md:block"></div>
                 </div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">3</span>
-                </div>
-                <div className="md:w-1/2 md:pl-12 invisible md:visible"></div>
               </div>
 
               {/* Q4 2025 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 invisible md:visible"></div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">4</span>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">4</span>
                 </div>
-                <div className="md:w-1/2 md:pl-12 mb-4 md:mb-0">
-                  <div className="web3-card-pink p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q4 2025</h3>
-                    <p className="text-muted-foreground">
-                      Implementation of pilot DeFi lending program alongside financial literacy training for coffee
-                      cooperatives, using future yield as collateral.
-                    </p>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="hidden md:block"></div>
+                  <div className="md:pl-8">
+                    <div className="web3-card-pink p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q4 2025</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Implementation of pilot DeFi lending program alongside financial literacy training for coffee
+                        cooperatives, using future yield as collateral.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Q1-Q2 2026 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
-                  <div className="web3-card-amber p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q1-Q2 2026</h3>
-                    <p className="text-muted-foreground">
-                      Launch of blockchain-based traceability system with comprehensive training programs, connecting
-                      500+ farmers to global markets while building technical capacity.
-                    </p>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">5</span>
+                </div>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="md:text-right md:pr-8">
+                    <div className="web3-card-amber p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q1-Q2 2026</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Launch of blockchain-based traceability system with comprehensive training programs, connecting
+                        500+ farmers to global markets while building technical capacity.
+                      </p>
+                    </div>
                   </div>
+                  <div className="hidden md:block"></div>
                 </div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">5</span>
-                </div>
-                <div className="md:w-1/2 md:pl-12 invisible md:visible"></div>
               </div>
 
               {/* Q3-Q4 2026 */}
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 invisible md:visible"></div>
-                <div className="z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-glow">
-                  <span className="text-white font-bold">6</span>
+              <div className="relative flex items-start md:items-center">
+                <div className="absolute left-4 md:left-1/2 md:transform md:-translate-x-1/2 z-10 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary shadow-glow">
+                  <span className="text-white font-bold text-sm md:text-base">6</span>
                 </div>
-                <div className="md:w-1/2 md:pl-12 mb-4 md:mb-0">
-                  <div className="web3-card-emerald p-6 rounded-lg">
-                    <h3 className="text-xl font-bold mb-2">Q3-Q4 2026</h3>
-                    <p className="text-muted-foreground">
-                      Establishment of Farmer Schools in key coffee-producing regions, formal partnerships with
-                      universities and training centers, and expansion of educational programs across Africa and Latin
-                      America.
-                    </p>
+                <div className="ml-16 md:ml-0 md:grid md:grid-cols-2 md:gap-8 w-full">
+                  <div className="hidden md:block"></div>
+                  <div className="md:pl-8">
+                    <div className="web3-card-emerald p-4 md:p-6 rounded-lg mt-2 md:mt-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Q3-Q4 2026</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Establishment of Farmer Schools in key coffee-producing regions, formal partnerships with
+                        universities and training centers, and expansion of educational programs across Africa and Latin
+                        America.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
