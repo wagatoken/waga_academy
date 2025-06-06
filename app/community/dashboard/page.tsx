@@ -191,11 +191,11 @@ export default async function CommunityDashboard() {
                       </div>
                     </div>
                     <div className="sm:w-3/4 space-y-2">
-                      <div className="flex justify-between items-start">
-                      <h3 className="font-medium">{event.title}</h3>
-                      <Badge variant="outline" className={`${bgClass} border-purple-500/30 text-purple-300`}>
-                        {event.is_virtual ? "Virtual" : "In Person"}
-                      </Badge>
+                      <div className="flex flex-col md:flex-row-reverse justify-between items-start">
+                        <Badge variant="outline" className={`${bgClass} border-purple-500/30 text-purple-300`}>
+                          {event.is_virtual ? "Virtual" : "In Person"}
+                        </Badge>
+                        <h3 className="font-medium">{event.title}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground">
                       {event.description
@@ -271,8 +271,8 @@ export default async function CommunityDashboard() {
                 return (
                   <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                     <CardContent className="p-6">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-4">
+                      <div className="flex flex-col md:flex-row justify-between items-start">
+                        <div className="flex flex-col md:flex-row items-start gap-4">
                           <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
                             <AvatarImage
                               src={typeof avatar === "string" ? avatar : `/placeholder.svg?height=40&width=40`}
@@ -302,7 +302,7 @@ export default async function CommunityDashboard() {
                         </div>
                         <Badge
                           variant="secondary"
-                          className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                          className="bg-purple-500/20 text-purple-300 border border-purple-500/30 mt-3 md:mt-0"
                         >
                           {topic.replies_count || 0} replies
                         </Badge>
