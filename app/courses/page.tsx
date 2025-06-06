@@ -26,9 +26,9 @@ const categoryMap = {
 
 const levelMap = {
   all: "",
-  beginner: "beginner",
-  intermediate: "intermediate",
-  advanced: "advanced",
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
 }
 
 export default function CoursesPage() {
@@ -138,11 +138,11 @@ export default function CoursesPage() {
           </div>
         )}
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <Badge variant="outline" className="mb-2">
+          <div className="flex flex-col xs:flex-col md:flex-row md:justify-between md:items-start gap-0 xs:gap-0">
+            <Badge variant="outline" className="mb-2 xs:mb-0 w-fit">
               {course.category}
             </Badge>
-            <Badge variant="secondary" className="mb-2 bg-purple-500/20 text-purple-300 border border-purple-500/30">
+            <Badge variant="secondary" className="mb-2 xs:mb-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 w-fit">
               Coming Soon
             </Badge>
           </div>
@@ -222,12 +222,22 @@ export default function CoursesPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
-            <TabsTrigger value="all">All Courses</TabsTrigger>
-            <TabsTrigger value="cultivation">Cultivation</TabsTrigger>
-            <TabsTrigger value="processing">Processing</TabsTrigger>
-            <TabsTrigger value="distribution">Distribution</TabsTrigger>
-            <TabsTrigger value="web3">Web3</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 h-auto p-1">
+            <TabsTrigger value="all" className="text-sm px-2= py-2">
+              All Courses
+            </TabsTrigger>
+            <TabsTrigger value="cultivation" className="text-sm px-2 py-2">
+              Cultivation
+            </TabsTrigger>
+            <TabsTrigger value="processing" className="text-sm px-2 py-2">
+              Processing
+            </TabsTrigger>
+            <TabsTrigger value="distribution" className="text-sm px-2 py-2">
+              Distribution
+            </TabsTrigger>
+            <TabsTrigger value="web3" className="text-sm px-2 py-2">
+              Web3
+            </TabsTrigger>
           </TabsList>
 
           {/* All tabs now use the filtered courses */}
