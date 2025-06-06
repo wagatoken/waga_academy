@@ -137,13 +137,14 @@ export default function AcademyPage() {
               <StrategicCoffeeBeans position="top-right" size={25} quantity={2} />
 
               <Tabs defaultValue="cultivation" className="w-full">
-                <TabsList className="grid grid-cols-5 w-full gap-2 text-[0.6rem]">
-                  <TabsTrigger value="cultivation">Cultivation</TabsTrigger>
-                  <TabsTrigger value="processing">Processing</TabsTrigger>
-                  <TabsTrigger value="logistics">Logistics</TabsTrigger>
-                  <TabsTrigger value="roasting">Roasting</TabsTrigger>
-                  <TabsTrigger value="sales">Sales</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 h-auto p-1">
+                  <TabsTrigger value="cultivation" className="text-sm px-2= py-2">Cultivation</TabsTrigger>
+                  <TabsTrigger value="processing" className="text-sm px-2= py-2">Processing</TabsTrigger>
+                  <TabsTrigger value="logistics" className="text-sm px-2= py-2">Logistics</TabsTrigger>
+                  <TabsTrigger value="roasting" className="text-sm px-2= py-2">Roasting</TabsTrigger>
+                  <TabsTrigger value="sales" className="text-sm px-2= py-2">Sales</TabsTrigger>
                 </TabsList>
+             
                 <TabsContent value="cultivation" className="p-4 border rounded-md mt-2 web3-card-teal">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start">
                     <div className="flex-shrink-0 flex justify-center md:block">
