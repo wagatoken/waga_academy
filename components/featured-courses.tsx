@@ -90,13 +90,13 @@ export function FeaturedCourses() {
                     </div>
                   )}
                   <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <Badge variant="outline" className={`mb-2 ${badgeClass} px-2 py-1 md:px-3 md:py-1.5 md:[font-size:0.7rem] sm:[font-size:0.55rem]`}>
+                    <div className="flex flex-col xs:flex-col md:flex-row md:justify-between md:items-start gap-0 xs:gap-0">
+                      <Badge variant="outline" className={`mb-2 ${badgeClass} px-2 py-1 md:px-3 md:py-1.5  w-fit`}>
                         {course.category}
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className={`mb-2 ${isEven ? "bg-emerald-500/10 text-emerald-300" : "bg-purple-500/10 text-purple-300"} px-2 py-1 md:px-3 md:py-1.5 md:[font-size:0.7rem] sm:[font-size:0.55rem]`}
+                        className={`mb-2 ${isEven ? "bg-emerald-500/10 text-emerald-300" : "bg-purple-500/10 text-purple-300"} px-2 py-1 md:px-3 md:py-1.5  w-fit`}
                       >
                         {course.difficulty_level}
                       </Badge>
