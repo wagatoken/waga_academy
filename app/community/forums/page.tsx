@@ -85,11 +85,12 @@ export default function CommunityForumsPage() {
             />
           </div>
         </div>
+       
         <Tabs defaultValue="categories" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="categories">Categories</TabsTrigger>
-            <TabsTrigger value="recent">Recent Discussions</TabsTrigger>
-            <TabsTrigger value="popular">Popular Topics</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-1 h-auto p-1">
+            <TabsTrigger value="categories" className="text-sm px-2 py-2">Categories</TabsTrigger>
+            <TabsTrigger value="recent" className="text-sm px-2 py-2">Recent Discussions</TabsTrigger>
+            <TabsTrigger value="popular" className="text-sm px-2 py-2">Popular Topics</TabsTrigger>
           </TabsList>
           <TabsContent value="categories" className="mt-6">
             <div className="space-y-4">
@@ -156,7 +157,7 @@ export default function CommunityForumsPage() {
                   return (
                     <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                       <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                           <div className="flex items-start gap-4">
                             <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
                               <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name} />
@@ -182,7 +183,7 @@ export default function CommunityForumsPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1">
+                          <div className="flex flex-col items-end gap-1 mt-3 md:mt-0">
                             <Badge
                               variant="secondary"
                               className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
@@ -220,7 +221,7 @@ export default function CommunityForumsPage() {
                   return (
                     <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                       <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                           <div className="flex items-start gap-4">
                             
                             <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
@@ -247,7 +248,7 @@ export default function CommunityForumsPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1">
+                          <div className="flex flex-col items-end gap-1 mt-3 md:mt-0">
                             <Badge
                               variant="secondary"
                               className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
