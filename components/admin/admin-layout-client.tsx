@@ -116,12 +116,12 @@ export default function AdminLayoutClient({
                 Users
               </Link>
               <Link
-                href="/admin/summer-camp"
+                href="/admin/bootcamp"
                 className="flex items-center gap-3 p-2 rounded-md hover:bg-purple-500/10 transition text-sm"
                 onClick={() => isMobile && setSidebarOpen(false)}
               >
                 <Tent className="h-4 w-4 text-pink-400" />
-                Summer Camp
+                Bootcamp
               </Link>
               <Link
                 href="/admin/settings"

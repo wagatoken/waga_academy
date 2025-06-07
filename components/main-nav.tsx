@@ -323,11 +323,11 @@ export function MainNav() {
                   )
                 )}
               </div>
-              {!user && !isAuthPage && (
+              {/* {!user && !isAuthPage && (
                 <div className="pt-2">
                   <ConnectWalletButton />
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
