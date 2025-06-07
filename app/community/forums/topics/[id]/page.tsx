@@ -456,13 +456,16 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
             {topic ? topic.title : <span className="text-muted-foreground">Loading...</span>}
           </h1>
           {topic && (
-            <div className="flex items-center gap-2 mt-2">
-              <Badge variant="outline" className="badge-emerald">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mt-2">
+              <Badge variant="outline" className="badge-emerald w-fit">
                 {topic.category}
               </Badge>
               <span className="text-sm text-muted-foreground">Started by {topic.author}</span>
-              <span className="text-sm text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">{topic.date}</span>
+              <span className="text-sm text-muted-foreground hidden sm:inline">•</span>
+              <span className="text-sm text-muted-foreground">
+                <span className="block sm:hidden">{topic && new Date(topic.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span className="hidden sm:inline">{topic.date}</span>
+              </span>
             </div>
           )}
         </div>
