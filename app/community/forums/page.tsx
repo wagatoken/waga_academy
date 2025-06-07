@@ -157,8 +157,8 @@ export default function CommunityForumsPage() {
                   return (
                     <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                       <CardContent className="p-6">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                          <div className="flex items-start gap-4">
+                        <div className="flex flex-col gap-2 sm:gap-4 md:flex-row md:items-center md:justify-between">
+                          <div className="flex flex-col md:flex-row md:items-start gap-4">
                             <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
                               <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name} />
                               <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
@@ -170,20 +170,20 @@ export default function CommunityForumsPage() {
                               >
                                 {topic.title}
                               </Link>
-                              <div className="flex items-center gap-2 mt-1">
+                              <div className="flex flex-col gap-1 sm:gap-4 md:flex-row md:items-center md:justify-between">
                                 <Badge
                                   variant="outline"
-                                  className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
+                                  className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300 w-fit my-2 sm:my-0"
                                 >
                                   {topic.category.name}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
-                                <span className="text-xs text-muted-foreground">•</span>
+                                <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
                                 <span className="text-xs text-muted-foreground">{topic.last_active ? `Last active ${new Date(topic.last_active).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : "No activity yet"}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1 mt-3 md:mt-0">
+                          <div className="flex flex-row justify-between items-center gap-4 sm:flex-col sm:items-end sm:gap-1 mt-3 md:mt-0">
                             <Badge
                               variant="secondary"
                               className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
@@ -221,11 +221,10 @@ export default function CommunityForumsPage() {
                   return (
                     <Card key={topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                       <CardContent className="p-6">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                          <div className="flex items-start gap-4">
-                            
+                        <div className="flex flex-col gap-2 sm:gap-4 md:flex-row md:items-center md:justify-between">
+                          <div className="flex flex-col md:flex-row md:items-start gap-4">
                             <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
-                              <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.firstname} />
+                              <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={topic.author.name || topic.author.firstname} />
                               <AvatarFallback className="bg-purple-900/50">{topic.avatar}</AvatarFallback>
                             </Avatar>
                             <div>
@@ -235,20 +234,20 @@ export default function CommunityForumsPage() {
                               >
                                 {topic.title}
                               </Link>
-                              <div className="flex items-center gap-2 mt-1">
+                              <div className="flex flex-col gap-1 sm:gap-4 md:flex-row md:items-center md:justify-between">
                                 <Badge
                                   variant="outline"
-                                  className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300"
+                                  className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300 w-fit my-2 sm:my-0"
                                 >
                                   {topic.category.name}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">By {topic.author.first_name} {topic.author.last_name}</span>
-                                <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">{topic.lastActive ? " Last active " +  topic.lastActive : " No activity yet"}</span>
+                                <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
+                                <span className="text-xs text-muted-foreground">{topic.last_active ? `Last active ${new Date(topic.last_active).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : "No activity yet"}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1 mt-3 md:mt-0">
+                          <div className="flex flex-row justify-between items-center gap-4 sm:flex-col sm:items-end sm:gap-1 mt-3 md:mt-0">
                             <Badge
                               variant="secondary"
                               className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
