@@ -136,34 +136,32 @@ function Reply({
     <div className="space-y-2">
       <Card className="web3-card-glass hover-lift">
         <CardContent className="p-6">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <div className="flex-shrink-0 self-start sm:self-center">
               <Avatar className="h-10 w-10 ring-2 ring-emerald-500/30">
                 <AvatarImage
                   src={reply.author.avatar_url || `/placeholder.svg?height=40&width=40`}
                   alt={reply.author.first_name ? `${reply.author.first_name} ${reply.author.last_name ?? ""}` : "User"}
                 />
-                <AvatarFallback className="bg-emerald-900/50">
-                  {reply.author.first_name?.[0] ?? "U"}
-                </AvatarFallback>
+                <AvatarFallback className="bg-emerald-900/50">{reply.author.first_name?.[0] ?? "U"}</AvatarFallback>
               </Avatar>
             </div>
             <div className="flex-grow space-y-2">
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
                 <span className="font-medium">
-                  {reply.author.first_name
-                    ? `${reply.author.first_name} ${reply.author.last_name ?? ""}`
-                    : "Unknown"}
+                  {reply.author.first_name ? `${reply.author.first_name} ${reply.author.last_name ?? ""}` : "Unknown"}
                 </span>
-                <span className="text-xs text-muted-foreground">{reply.date}</span>
+                <span className="text-xs text-muted-foreground mt-1 sm:mt-0 sm:ml-4">{reply.date}</span>
               </div>
-              <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: simpleMarkdown(reply.content) }} />
-              <div className="flex items-center gap-4 pt-4">
-                {/* Like button removed as requested */}
+              <div
+                className="prose prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: simpleMarkdown(reply.content) }}
+              />
+              <div className="flex flex-wrap gap-2 sm:flex-row sm:items-center sm:gap-4 pt-3 sm:pt-4">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
+                  className="h-9 sm:h-8 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                   onClick={handleReplyClick}
                 >
                   <ReplyIcon />
@@ -173,27 +171,13 @@ function Reply({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`hover:text-emerald-400 hover:bg-emerald-500/10 ${hasNewReplies ? "text-emerald-400" : "text-muted-foreground"}`}
+                    className={`h-9 sm:h-8 hover:text-emerald-400 hover:bg-emerald-500/10 ${hasNewReplies ? "text-emerald-400" : "text-muted-foreground"}`}
                     onClick={toggleCollapse}
                   >
                     <MessageSquare className={`mr-1 h-4 w-4 ${hasNewReplies ? "text-emerald-400" : ""}`} />
                     {isCollapsed ? `Show ${replyCount} ${replyCount === 1 ? "reply" : "replies"}` : "Hide replies"}
                   </Button>
                 )}
-                {/* <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
-                >
-                  <Share2 className="mr-1 h-4 w-4" /> Share
-                </Button> */}
-                {/* <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
-                >
-                  <Flag className="mr-1 h-4 w-4" /> Report
-                </Button> */}
               </div>
             </div>
           </div>
@@ -201,20 +185,25 @@ function Reply({
       </Card>
 
       {showReplyBox && (
-        <Card className="ml-14 web3-card-glass border-l-2 border-emerald-500/30">
+        <Card className="ml-6 sm:ml-14 web3-card-glass border-l-2 border-emerald-500/30">
           <CardContent className="p-4">
             <p className="text-sm text-emerald-400 mb-2">Replying to {reply.author.first_name}</p>
             <Textarea
               placeholder={`Write your reply...`}
-              className="min-h-[80px] web3-input-glow focus-emerald"
+              className="min-h-[100px] sm:min-h-[120px] lg:min-h-[150px] web3-input-glow focus-emerald flex-1"
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
             />
             <div className="flex gap-2 justify-end mt-2">
-              <Button variant="outline" size="sm" onClick={() => setShowReplyBox(false)}>
+              <Button variant="outline" size="sm" className="h-9 sm:h-8" onClick={() => setShowReplyBox(false)}>
                 Cancel
               </Button>
-              <Button className="web3-button-purple" size="sm" onClick={handleSubmit} disabled={isSubmitting}>
+              <Button
+                className="web3-button-purple h-9 sm:h-8"
+                size="sm"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Posting..." : "Post Reply"}
               </Button>
             </div>
@@ -224,7 +213,7 @@ function Reply({
 
       {/* Render child replies recursively */}
       {hasReplies && !isCollapsed && (
-        <div className="ml-14 space-y-3 border-l-2 border-emerald-500/20 pl-4">
+        <div className="ml-6 sm:ml-14 space-y-3 border-l-2 border-emerald-500/20 pl-3 sm:pl-4">
           {reply.replies.map((child) => (
             <Reply
               key={child.id + "-" + child.date}
@@ -472,7 +461,7 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
 
         <Card className="web3-card-glow-border hover-lift">
           <CardContent className="p-6">
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex-shrink-0">
                 <Avatar className="h-10 w-10 ring-2 ring-emerald-500/30">
                   <AvatarImage src={topic && topic.avatar ? topic.avatar : "/placeholder.svg?height=40&width=40"} alt={topic?.author || ""} />
@@ -480,12 +469,15 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
                 </Avatar>
               </div>
               <div className="flex-grow space-y-2">
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
                   <div>
                     <span className="font-medium">{topic?.author || <span className="text-muted-foreground">Loading...</span>}</span>
                     <span className="text-xs text-emerald-400 ml-2">Topic Starter</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">{topic?.date || ""}</span>
+                  <span className="text-xs text-muted-foreground">
+                    <span className="block sm:hidden">{topic && new Date(topic.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <span className="hidden sm:inline">{topic?.date || ""}</span>
+                  </span>
                 </div>
                 <div
                   className="prose prose-invert max-w-none"
@@ -526,15 +518,20 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold web3-gradient-text">Replies ({replies.length})</h2>
-          {replies.map((reply) => (
-            <Reply
-              key={reply.id}
-              reply={reply}
-              onReply={handleReplyToReply}
-              onLike={() => {}}
-              likedIds={likedIds}
-            />
-          ))}
+          <div className="flex flex-col gap-6">
+            {replies.map((reply) => (
+              <div key={reply.id} className="flex flex-col md:flex-row md:items-start md:gap-6">
+                <div className="flex-1 min-w-0">
+                  <Reply
+                    reply={reply}
+                    onReply={handleReplyToReply}
+                    onLike={() => {}}
+                    likedIds={likedIds}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <Card className="web3-card-gradient">
@@ -543,13 +540,13 @@ export default function TopicPage({ params }: { params: Promise<{ id: string }> 
             <p className="text-sm text-muted-foreground">Share your thoughts on this topic</p>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Avatar className="h-10 w-10 ring-2 ring-emerald-500/30 flex-shrink-0">
                 <AvatarFallback className="bg-emerald-900/50">U</AvatarFallback>
               </Avatar>
               <Textarea
                 placeholder="Write your reply here..."
-                className="min-h-[150px] web3-input-glow focus-emerald"
+                className="min-h-[120px] sm:min-h-[150px] web3-input-glow focus-emerald flex-1"
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
               />
