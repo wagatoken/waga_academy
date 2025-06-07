@@ -197,8 +197,8 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
                     dangerouslySetInnerHTML={{ __html: resourceData.longDescription }}
                   />
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div className="flex gap-2">
+                <CardFooter className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center px-4 py-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
@@ -224,7 +224,7 @@ export default function ResourcePage({ params }: { params: Promise<{ id: string 
                       <Download className="mr-1 h-4 w-4" /> Download
                     </Button>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
