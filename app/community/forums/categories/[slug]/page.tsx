@@ -205,8 +205,8 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
               return (
                 <Card key={topic.id || topic.topic_id} className={`${cardClass} hover:border-purple-500/40 transition-colors`}>
                   <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-4">
+                    <div className="flex flex-col gap-2 sm:gap-4 md:flex-row md:items-center md:justify-between">
+                      <div className="flex flex-col md:flex-row md:items-start gap-4">
                         <Avatar className="h-10 w-10 ring-2 ring-purple-500/30">
                           <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={`${topic.first_name || ""} ${topic.last_name || ""}`} />
                           <AvatarFallback className="bg-purple-900/50">
@@ -221,18 +221,22 @@ export default function CategoryDetailPage({ params }: { params: { slug: string 
                           >
                             {topic.title}
                           </Link>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">
-                              By {topic.first_name} {topic.last_name}
-                            </span>
-                            <span className="text-xs text-muted-foreground">•</span>
+                          <div className="flex flex-col gap-1 sm:gap-4 md:flex-row md:items-center md:justify-between">
+                            <Badge
+                              variant="outline"
+                              className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-300 w-fit my-2 sm:my-0"
+                            >
+                              {category?.name}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">By {topic.first_name} {topic.last_name}</span>
+                            <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
                             <span className="text-xs text-muted-foreground">
                               {topic.last_active ? `Last active ${new Date(topic.last_active).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : "No activity yet"}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-1">
+                      <div className="flex flex-row justify-between items-center gap-4 sm:flex-col sm:items-end sm:gap-1 mt-3 md:mt-0">
                         <Badge
                           variant="secondary"
                           className="bg-purple-500/20 text-purple-300 border border-purple-500/30"
