@@ -53,7 +53,7 @@ export function CourseCurriculumExpanded({ modules }: CourseCurriculumExpandedPr
               {module.lessons.map((lesson, lessonIndex) => (
                 <div
                   key={lessonIndex}
-                  className="flex justify-between items-center p-3 rounded-md hover:bg-gradient-to-r hover:from-emerald-500/5 hover:to-purple-500/5 border border-emerald-500/10 hover:border-purple-500/20 transition-all duration-300 transform hover:-translate-y-0.5"
+                  className="flex flex-col sm-flex-row justify-between items-center p-3 rounded-md hover:bg-gradient-to-r hover:from-emerald-500/5 hover:to-purple-500/5 border border-emerald-500/10 hover:border-purple-500/20 transition-all duration-300 transform hover:-translate-y-0.5"
                 >
                   <div className="flex items-center gap-3">
                     <div className="h-6 w-6 rounded-full flex items-center justify-center border border-emerald-500/30 animate-purpleEmeraldPulse">
