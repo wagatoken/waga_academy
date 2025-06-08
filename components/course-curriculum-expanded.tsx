@@ -49,23 +49,25 @@ export function CourseCurriculumExpanded({ modules }: CourseCurriculumExpandedPr
             <CardTitle className="text-base web3-dual-gradient-text-enhanced">{module.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3 sm:space-y-2">
               {module.lessons.map((lesson, lessonIndex) => (
                 <div
                   key={lessonIndex}
-                  className="flex flex-col sm-flex-row justify-between items-center p-3 rounded-md hover:bg-gradient-to-r hover:from-emerald-500/5 hover:to-purple-500/5 border border-emerald-500/10 hover:border-purple-500/20 transition-all duration-300 transform hover:-translate-y-0.5"
+                  className="flex flex-col xs:flex-row sm:flex-row justify-between items-start xs:items-center sm:items-center p-3 sm:p-4 rounded-md hover:bg-gradient-to-r hover:from-emerald-500/5 hover:to-purple-500/5 border border-emerald-500/10 hover:border-purple-500/20 transition-all duration-300 transform hover:-translate-y-0.5 gap-3 xs:gap-2 sm:gap-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="h-6 w-6 rounded-full flex items-center justify-center border border-emerald-500/30 animate-purpleEmeraldPulse">
-                      <span className="text-xs text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-purple-400">
+                  <div className="flex items-center gap-3 w-full xs:w-auto sm:w-auto">
+                    <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full flex items-center justify-center border border-emerald-500/30 animate-purpleEmeraldPulse flex-shrink-0">
+                      <span className="text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-purple-400 font-medium">
                         {lessonIndex + 1}
                       </span>
                     </div>
-                    <span className="group-hover:text-emerald-300 transition-colors duration-300">{lesson.title}</span>
+                    <span className="text-sm sm:text-base group-hover:text-emerald-300 transition-colors duration-300 leading-relaxed">
+                      {lesson.title}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-800 dark:text-muted-foreground">
-                    <Clock className="h-3 w-3 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
-                    <span>{lesson.duration}</span>
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-muted-foreground ml-9 xs:ml-0 sm:ml-0 flex-shrink-0">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400 group-hover:text-purple-400 transition-colors duration-300" />
+                    <span className="whitespace-nowrap">{lesson.duration}</span>
                   </div>
                 </div>
               ))}
