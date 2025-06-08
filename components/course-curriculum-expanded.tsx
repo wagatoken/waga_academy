@@ -20,11 +20,12 @@ interface CourseCurriculumExpandedProps {
 export function CourseCurriculumExpanded({ modules }: CourseCurriculumExpandedProps) {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold web3-dual-gradient-text-glow">Course Curriculum</h2>
-        <div className="text-sm text-gray-800 dark:text-muted-foreground">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
+        <h2 className="text-lg sm:text-xl font-bold web3-dual-gradient-text-glow">Course Curriculum</h2>
+        <div className="text-xs sm:text-sm text-gray-800 dark:text-muted-foreground flex flex-row gap-1 sm:gap-2 items-center">
           <span className="font-medium">{modules.reduce((total, module) => total + module.lessons.length, 0)}</span>{" "}
-          lessons •
+          <span>lessons</span>
+          <span className="mx-1">•</span>
           <span className="font-medium">
             {Math.round(
               modules.reduce(
@@ -35,7 +36,7 @@ export function CourseCurriculumExpanded({ modules }: CourseCurriculumExpandedPr
               ) / 60,
             )}
           </span>{" "}
-          hours
+          <span>hours</span>
         </div>
       </div>
 
