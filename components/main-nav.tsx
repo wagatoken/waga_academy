@@ -147,9 +147,9 @@ export function MainNav() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div>
+              {/* <div>
                 <ConnectWalletButton />
-              </div>
+              </div> */}
             </div>
           )}
 
