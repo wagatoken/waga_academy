@@ -109,7 +109,7 @@ export function FeaturedCourses() {
                     </CardDescription>
                   </CardContent>
                   <CardFooter>
-                    <Link href={`/community/courses/${course.slug}`} className="w-full">
+                    <Link href={`/courses/${course.slug}`} className="w-full">
                       <Button className={`w-full ${buttonClass} relative z-20`}>View Course</Button>
                     </Link>
                   </CardFooter>
